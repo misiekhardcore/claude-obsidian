@@ -28,17 +28,5 @@
     "vault_path": {
       "description": "Absolute path to your Obsidian vault"
     }
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "[ -n \"${user_config.vault_path}\" ] && echo \"claude-obsidian: vault=${user_config.vault_path}\" || true"
-          }
-        ]
-      }
-    ]
   }
 }
