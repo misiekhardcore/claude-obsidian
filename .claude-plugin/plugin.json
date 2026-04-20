@@ -1,0 +1,45 @@
+{
+  "name": "claude-obsidian",
+  "version": "1.0.0",
+  "description": "Claude + Obsidian knowledge companion. Sets up a persistent, compounding wiki vault. Covers memory management, session notetaking, knowledge organization, and agent context across projects.",
+  "author": {
+    "name": "Michał Konopski",
+    "url": "https://github.com/misiekhardcore"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/misiekhardcore/claude-obsidian",
+  "repository": "https://github.com/misiekhardcore/claude-obsidian",
+  "keywords": [
+    "obsidian",
+    "knowledge-base",
+    "wiki",
+    "memory",
+    "notetaker",
+    "second-brain",
+    "vault",
+    "markdown",
+    "cross-project",
+    "llm-wiki",
+    "karpathy",
+    "pkm",
+    "canvas",
+    "visual"
+  ],
+  "userConfig": {
+    "vault_path": {
+      "description": "Absolute path to your Obsidian vault"
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -n \"${user_config.vault_path}\" ] && echo \"claude-obsidian: vault=${user_config.vault_path}\" || true"
+          }
+        ]
+      }
+    ]
+  }
+}
