@@ -1,0 +1,25 @@
+{
+  "name": "claude-obsidian",
+  "owner": {
+    "name": "Michał Konopski",
+    "email": "misiekhardcore@gmail.com"
+  },
+  "metadata": {
+    "description": "claude-obsidian: Claude + Obsidian knowledge companion by Michał Konopski"
+  },
+  "plugins": [
+    {
+      "name": "claude-obsidian",
+      "source": "./",
+      "description": "Claude + Obsidian knowledge companion. Sets up a persistent, compounding wiki vault.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Michał Konopski",
+        "url": "https://github.com/misiekhardcore"
+      },
+      "homepage": "https://github.com/misiekhardcore/claude-obsidian",
+      "repository": "https://github.com/misiekhardcore/claude-obsidian",
+      "license": "MIT"
+    }
+  ]
+}
