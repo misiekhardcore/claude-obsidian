@@ -57,6 +57,8 @@ Dot-prefixed folders (`.raw/`) are hidden in Obsidian's file explorer and graph 
 
 ## Hot Cache
 
+> For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+
 `wiki/hot.md` is a ~500-word summary of the most recent context. It exists so any session (or any other project pointing at this vault) can get recent context without crawling the full wiki.
 
 Update hot.md:

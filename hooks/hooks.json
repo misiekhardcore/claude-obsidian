@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" \"${user_config.vault_path}\") || exit 0; [ -d \"$VAULT/wiki\" ] && [ -d \"$VAULT/.git\" ] && git -C \"$VAULT\" diff --name-only HEAD 2>/dev/null | grep -q '^wiki/' && echo 'WIKI_CHANGED: Wiki pages were modified this session. Please update $VAULT/wiki/hot.md with a brief summary of what changed (under 500 words). Use the hot cache format: Last Updated, Key Recent Facts, Recent Changes, Active Threads. Keep it factual. Overwrite the file completely. It is a cache, not a journal.' || true"
+            "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" \"${user_config.vault_path}\") || exit 0; [ -d \"$VAULT/wiki\" ] && [ -d \"$VAULT/.git\" ] && git -C \"$VAULT\" diff --name-only HEAD 2>/dev/null | grep -q '^wiki/' && echo 'WIKI_CHANGED: Wiki pages were modified this session. Please update $VAULT/wiki/hot.md following the hot-cache protocol at ${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md (under 500 words; sections: Last Updated, Key Recent Facts, Recent Changes, Active Threads; overwrite completely; factual cache, not a journal).' || true"
           }
         ]
       }

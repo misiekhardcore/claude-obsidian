@@ -133,7 +133,7 @@ sources:
    - Synthesis: [[Research: Topic]]
    - Key finding: [one sentence]
    ```
-3. Update `wiki/hot.md` with the research summary
+3. Update `wiki/hot.md` with the research summary. Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 
 ---
 

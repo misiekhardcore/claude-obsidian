@@ -50,7 +50,7 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
    - Location: wiki/[folder]/Note Title.md
    - From: conversation on [brief topic description]
    ```
-9. **Update** `wiki/hot.md` to reflect the new addition.
+9. **Update** `wiki/hot.md` to reflect the new addition. Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 10. **Confirm**: "Saved as [[Note Title]] in wiki/[folder]/."
 
 ---
