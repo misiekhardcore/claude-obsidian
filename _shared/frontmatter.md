@@ -43,7 +43,7 @@ sources:
 
 **evidence:** flat list of wikilinks to source or concept pages that support the claims on this page. Required when `confidence` is `INFERRED` or `AMBIGUOUS`.
 
-See `maintenance-rules.md` for promotion/demotion criteria.
+See `${CLAUDE_PLUGIN_ROOT}/skills/wiki/references/maintenance-rules.md` for promotion/demotion criteria. See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md` for confidence tagging semantics and typed-relationship semantics.
 
 ---
 
