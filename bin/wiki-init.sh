@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Umbrella script for `/wiki init`. Seeds an Obsidian vault from the path
+# passed in $1 by delegating to setup-vault.sh + copy-templates.sh, then
+# prints next steps. Re-running is idempotent.
+#
+# Usage: bin/wiki-init.sh /absolute/path/to/vault
+#
+# If $1 is empty, prints the configured "vault not set" message and exits 0
+# (no error) so `/wiki init` can guide the user to set vault_path without
+# aborting the session.
+
+set -euo pipefail
+
+VAULT="${1:-}"
+
+if [ -z "$VAULT" ]; then
+  echo "Configure vault path first: enable the plugin and enter your vault path when prompted"
+  exit 0
+fi
+
+# Locate the plugin root. Prefer CLAUDE_PLUGIN_ROOT when set (in-session).
+# Otherwise derive it from $0 so standalone invocations work.
+if [ -z "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  SCRIPT_PATH=$(readlink -f "$0" 2>/dev/null || python3 -c "import os,sys;print(os.path.realpath(sys.argv[1]))" "$0")
+  CLAUDE_PLUGIN_ROOT=$(dirname "$(dirname "$SCRIPT_PATH")")
+  export CLAUDE_PLUGIN_ROOT
+fi
+
+bash "${CLAUDE_PLUGIN_ROOT}/bin/setup-vault.sh" "$VAULT"
+bash "${CLAUDE_PLUGIN_ROOT}/bin/copy-templates.sh" "$VAULT"
+
+cat <<EOF
+
+Next steps:
+  1. Open Obsidian → Manage Vaults → Open folder as vault → select: $VAULT
+  2. Enable community plugins when prompted, then install:
+       - Dataview
+       - Templater
+       - Obsidian Git
+  3. Run /wiki in Claude Code to scaffold your knowledge base.
+EOF

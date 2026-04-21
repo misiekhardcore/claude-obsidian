@@ -116,31 +116,22 @@ Route to the correct operation based on what the user says:
 
 Trigger: `/wiki init`, "init vault", "bootstrap vault".
 
-Goal: seed an empty vault from `${user_config.vault_path}` so the user can open it in Obsidian. This is a one-shot, idempotent bootstrap — it does not ask questions and does not scaffold the knowledge base (that is SCAFFOLD).
+Goal: seed an empty vault from `${user_config.vault_path}` so the user can open it in Obsidian. One-shot, idempotent; does not scaffold the knowledge base (that is SCAFFOLD).
 
-Steps:
+Delegate to the umbrella script:
 
-1. Resolve `${user_config.vault_path}`. If empty, print:
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/bin/wiki-init.sh" "${user_config.vault_path}"
+```
 
-   `Configure vault path first: enable the plugin and enter your vault path when prompted`
+`bin/wiki-init.sh` handles the full flow:
 
-   Then stop without error.
+1. If the vault path argument is empty, prints `Configure vault path first: enable the plugin and enter your vault path when prompted` and exits 0 — no error, no further action.
+2. Calls `bin/setup-vault.sh` to create `.obsidian/`, `.raw/`, `wiki/`, `_templates/` and the Obsidian config files.
+3. Calls `bin/copy-templates.sh` to copy `_templates/*.md` into the vault, skipping files that already exist.
+4. Prints next steps: open Obsidian at the vault path, enable community plugins (Dataview, Templater, Obsidian Git), then run `/wiki` to scaffold the knowledge base.
 
-2. Run `bash "${CLAUDE_PLUGIN_ROOT}/bin/setup-vault.sh" "${user_config.vault_path}"` — creates `.obsidian/`, `.raw/`, `wiki/`, `_templates/` and the Obsidian config files.
-
-3. Copy templates from the plugin into the vault, skipping existing files:
-
-   ```bash
-   mkdir -p "${user_config.vault_path}/_templates"
-   for src in "${CLAUDE_PLUGIN_ROOT}/_templates/"*.md; do
-     dst="${user_config.vault_path}/_templates/$(basename "$src")"
-     [ -e "$dst" ] || cp "$src" "$dst"
-   done
-   ```
-
-4. Print next steps: open Obsidian at the vault path, enable community plugins (Dataview, Templater, Obsidian Git), then run `/wiki` to scaffold the knowledge base.
-
-Re-running is idempotent: `setup-vault.sh` guards existing files and the copy loop skips templates already present.
+Re-running is safe: every step guards existing files.
 
 ---
 
