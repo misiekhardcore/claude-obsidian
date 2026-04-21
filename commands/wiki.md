@@ -9,35 +9,21 @@ If the argument is `init`, run the **INIT** operation below. Otherwise, run the 
 
 ## INIT
 
-1. Resolve the vault path from `${user_config.vault_path}`. If it is empty, print exactly this line and stop without error:
+Seed the configured Obsidian vault. One-shot, idempotent; does not scaffold the knowledge base (that is `/wiki`).
 
-   ```
-   Configure vault path first: enable the plugin and enter your vault path when prompted
-   ```
+Run:
 
-2. Run the setup script:
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/bin/wiki-init.sh" "${user_config.vault_path}"
+```
 
-   ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/bin/setup-vault.sh" "${user_config.vault_path}"
-   ```
+The script handles everything:
 
-3. Copy the plugin's `_templates/` into the vault, skipping existing files so the step is idempotent:
+- If `${user_config.vault_path}` is empty, prints `Configure vault path first: enable the plugin and enter your vault path when prompted` and exits 0.
+- Delegates to `bin/setup-vault.sh` (vault directories + Obsidian config) and `bin/copy-templates.sh` (idempotent template copy).
+- Prints the next steps (open Obsidian, install Dataview/Templater/Obsidian Git, run `/wiki` to scaffold).
 
-   ```bash
-   mkdir -p "${user_config.vault_path}/_templates"
-   for src in "${CLAUDE_PLUGIN_ROOT}/_templates/"*.md; do
-     dst="${user_config.vault_path}/_templates/$(basename "$src")"
-     [ -e "$dst" ] || cp "$src" "$dst"
-   done
-   ```
-
-4. Print next steps:
-
-   - Open Obsidian → *Manage Vaults* → *Open folder as vault* and select `${user_config.vault_path}`.
-   - Enable community plugins when prompted, then install **Dataview**, **Templater**, and **Obsidian Git** from Settings → Community Plugins.
-   - Run `/wiki` to scaffold your knowledge base.
-
-Re-running `/wiki init` must be idempotent: `setup-vault.sh` already guards existing files, and `cp -n` skips templates that are already in the vault.
+Surface the script's stdout to the user verbatim.
 
 ## SCAFFOLD (default)
 
