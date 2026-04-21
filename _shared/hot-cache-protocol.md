@@ -29,6 +29,7 @@ Update `wiki/hot.md` at the end of every operation that changes wiki content:
 | Autoresearch | Autoresearch skill | After all pages are filed |
 | Save | Save skill | After the note is created |
 | Query (if answer was filed) | Query skill | After filing the answer as a wiki page |
+| Lint (if fixes were applied) | Lint skill | After the lint report is written and any auto-fixes are committed |
 | Session end (wiki changed) | Agent | Before the session closes |
 
 Do not skip the hot cache update at the end of an ingest or autoresearch session. It is what keeps future sessions fast.
@@ -76,4 +77,4 @@ YYYY-MM-DD. [what happened in one phrase]
 
 ## Sub-agent Discipline
 
-Parallel ingest agents (see `agents/ingest.md`) must NOT update `wiki/hot.md`. Only the orchestrating session updates it, once, after all agents have reported back. This prevents race conditions and conflicting writes.
+Parallel ingest agents (see `${CLAUDE_PLUGIN_ROOT}/agents/ingest.md`) must NOT update `wiki/hot.md`. Only the orchestrating session updates it, once, after all agents have reported back. This prevents race conditions and conflicting writes.
