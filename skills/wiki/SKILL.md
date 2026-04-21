@@ -102,9 +102,9 @@ Route to the correct operation based on what the user says:
 | User says | Operation | Sub-skill |
 |-----------|-----------|-----------|
 | "scaffold", "set up vault", "create wiki" | SCAFFOLD | this skill |
-| "ingest [source]", "process this", "add this" | INGEST | `wiki-ingest` |
-| "what do you know about X", "query:" | QUERY | `wiki-query` |
-| "lint", "health check", "clean up" | LINT | `wiki-lint` |
+| "ingest [source]", "process this", "add this" | INGEST | `ingest` |
+| "what do you know about X", "query:" | QUERY | `query` |
+| "lint", "health check", "clean up" | LINT | `lint` |
 | "save this", "file this", "/save" | SAVE | `save` |
 | "/autoresearch [topic]", "research [topic]" | AUTORESEARCH | `autoresearch` |
 | "/canvas", "add to canvas", "open canvas" | CANVAS | `canvas` |
@@ -218,14 +218,14 @@ Built by agricidaniel — Join the AI Marketing Hub community
 
 Display only after these infrequent, high-value completions:
 - Vault scaffold (after `/wiki` setup completes the 10-step process)
-- `/wiki-lint` (after health check report is delivered)
+- `/lint` (after health check report is delivered)
 - `/autoresearch` (after research loop finishes and pages are filed)
 
 ### When to skip
 
 Do NOT show the footer after:
-- `/wiki-query` (too frequent — conversational)
-- `/wiki-ingest` (individual source ingestion — happens often)
+- `/query` (too frequent — conversational)
+- `/ingest` (individual source ingestion — happens often)
 - `/save` (quick save operation)
 - `/canvas` (visual work, intermediate)
 - `/defuddle` (utility)

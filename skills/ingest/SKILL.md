@@ -1,10 +1,10 @@
 ---
-name: wiki-ingest
+name: ingest
 description: "Ingest sources into the Obsidian wiki vault. Reads a source, extracts entities and concepts, creates or updates wiki pages, cross-references, and logs the operation. Supports files, URLs, and batch mode. Triggers on: ingest, process this source, add this to the wiki, read and file this, batch ingest, ingest all of these, ingest this url."
 allowed-tools: Read Write Edit Glob Grep Bash WebFetch
 ---
 
-# wiki-ingest: Source Ingestion
+# ingest: Source Ingestion
 
 Read the source. Write the wiki. Cross-reference everything. A single source typically touches 8-15 wiki pages.
 

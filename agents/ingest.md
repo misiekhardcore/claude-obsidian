@@ -1,5 +1,5 @@
 ---
-name: wiki-ingest
+name: ingest
 description: >
   Parallel batch ingestion agent for the Obsidian wiki vault. Dispatched when multiple
   sources need to be ingested simultaneously. Processes one source fully (read, extract,
@@ -9,7 +9,7 @@ description: >
   assistant: "I'll dispatch parallel agents to process all 5 sources simultaneously."
   </example>
   <example>Context: User says "process everything in .raw/ that hasn't been ingested yet"
-  assistant: "I'll use wiki-ingest agents to handle each source in parallel."
+  assistant: "I'll use ingest agents to handle each source in parallel."
   </example>
 model: sonnet
 maxTurns: 30

@@ -75,9 +75,9 @@ If not installed: use WebFetch directly. The content will be less clean but stil
 
 ---
 
-## Integration with /wiki-ingest
+## Integration with /ingest
 
-The `/wiki-ingest` skill checks for defuddle automatically when a URL is passed. You do not need to run defuddle manually before ingesting a URL. The ingest skill will call it if available.
+The `/ingest` skill checks for defuddle automatically when a URL is passed. You do not need to run defuddle manually before ingesting a URL. The ingest skill will call it if available.
 
 To manually clean a page and save before ingesting:
 1. Run the save command above

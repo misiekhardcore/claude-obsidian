@@ -1,15 +1,15 @@
 ---
-name: wiki-lint
+name: lint
 description: >
   Comprehensive wiki health check agent. Scans for orphan pages, dead links, stale claims,
   missing cross-references, frontmatter gaps, and empty sections. Generates a structured
   lint report. Dispatched when the user says "lint the wiki", "health check", "wiki audit",
   or "clean up".
   <example>Context: User says "lint the wiki" after 15 ingests
-  assistant: "I'll dispatch the wiki-lint agent for a full health check."
+  assistant: "I'll dispatch the lint agent for a full health check."
   </example>
   <example>Context: User says "find all orphan pages"
-  assistant: "I'll use the wiki-lint agent to scan for pages with no inbound links."
+  assistant: "I'll use the lint agent to scan for pages with no inbound links."
   </example>
 model: sonnet
 maxTurns: 40

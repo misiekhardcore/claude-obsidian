@@ -1,5 +1,5 @@
 ---
-name: wiki-lint
+name: lint
 description: >
   Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims,
   missing cross-references, frontmatter gaps, and empty sections. Creates or updates
@@ -8,7 +8,7 @@ description: >
 allowed-tools: Read Write Edit Glob Grep
 ---
 
-# wiki-lint: Wiki Health Check
+# lint: Wiki Health Check
 
 Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. Output a lint report to `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
