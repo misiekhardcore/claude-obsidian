@@ -2,6 +2,40 @@
 
 Obsidian wiki plugin for Claude Code — personal knowledge vault with LLM-assisted ingestion, research, and retrieval.
 
+## Install
+
+```bash
+claude plugin marketplace add misiekhardcore/claude-obsidian
+claude plugin install claude-obsidian@claude-obsidian
+```
+
+Then enable the plugin and set `vault_path` (absolute path to your Obsidian vault) when Claude Code prompts for user configuration.
+
+## Skills
+
+- `wiki` — bootstrap / health-check the vault
+- `ingest` — parallel batch ingestion of sources
+- `query` — answer questions from vault content
+- `lint` — find orphan pages, dead links, stale claims
+- `save` — save the current conversation or insight into the vault
+- `autoresearch` — autonomous iterative research loop
+- `canvas` — create / update Obsidian canvas files
+- `defuddle` — strip clutter from web pages before ingestion
+- `obsidian-markdown` — correct Obsidian-flavored Markdown (wikilinks, embeds, callouts)
+- `obsidian-bases` — create / edit `.base` files
+
+## Vault structure
+
+```
+<vault_path>/
+  wiki/          agent-generated knowledge (hot.md, index.md, concepts/, entities/, sources/)
+  .raw/          immutable source documents + .manifest.json
+  _templates/    Obsidian Templater templates
+  _attachments/  images + PDFs referenced by wiki pages
+  .obsidian/     (user-owned) Obsidian app config
+  daily/         (optional) daily notes if the user enables them
+```
+
 ## Hooks
 
 The plugin wires several passive automations into every session via `hooks/hooks.json`. All of them resolve the vault path through `scripts/resolve-vault.sh` and silently skip if no vault is configured.
