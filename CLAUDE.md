@@ -60,9 +60,9 @@ All skills live in `skills/<name>/SKILL.md` and are auto-discovered by Claude Co
 | Skill | Trigger phrases |
 |---|---|
 | `wiki` | `/wiki`, set up wiki, scaffold vault, check setup |
-| `wiki-ingest` | ingest, ingest this url, ingest this image, batch ingest |
-| `wiki-query` | query, what do you know about, query quick:, query deep: |
-| `wiki-lint` | lint the wiki, health check, find orphans, dead links |
+| `ingest` | ingest, ingest this url, ingest this image, batch ingest |
+| `query` | query, what do you know about, query quick:, query deep: |
+| `lint` | lint the wiki, health check, find orphans, dead links |
 | `save` | `/save`, file this conversation, save insight |
 | `autoresearch` | autoresearch, autonomous research loop |
 | `canvas` | `/canvas`, add to canvas, create canvas |
