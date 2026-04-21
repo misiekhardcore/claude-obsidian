@@ -2,6 +2,14 @@
 
 Guidance for using claude-obsidian as a Claude Code plugin.
 
+## Vault Assumptions
+
+This vault is designed for **agent-only** use with **single-user, single-machine** access patterns. Any feature proposal violating one of these assumptions must be challenged before implementation:
+
+- **Agent-only readers/writers.** No multi-user tiering, reviewer workflow, access control, or `reviewed_at` timestamps. Every write is an agent or the single human owner; human review happens via git, not via in-vault metadata.
+- **Single-user, single-machine by default.** Cross-project access is opt-in per-project, not a multi-tenant design target.
+- **Git-backed, file-per-page.** No database, no server, no live sync. All coordination is via commit history.
+
 ## Plugin Setup
 
 This is both a Claude Code plugin and an Obsidian vault. To use it:
