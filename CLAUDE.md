@@ -39,7 +39,6 @@ wiki/              Claude-generated knowledge base
 .raw/              Source documents — immutable, never modified by agents
 _templates/        Obsidian Templater templates
 _attachments/      Images and PDFs referenced by wiki pages
-daily/             End-of-session reflections (created on demand)
 ```
 
 ## Wiki Conventions
@@ -90,30 +89,6 @@ Single-source ingests via `/wiki-ingest` require an interactive discussion befor
 **Escape hatch:** Say "just ingest it" or "auto-ingest" to skip discussion and proceed automatically.
 
 The `/autoresearch` pipeline is exempt — it is intentionally autonomous.
-
-## Hooks
-
-The plugin ships the following passive automation wired through `hooks/hooks.json`:
-
-- **SessionStart — hot cache restore.** If `wiki/hot.md` exists, it is injected into context.
-- **PostToolUse (Edit|Write) — auto-commit + scratch log.** Wiki changes are auto-committed, and touched file paths are appended to `$VAULT/.session-scratch.log` for the SessionEnd reflection.
-- **SessionEnd — reflection.** A short reflection on patterns, decisions, and learnings is generated via the `claude -p` CLI using **Haiku** (cheap model) and appended to `$VAULT/daily/YYYY-MM-DD.md`. This complements — not duplicates — auto-memory at `~/.claude/projects/*/memory/`, which already captures raw facts. The hook is non-blocking: missing CLI, API errors, or timeouts exit cleanly.
-
-Non-trivial hook logic lives in `hooks/*.sh`; `hooks.json` contains only thin invocations.
-
-## Scheduled Maintenance
-
-The plugin does **not** auto-schedule wiki-lint. Claude Code has no native cron/scheduled hook, and relying on an in-session nudge would tie a maintenance task to unpredictable session timing. Instead, lint is **opt-in via your OS scheduler**.
-
-A standalone runner is provided at `bin/wiki-lint-cron.sh`. It resolves the vault path via `scripts/resolve-vault.sh`, invokes the lint skill through the `claude` CLI, and stamps `$VAULT/.wiki-lint.lastrun` on success.
-
-Example crontab entry (weekly, Sunday 03:00 — recommended starting cadence):
-
-```cron
-0 3 * * 0 /absolute/path/to/claude-obsidian/bin/wiki-lint-cron.sh
-```
-
-Pick any cadence you like — weekly is a conservative default that matches the lint skill's own "weekly" guidance without being noisy. Use `systemd --user` timers, `launchd`, or any other scheduler if you don't use cron.
 
 ## MCP (Optional)
 
