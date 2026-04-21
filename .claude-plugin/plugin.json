@@ -26,6 +26,8 @@
   ],
   "userConfig": {
     "vault_path": {
+      "title": "Vault path",
+      "type": "directory",
       "description": "Absolute path to your Obsidian vault"
     }
   }
