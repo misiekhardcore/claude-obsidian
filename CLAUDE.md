@@ -39,6 +39,7 @@ wiki/              Claude-generated knowledge base
 .raw/              Source documents — immutable, never modified by agents
 _templates/        Obsidian Templater templates
 _attachments/      Images and PDFs referenced by wiki pages
+daily/             End-of-session reflections (created on demand)
 ```
 
 ## Wiki Conventions
@@ -89,6 +90,17 @@ Single-source ingests via `/wiki-ingest` require an interactive discussion befor
 **Escape hatch:** Say "just ingest it" or "auto-ingest" to skip discussion and proceed automatically.
 
 The `/autoresearch` pipeline is exempt — it is intentionally autonomous.
+
+## Hooks
+
+The plugin ships four kinds of passive automation wired through `hooks/hooks.json`:
+
+- **SessionStart — hot cache restore.** If `wiki/hot.md` exists, it is injected into context.
+- **SessionStart — wiki-lint nudge.** If the vault's `.wiki-lint.lastrun` marker is older than 7 days (configurable via `WIKI_LINT_INTERVAL_DAYS`), a soft `WIKI_LINT_DUE` suggestion is surfaced. After running the lint skill, write the new timestamp with `date +%s > "$VAULT/.wiki-lint.lastrun"`. Claude Code has no native scheduled/cron hook, so this marker-based nudge is the pragmatic equivalent.
+- **PostToolUse (Edit|Write) — auto-commit + scratch log.** Wiki changes are auto-committed, and touched file paths are appended to `$VAULT/.session-scratch.log` for the SessionEnd reflection.
+- **SessionEnd — reflection.** A short reflection on patterns, decisions, and learnings is generated via the `claude -p` CLI using **Haiku** (cheap model) and appended to `$VAULT/daily/YYYY-MM-DD.md`. This complements — not duplicates — auto-memory at `~/.claude/projects/*/memory/`, which already captures raw facts. The hook is non-blocking: missing CLI, API errors, or timeouts exit cleanly.
+
+Non-trivial hook logic lives in `hooks/*.sh`; `hooks.json` contains only thin invocations.
 
 ## MCP (Optional)
 
