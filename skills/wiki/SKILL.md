@@ -101,6 +101,7 @@ Route to the correct operation based on what the user says:
 
 | User says | Operation | Sub-skill |
 |-----------|-----------|-----------|
+| "/wiki init", "init vault", "bootstrap vault" | INIT | this skill |
 | "scaffold", "set up vault", "create wiki" | SCAFFOLD | this skill |
 | "ingest [source]", "process this", "add this" | INGEST | `ingest` |
 | "what do you know about X", "query:" | QUERY | `query` |
@@ -108,6 +109,38 @@ Route to the correct operation based on what the user says:
 | "save this", "file this", "/save" | SAVE | `save` |
 | "/autoresearch [topic]", "research [topic]" | AUTORESEARCH | `autoresearch` |
 | "/canvas", "add to canvas", "open canvas" | CANVAS | `canvas` |
+
+---
+
+## INIT Operation
+
+Trigger: `/wiki init`, "init vault", "bootstrap vault".
+
+Goal: seed an empty vault from `${user_config.vault_path}` so the user can open it in Obsidian. This is a one-shot, idempotent bootstrap — it does not ask questions and does not scaffold the knowledge base (that is SCAFFOLD).
+
+Steps:
+
+1. Resolve `${user_config.vault_path}`. If empty, print:
+
+   `Configure vault path first: enable the plugin and enter your vault path when prompted`
+
+   Then stop without error.
+
+2. Run `bash "${CLAUDE_PLUGIN_ROOT}/bin/setup-vault.sh" "${user_config.vault_path}"` — creates `.obsidian/`, `.raw/`, `wiki/`, `_templates/` and the Obsidian config files.
+
+3. Copy templates from the plugin into the vault, skipping existing files:
+
+   ```bash
+   mkdir -p "${user_config.vault_path}/_templates"
+   for src in "${CLAUDE_PLUGIN_ROOT}/_templates/"*.md; do
+     dst="${user_config.vault_path}/_templates/$(basename "$src")"
+     [ -e "$dst" ] || cp "$src" "$dst"
+   done
+   ```
+
+4. Print next steps: open Obsidian at the vault path, enable community plugins (Dataview, Templater, Obsidian Git), then run `/wiki` to scaffold the knowledge base.
+
+Re-running is idempotent: `setup-vault.sh` guards existing files and the copy loop skips templates already present.
 
 ---
 
