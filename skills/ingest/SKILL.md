@@ -108,7 +108,7 @@ Steps:
    - "Is there existing wiki context I should link against?"
    **Wait for the user's response before proceeding.** Do not assume defaults and do not skip ahead.
    **Skip this step only if** the user's original message included "just ingest it" or "auto-ingest".
-3. **Create** source summary in `wiki/sources/`. Use the source frontmatter schema from `references/frontmatter.md`.
+3. **Create** source summary in `wiki/sources/`. Use the source frontmatter schema from `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 4. **Create or update** entity pages for every person, org, product, and repo mentioned. One page per entity.
 5. **Create or update** concept pages for significant ideas and frameworks.
 6. **Update** relevant domain page(s) and their `_index.md` sub-indexes.

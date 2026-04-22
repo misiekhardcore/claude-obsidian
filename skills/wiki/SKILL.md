@@ -59,39 +59,7 @@ Dot-prefixed folders (`.raw/`) are hidden in Obsidian's file explorer and graph 
 
 `wiki/hot.md` is a ~500-word summary of the most recent context. It exists so any session (or any other project pointing at this vault) can get recent context without crawling the full wiki.
 
-Update hot.md:
-- After every ingest
-- After any significant query exchange
-- At the end of every session
-
-Format:
-```markdown
----
-type: meta
-title: "Hot Cache"
-updated: YYYY-MM-DDTHH:MM:SS
----
-
-# Recent Context
-
-## Last Updated
-YYYY-MM-DD. [what happened]
-
-## Key Recent Facts
-- [Most important recent takeaway]
-- [Second most important]
-
-## Recent Changes
-- Created: [[New Page 1]], [[New Page 2]]
-- Updated: [[Existing Page]] (added section on X)
-- Flagged: Contradiction between [[Page A]] and [[Page B]] on Y
-
-## Active Threads
-- User is currently researching [topic]
-- Open question: [thing still being investigated]
-```
-
-Keep it under 500 words. It is a cache, not a journal. Overwrite it completely each time.
+For the full protocol — when to read, when to update, the exact format, and sub-agent discipline — see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`. That document is the single source of truth; do not duplicate its rules here.
 
 ---
 

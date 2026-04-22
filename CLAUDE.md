@@ -97,11 +97,15 @@ See `skills/wiki/references/mcp-setup.md` for setup instructions.
 
 ## Maintenance
 
-The schema (directory map, page types), ingest procedure, contradiction handling, and quality standards are defined in `skills/wiki/references/maintenance-rules.md`.
+Cross-skill structural conventions (vault directory map, page types, confidence tagging semantics, typed-relationship semantics) are defined in `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md`.
 
-The frontmatter field schema (universal fields, typed relationships) is defined in `skills/wiki/references/frontmatter.md`.
+The frontmatter field schema (universal fields, typed relationships, status and confidence values) is defined in `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 
-Read both files before any ingest, autoresearch, or significant wiki operation.
+Skill-operational rules (ingest procedure, contradiction handling, quality standards, log format) are defined in `skills/wiki/references/maintenance-rules.md`.
+
+The hot-cache read/write protocol is defined in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+
+Read the relevant files before any ingest, autoresearch, or significant wiki operation.
 
 ## Cross-Project Access
 

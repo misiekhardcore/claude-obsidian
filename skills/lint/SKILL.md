@@ -170,3 +170,13 @@ Needs review before fixing:
 - Deleting orphan pages (they might be intentionally isolated)
 - Resolving contradictions (requires human judgment)
 - Merging duplicate pages
+
+---
+
+## After Lint
+
+If the lint run applied any auto-fixes that modified wiki pages (new stubs, added frontmatter, added wikilinks), update `wiki/hot.md` before closing the session. Note which pages were touched under `## Recent Changes` and summarize the lint outcome under `## Last Updated`.
+
+For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+
+If the lint report is advisory only (no auto-fixes applied), skip the hot.md update — reports live at `wiki/meta/lint-report-*.md` and do not count as wiki content changes.

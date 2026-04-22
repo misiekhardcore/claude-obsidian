@@ -72,6 +72,8 @@ Read the minimum needed:
 
 If hot.md has the answer, respond without reading further.
 
+For the full hot-cache protocol (when it is written, what it contains, and sub-agent rules), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+
 ---
 
 ## Index Format Reference
