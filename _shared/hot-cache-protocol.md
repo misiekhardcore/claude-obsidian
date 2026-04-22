@@ -29,7 +29,7 @@ Update `wiki/hot.md` at the end of every operation that changes wiki content. **
 | Autoresearch | Autoresearch skill | After all pages are filed |
 | Save | Save skill | After the note is created |
 | Query (if answer was filed) | Query skill | After filing the answer as a wiki page |
-| Lint (if fixes were applied) | Lint skill | After the lint report is written and any auto-fixes are committed |
+| Lint (if fixes were applied) | Lint skill | After the lint report is written and any auto-fixes are applied |
 | Session end (wiki changed) | Agent | Before the session closes |
 
 Do not skip the hot cache update at the end of an ingest or autoresearch session. It is what keeps future sessions fast.
@@ -44,7 +44,7 @@ Overwrite `wiki/hot.md` completely each time — it is a cache, not a journal.
 ---
 type: meta
 title: "Hot Cache"
-updated: YYYY-MM-DDTHH:MM:SS
+updated: YYYY-MM-DD
 ---
 
 # Recent Context
