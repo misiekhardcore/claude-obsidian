@@ -20,7 +20,7 @@ The hot cache costs ~500 tokens. Reading it first is always cheaper than reading
 
 ## When to Update
 
-Update `wiki/hot.md` at the end of every operation that changes wiki content:
+Update `wiki/hot.md` at the end of every operation that changes wiki content. **The orchestrator writes, once, after all parallel workers have reported.** Never update mid-operation or from within a worker.
 
 | Operation | Who updates | When |
 |-----------|-------------|------|
@@ -75,6 +75,6 @@ YYYY-MM-DD. [what happened in one phrase]
 
 ---
 
-## Sub-agent Discipline
+## Parallel Worker Discipline
 
-Parallel ingest agents (see `${CLAUDE_PLUGIN_ROOT}/agents/ingest.md`) must NOT update `wiki/hot.md`. Only the orchestrating session updates it, once, after all agents have reported back. This prevents race conditions and conflicting writes.
+Parallel workers, whether Task-tool subagents (see `${CLAUDE_PLUGIN_ROOT}/agents/ingest.md`) or TeamCreate teammates, must NOT update `wiki/hot.md`. Only the orchestrating session updates it, once, after all workers have reported back. This prevents race conditions and conflicting writes.
