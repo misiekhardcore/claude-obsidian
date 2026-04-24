@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump
+        required: true
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute next version
+        id: bump
+        run: |
+          set -euo pipefail
+          name=$(jq -r '.name' .claude-plugin/plugin.json)
+          current=$(jq -r '.version' .claude-plugin/plugin.json)
+          IFS='.' read -r major minor patch <<<"$current"
+          case "${{ inputs.bump }}" in
+            major) major=$((major+1)); minor=0; patch=0 ;;
+            minor) minor=$((minor+1)); patch=0 ;;
+            patch) patch=$((patch+1)) ;;
+          esac
+          new="${major}.${minor}.${patch}"
+          {
+            echo "name=$name"
+            echo "version=$new"
+            echo "tag=v$new"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Bump plugin.json and marketplace.json
+        run: |
+          set -euo pipefail
+          v="${{ steps.bump.outputs.version }}"
+          tmp=$(mktemp)
+          jq --arg v "$v" '.version = $v' .claude-plugin/plugin.json > "$tmp"
+          mv "$tmp" .claude-plugin/plugin.json
+          jq --arg v "$v" '.metadata.version = $v | .plugins[0].version = $v' .claude-plugin/marketplace.json > "$tmp"
+          mv "$tmp" .claude-plugin/marketplace.json
+
+      - name: Commit, tag, push
+        run: |
+          set -euo pipefail
+          git add .claude-plugin/plugin.json .claude-plugin/marketplace.json
+          git commit -m "chore: release ${{ steps.bump.outputs.tag }}"
+          git tag -a "${{ steps.bump.outputs.tag }}" -m "${{ steps.bump.outputs.tag }}"
+          git push origin HEAD
+          git push origin "${{ steps.bump.outputs.tag }}"
+
+      - name: Package source tarball
+        run: |
+          set -euo pipefail
+          name="${{ steps.bump.outputs.name }}"
+          version="${{ steps.bump.outputs.version }}"
+          file="${name}-${version}.tar.gz"
+          git archive \
+            --format=tar.gz \
+            --prefix="${name}-${version}/" \
+            -o "$file" \
+            "${{ steps.bump.outputs.tag }}"
+          echo "artifact=$file" >> "$GITHUB_ENV"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.bump.outputs.tag }}" \
+            --title "${{ steps.bump.outputs.tag }}" \
+            --generate-notes \
+            "$artifact"

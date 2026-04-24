@@ -12,7 +12,7 @@
       "name": "claude-obsidian",
       "source": "./",
       "description": "Claude + Obsidian knowledge companion. Sets up a persistent, compounding wiki vault.",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "author": {
         "name": "Michał Konopski",
         "url": "https://github.com/misiekhardcore"
