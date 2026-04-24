@@ -444,6 +444,11 @@ In **Settings → Community Plugins → Browse**, install:
 | **Dataview** | Query your wiki pages as a database |
 | **Templater** | Use the templates in `_templates/` to create new pages |
 | **Obsidian Git** | Sync vault changes to git automatically |
+| **Local REST API** | Exposes the vault so the `claude-obsidian` plugin can read and write pages |
+| **Tray** | Keeps Obsidian running in the system tray so the REST API stays available when the window is closed |
+
+After installing **Local REST API**, open its settings, copy the API key, and
+paste it into the `claude-obsidian` plugin settings so Claude can reach the vault.
 
 ---
 
