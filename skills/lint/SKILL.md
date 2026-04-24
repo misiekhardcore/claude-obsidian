@@ -26,6 +26,10 @@ Work through these in order:
 6. **Frontmatter gaps**. Pages missing required fields (type, status, created, updated, tags).
 7. **Empty sections**. Headings with no content underneath.
 8. **Stale index entries**. Items in `wiki/index.md` pointing to renamed or deleted pages.
+9. **hot.md size budget**. Count words in `wiki/hot.md`.
+   - **WARN** if word count > 500 (spec limit per `_shared/hot-cache-protocol.md`).
+   - **FAIL** if word count > 750 (50 % buffer exceeded).
+   - Remediation: move entries older than 2 weeks to `wiki/log.md`; trim `## Last Updated` to the 3–5 most recent items.
 
 ---
 
@@ -68,6 +72,10 @@ status: developing
 
 ## Cross-Reference Gaps
 - [[Entity Name]] mentioned in [[Page A]] without a wikilink.
+
+## Hot Cache Size
+- hot.md: N words (spec: 500, delta: +N). Status: OK | WARN | FAIL
+  - Suggest: move entries older than 2026-XX-XX to [[log]], trim ## Last Updated to top 3–5 items.
 ```
 
 ---
