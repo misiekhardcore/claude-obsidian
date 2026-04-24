@@ -76,7 +76,18 @@ seed_file "wiki/hot.md" << EOF
 ---
 type: meta
 title: "Hot Cache"
+created: $TODAY
 updated: $TODAY
+tags:
+  - meta
+  - hot
+status: evergreen
+confidence: EXTRACTED
+evidence: []
+related:
+  - "[[index]]"
+  - "[[log]]"
+  - "[[overview]]"
 ---
 
 # Recent Context
