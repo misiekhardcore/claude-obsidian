@@ -28,14 +28,18 @@ fi
 
 bash "${CLAUDE_PLUGIN_ROOT}/bin/setup-vault.sh" "$VAULT"
 bash "${CLAUDE_PLUGIN_ROOT}/bin/copy-templates.sh" "$VAULT"
+bash "${CLAUDE_PLUGIN_ROOT}/bin/seed-demo.sh" "$VAULT"
 
 cat <<EOF
 
 Next steps:
-  1. Open Obsidian → Manage Vaults → Open folder as vault → select: $VAULT
-  2. Enable community plugins when prompted, then install:
+  1. Open $VAULT/FIRST_RUN.md for detailed setup instructions.
+  2. Open Obsidian → Manage Vaults → Open folder as vault → select: $VAULT
+  3. Enable community plugins when prompted, then install:
        - Dataview
        - Templater
        - Obsidian Git
-  3. Run /wiki in Claude Code to scaffold your knowledge base.
+       - Local REST API  (required for the plugin to reach the vault)
+       - Tray  (keeps Obsidian + REST API alive when the window is closed)
+  4. Run /wiki in Claude Code to scaffold your knowledge base.
 EOF
