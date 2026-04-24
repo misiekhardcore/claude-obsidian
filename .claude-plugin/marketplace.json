@@ -5,14 +5,15 @@
     "email": "misiekhardcore@gmail.com"
   },
   "metadata": {
-    "description": "claude-obsidian: Claude + Obsidian knowledge companion by Michał Konopski"
+    "description": "claude-obsidian: Claude + Obsidian knowledge companion by Michał Konopski",
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "claude-obsidian",
       "source": "./",
       "description": "Claude + Obsidian knowledge companion. Sets up a persistent, compounding wiki vault.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Michał Konopski",
         "url": "https://github.com/misiekhardcore"
