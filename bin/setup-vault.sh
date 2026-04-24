@@ -24,7 +24,7 @@ echo "Setting up claude-obsidian vault at: $VAULT"
 # ── 1. Create directories ─────────────────────────────────────────────────────
 mkdir -p "$OBSIDIAN/snippets"
 mkdir -p "$VAULT/.raw"
-mkdir -p "$VAULT/wiki/concepts" "$VAULT/wiki/entities" "$VAULT/wiki/sources" "$VAULT/wiki/meta"
+mkdir -p "$VAULT/wiki/concepts" "$VAULT/wiki/entities" "$VAULT/wiki/sources" "$VAULT/wiki/questions" "$VAULT/wiki/meta"
 mkdir -p "$VAULT/_templates"
 
 # ── 2. Write graph.json ───────────────────────────────────────────────────────
