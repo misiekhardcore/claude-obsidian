@@ -19,6 +19,16 @@ fi
 VAULT="$1"
 OBSIDIAN="$VAULT/.obsidian"
 
+# Locate the plugin root. Prefer CLAUDE_PLUGIN_ROOT when set (in-session).
+# Otherwise derive it from $0 so standalone invocations work.
+if [ -z "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  SCRIPT_PATH=$(readlink -f "$0" 2>/dev/null || python3 -c "import os,sys;print(os.path.realpath(sys.argv[1]))" "$0")
+  CLAUDE_PLUGIN_ROOT=$(dirname "$(dirname "$SCRIPT_PATH")")
+  export CLAUDE_PLUGIN_ROOT
+fi
+
+DEFAULTS_DIR="${CLAUDE_PLUGIN_ROOT}/_obsidian-defaults"
+
 echo "Setting up claude-obsidian vault at: $VAULT"
 
 # ── 1. Create directories ─────────────────────────────────────────────────────
@@ -27,62 +37,18 @@ mkdir -p "$VAULT/.raw"
 mkdir -p "$VAULT/wiki/concepts" "$VAULT/wiki/entities" "$VAULT/wiki/sources" "$VAULT/wiki/questions" "$VAULT/wiki/meta"
 mkdir -p "$VAULT/_templates"
 
-# ── 2. Write graph.json ───────────────────────────────────────────────────────
-cat > "$OBSIDIAN/graph.json" << 'EOF'
-{
-  "collapse-filter": false,
-  "search": "path:wiki",
-  "showTags": false,
-  "showAttachments": false,
-  "hideUnresolved": true,
-  "showOrphans": false,
-  "collapse-color-groups": false,
-  "colorGroups": [
-    { "query": "path:wiki/entities",    "color": { "a": 1, "rgb": 12945088 } },
-    { "query": "path:wiki/concepts",    "color": { "a": 1, "rgb": 5227007  } },
-    { "query": "path:wiki/sources",     "color": { "a": 1, "rgb": 6986069  } },
-    { "query": "path:wiki/meta",        "color": { "a": 1, "rgb": 5676246  } },
-    { "query": "path:wiki",             "color": { "a": 1, "rgb": 5676246  } }
-  ],
-  "showArrow": true,
-  "textFadeMultiplier": -1,
-  "nodeSizeMultiplier": 1.8,
-  "lineSizeMultiplier": 1.2,
-  "centerStrength": 0.5,
-  "repelStrength": 30,
-  "linkStrength": 1.5,
-  "linkDistance": 120,
-  "scale": 1.0
-}
-EOF
+# ── 2. Copy Obsidian default configs (graph.json, app.json, appearance.json) ──
+# These are overwritten on every run so the vault stays in sync with the
+# plugin's expected filters and color groups.
+if [ ! -d "$DEFAULTS_DIR" ]; then
+  echo "Error: defaults directory not found at $DEFAULTS_DIR" >&2
+  exit 1
+fi
 
-# ── 3. Write app.json (excluded files) ───────────────────────────────────────
-cat > "$OBSIDIAN/app.json" << 'EOF'
-{
-  "userIgnoreFilters": [
-    "agents/",
-    "commands/",
-    "hooks/",
-    "skills/",
-    "_templates/",
-    "README.md",
-    "CLAUDE.md",
-    "WIKI.md",
-    "Welcome.md"
-  ]
-}
-EOF
-
-# ── 4. Write appearance.json (enable CSS snippets) ─────────────────────────
-cat > "$OBSIDIAN/appearance.json" << 'EOF'
-{
-  "enabledCssSnippets": [
-    "vault-colors",
-    "ITS-Dataview-Cards",
-    "ITS-Image-Adjustments"
-  ]
-}
-EOF
+for src in "$DEFAULTS_DIR"/*.json; do
+  [ -e "$src" ] || continue
+  cp "$src" "$OBSIDIAN/$(basename "$src")"
+done
 
 # ── 5. Download Excalidraw main.js (8MB, not in git) ─────────────────────────
 EXCALIDRAW="$OBSIDIAN/plugins/obsidian-excalidraw-plugin"

@@ -79,6 +79,19 @@ assert_contains "$VAULT/wiki/entities/example-entity.md" "\[\["
 assert_contains "$VAULT/wiki/sources/example-source.md" "\[\["
 assert_contains "$VAULT/wiki/questions/example-question.md" "\[\["
 
+# ── Test 3b: Date substitution ────────────────────────────────────────────────
+echo ""
+echo "3b. {{today}} placeholder is substituted with actual date"
+TODAY=$(date +%Y-%m-%d)
+for f in wiki/index.md wiki/hot.md wiki/log.md wiki/overview.md; do
+  if grep -q "{{today}}" "$VAULT/$f"; then
+    fail "unsubstituted {{today}} in $f"
+  else
+    pass "no unsubstituted placeholder in $f"
+  fi
+  assert_contains "$VAULT/$f" "$TODAY"
+done
+
 # ── Test 4: Idempotency ──────────────────────────────────────────────────────
 echo ""
 echo "4. Idempotency — re-run does not overwrite existing files"
