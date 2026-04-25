@@ -36,6 +36,8 @@ wiki/              Claude-generated knowledge base
   concepts/        Conceptual deep-dives
   entities/        Reference material (people, organizations, tools)
   sources/         Summaries linked to original materials
+notes/             Inbox: verbatim quick-capture notes (owned by `notes` skill)
+  index.md         Pending + Deferred bullet list
 .raw/              Source documents — immutable, never modified by agents
 _templates/        Obsidian Templater templates
 _attachments/      Images and PDFs referenced by wiki pages
@@ -64,6 +66,7 @@ All skills live in `skills/<name>/SKILL.md` and are auto-discovered by Claude Co
 | `query` | query, what do you know about, query quick:, query deep: |
 | `lint` | lint the wiki, health check, find orphans, dead links |
 | `save` | `/save`, file this conversation, save insight |
+| `notes` | `/note`, `/dump`, note this, todo:, show my inbox, `/note process` |
 | `autoresearch` | autoresearch, autonomous research loop |
 | `canvas` | `/canvas`, add to canvas, create canvas |
 | `defuddle` | clean this url, defuddle, strip clutter |

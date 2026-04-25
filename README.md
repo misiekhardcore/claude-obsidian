@@ -18,6 +18,7 @@ Then enable the plugin and set `vault_path` (absolute path to your Obsidian vaul
 - `query` — answer questions from vault content
 - `lint` — find orphan pages, dead links, stale claims
 - `save` — save the current conversation or insight into the vault
+- `notes` — quick inbox capture (`/note`, `/dump`); list and process flows for triage
 - `autoresearch` — autonomous iterative research loop
 - `canvas` — create / update Obsidian canvas files
 - `defuddle` — strip clutter from web pages before ingestion
@@ -29,6 +30,7 @@ Then enable the plugin and set `vault_path` (absolute path to your Obsidian vaul
 ```
 <vault_path>/
   wiki/          agent-generated knowledge (hot.md, index.md, concepts/, entities/, sources/)
+  notes/         inbox: verbatim quick-capture notes (owned by `notes` skill)
   .raw/          immutable source documents + .manifest.json
   _templates/    Obsidian Templater templates
   _attachments/  images + PDFs referenced by wiki pages
