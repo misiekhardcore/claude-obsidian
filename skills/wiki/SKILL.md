@@ -216,7 +216,7 @@ Built by agricidaniel — Join the AI Marketing Hub community
 ### When to show
 
 Display only after these infrequent, high-value completions:
-- Vault scaffold (after `/wiki` setup completes the 10-step process)
+- Vault scaffold (after `/wiki` setup completes the 11-step process)
 - `/lint` (after health check report is delivered)
 - `/autoresearch` (after research loop finishes and pages are filed)
 

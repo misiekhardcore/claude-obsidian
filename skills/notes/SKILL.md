@@ -7,8 +7,9 @@ description: >
   flows for triaging the inbox later. Triggers on: "/note", "/dump",
   "note this", "remember this for later", "add to inbox", "todo:",
   "show my inbox", "/note list", "what's in notes",
-  "/note process", "process my notes", "process the inbox".
-allowed-tools: Read Write Edit Glob Grep
+  "/note process", "process my notes", "process the inbox",
+  "triage the inbox".
+allowed-tools: Read Write Edit Glob Grep Bash
 ---
 
 # notes: Inbox Capture for the Vault
@@ -29,11 +30,11 @@ If no vault is configured, abort with `No vault configured — run /wiki init fi
 
 ## Operations
 
-| User says | Operation |
-|-----------|-----------|
-| `/note <text>`, `/dump <text>`, "note this …", "remember this for later", "add to inbox …", "todo: …" | CAPTURE |
-| `/note list`, "show my inbox", "what's in notes" | LIST |
-| `/note process`, "process my notes", "triage the inbox" | PROCESS |
+| User says | Operation | Handled by |
+|-----------|-----------|------------|
+| `/note <text>`, `/dump <text>`, "note this …", "remember this for later", "add to inbox …", "todo: …" | CAPTURE | this skill |
+| `/note list`, "show my inbox", "what's in notes" | LIST | this skill |
+| `/note process`, "process my notes", "triage the inbox" | PROCESS | this skill |
 
 Capture, list, and process do not prompt for tags, types, or confirmations beyond the per-note action prompt in PROCESS.
 
@@ -46,8 +47,8 @@ Goal: persist the user's verbatim text with minimal metadata. No conversation co
 Steps:
 
 1. **Extract** the verbatim text from the user's message. For `/note <text>` and `/dump <text>`, the text is everything after the trigger. For natural-language triggers (`"note this: …"`, `"todo: …"`), extract the substring after the trigger phrase. Preserve the original wording exactly — no rewriting, no summarising.
-2. **Resolve** `<vault_root>` (see Vault path). Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`.
-3. **Enumerate** existing notes by listing `<vault_root>/notes/*.md` and reading **frontmatter only** for each (title, topic, tags). Skip bodies — they bloat the prompt and aren't needed for the match decision. Skip `notes/index.md` and any file with `status: deferred`.
+2. **Resolve** `<vault_root>` (see Vault path). Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`. If `<vault_root>/notes/` does not exist, create the directory and initialise `notes/index.md` from the template in the `## notes/index.md` section below; then continue.
+3. **Enumerate** existing notes by listing `<vault_root>/notes/*.md` and reading **frontmatter only** for each (title, topic, tags). Skip bodies — they bloat the prompt and aren't needed for the match decision. Skip `notes/index.md` and any file with `status: deferred`. (Deferred notes are excluded intentionally: the user set them aside; routing new content into them would silently overturn that decision.)
 4. **Decide MATCH or NEW** using the prompt template below. The bar is intentionally high; misroutes cost more than duplicates because the user does not see the decision at capture time.
 5. **MATCH path** — append to the existing file:
    - Add a separator + the new verbatim chunk to the body:
@@ -67,7 +68,7 @@ Steps:
    - For NEW captures the title is the user's text trimmed to a one-line summary (≤80 chars). If the verbatim text is itself short and one-line, use it as the title. Topic and tags may be left empty (`""` and `[]`) — they're populated by the user later if needed.
 7. **Update `notes/index.md`** — patch in place, no full rewrite:
    - On NEW: prepend a row under `## Pending`.
-   - On MATCH: bump the existing row's date to today; if the title was rewritten, replace the title text. Never add a duplicate row.
+   - On MATCH: find the existing row by the **pre-rewrite title** (the title the file had before this operation). Bump its date to today; if the title was rewritten, replace the title text. Never add a duplicate row.
    - Format: `- [ ] YYYY-MM-DD [<source_project>] <title>`.
 8. **Confirm** with one terse line. Two shapes only:
    - NEW: `Captured to notes/YYYY-MM-DD-<slug>.md`
@@ -135,7 +136,7 @@ Goal: walk pending notes one at a time and route each to `/save`, defer, or dele
 
 Steps:
 
-1. Enumerate pending notes (skip `status: deferred` unless `--include-deferred`). Sort by `updated` ascending — oldest first.
+1. Enumerate pending notes (skip `status: deferred` unless `--include-deferred`). Sort by `updated` ascending — oldest first. If there are no notes to process, print `Inbox is empty.` and exit.
 2. For each note, read full frontmatter + body and display:
    ```
    [N/total] YYYY-MM-DD [source_project]
@@ -146,7 +147,7 @@ Steps:
    Action? [s]ave / [d]efer / [x]delete / [q]uit
    ```
 3. Wait for the user's single-letter action. Loop on invalid input.
-4. **`s` (save)** — invoke the `save` skill via the Skill tool, passing the note body + frontmatter as input. On success:
+4. **`s` (save)** — invoke the `save` skill via the Skill tool, passing the note body, the frontmatter, and an explicit note name: `"Save this as: <title>"` so the save skill's step 2 name-prompt is pre-satisfied and the interactive loop is not broken. On success:
    - Delete `<vault_root>/notes/<filename>`.
    - Remove the corresponding row from `notes/index.md`.
    On `/save` failure, leave the note untouched and surface the error.
@@ -159,7 +160,7 @@ Steps:
 
 ---
 
-## Frontmatter template
+## Frontmatter Template
 
 ```yaml
 ---
@@ -198,6 +199,10 @@ tags:
   - meta
   - notes
 status: evergreen
+confidence: EXTRACTED
+evidence: []
+related:
+  - "[[wiki/index]]"
 ---
 
 # Notes Inbox
@@ -242,8 +247,8 @@ Out of scope:
 
 **Capture (NEW):**
 ```
-user> /note process should reuse confidence threshold from save
-assistant> Captured to notes/2026-04-25-process-should-reuse-confidence-threshold-from-save.md
+user> /note inbox count missing from /wiki status
+assistant> Captured to notes/2026-04-25-inbox-count-missing-from-wiki-status.md
 ```
 
 **Capture (MATCH-append, scope unchanged):**

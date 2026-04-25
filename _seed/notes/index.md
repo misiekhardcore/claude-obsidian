@@ -7,6 +7,10 @@ tags:
   - meta
   - notes
 status: evergreen
+confidence: EXTRACTED
+evidence: []
+related:
+  - "[[wiki/index]]"
 ---
 
 # Notes Inbox
