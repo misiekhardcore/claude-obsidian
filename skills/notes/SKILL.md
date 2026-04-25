@@ -48,7 +48,7 @@ Steps:
 
 1. **Extract** the verbatim text from the user's message. For `/note <text>` and `/dump <text>`, the text is everything after the trigger. For natural-language triggers (`"note this: …"`, `"todo: …"`), extract the substring after the trigger phrase. Preserve the original wording exactly — no rewriting, no summarising.
 2. **Resolve** `<vault_root>` (see Vault path). Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`. If `<vault_root>/notes/` does not exist, create the directory and initialise `notes/index.md` from the template in the `## notes/index.md` section below; then continue.
-3. **Enumerate** existing notes by listing `<vault_root>/notes/*.md` and reading **frontmatter only** for each (title, topic, tags). Skip bodies — they bloat the prompt and aren't needed for the match decision. Skip `notes/index.md` and any file with `status: deferred`. (Deferred notes are excluded intentionally: the user set them aside; routing new content into them would silently overturn that decision.)
+3. **Enumerate** existing notes by listing `<vault_root>/notes/*.md` and reading **frontmatter only** for each (title, topic, tags). Skip bodies — they bloat the prompt and aren't needed for the match decision. Skip `notes/index.md` and any file with `status: deferred`. (Deferred notes are excluded intentionally: the user set them aside; routing new content into them would silently overturn that decision.) Cap candidates at the **20 most recent by `updated:`** — older notes rarely match new captures and inflate the prompt. Use `mcp__obsidian-vault__obsidian_batch_get_file_contents` when the MCP server is available to read frontmatter in one call.
 4. **Decide MATCH or NEW** using the prompt template below. The bar is intentionally high; misroutes cost more than duplicates because the user does not see the decision at capture time.
 5. **MATCH path** — append to the existing file:
    - Add a separator + the new verbatim chunk to the body:
@@ -110,7 +110,7 @@ Goal: show pending and deferred notes for triage.
 
 Steps:
 
-1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`.
+1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`. Use `mcp__obsidian-vault__obsidian_batch_get_file_contents` when available — one batched read beats N sequential ones once the inbox grows past a handful of notes.
 2. Sort by `updated` descending.
 3. Render flat reverse-chronological bullets:
    ```
@@ -187,59 +187,16 @@ The body is the user's verbatim text. No headings, no metadata in the body. On M
 
 ## `notes/index.md`
 
-Two static sections — `## Pending` and `## Deferred`. No project subgroups.
+Canonical template lives at `_seed/notes/index.md` (copied during `/wiki init`). Two static sections — `## Pending` and `## Deferred`. No project subgroups.
 
-```markdown
----
-type: meta
-title: "Notes Inbox"
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-tags:
-  - meta
-  - notes
-status: evergreen
-confidence: EXTRACTED
-evidence: []
-related:
-  - "[[wiki/index]]"
----
+Row format:
 
-# Notes Inbox
-
-Captured notes pending processing. Maintained by `skills/notes`.
-
-## Pending
-
-- [ ] 2026-04-25 [claude-obsidian] /note process should reuse confidence threshold from save
-- [ ] 2026-04-24 [scripts] dependency upgrade leaves stale lockfile entries
-
-## Deferred
-
+```
+- [ ] 2026-04-25 [claude-obsidian] /note process should reuse confidence threshold
 - [~] 2026-04-22 [scripts] old idea, deferred — revisit Q3
 ```
 
 Patch the index on every CAPTURE/PROCESS action — never re-render from scratch. Mirror the patch-in-place pattern used by `/save` and `/ingest`. The index is the single source of truth at this scale; `/wiki lint` is the safety net for drift.
-
----
-
-## What is and isn't in scope
-
-In scope:
-- Verbatim capture with timestamp and `source_project` only.
-- Silent auto-match append on confident overlap.
-- Silent file creation on no match.
-- Title rewrite on scope-broadening append.
-- List + per-project filter.
-- Process loop with save / defer / delete / quit.
-
-Out of scope:
-- Modifying `/save`'s internals (handoff only).
-- GitHub-issue export as a processing target.
-- Auto-expiry, archival, or stale-note cleanup (`/wiki lint` reports drift only).
-- Capturing the previous assistant turn or any conversation context.
-- Manual tag prompts at capture time.
-- Confirmation prompts on capture (silent always).
 
 ---
 
