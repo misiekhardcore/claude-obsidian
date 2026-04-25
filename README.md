@@ -42,8 +42,8 @@ Then enable the plugin and set `vault_path` (absolute path to your Obsidian vaul
 
 The plugin wires several passive automations into every session via `hooks/hooks.json`. All of them resolve the vault path through `scripts/resolve-vault.sh` and silently skip if no vault is configured.
 
-- **SessionStart — hot cache restore.** If `wiki/hot.md` exists, its contents are injected into the session so recent context is available immediately.
-- **PostCompact — hot cache restore.** Re-injects `wiki/hot.md` after context compaction (hook-injected context does not survive compaction).
+- **SessionStart — hot cache restore.** If `wiki/hot.md` exists and `bootstrap_read_hot` is `"always"`, its contents are injected into the session so recent context is available immediately. The default is `"on-demand"` — injection is skipped and wiki skills read hot.md when they activate, saving ~2–3k tokens/turn for non-wiki sessions. See [Auto-Read Gating](_shared/hot-cache-protocol.md).
+- **PostCompact — hot cache restore.** Re-injects `wiki/hot.md` after context compaction when `bootstrap_read_hot` is `"always"` (hook-injected context does not survive compaction).
 - **PostToolUse (Edit | Write) — auto-commit.** Changes under `wiki/` and `.raw/` are auto-committed to the vault's git history with a timestamp, keeping review/blame workflow intact.
 - **PostToolUse (Edit | Write) — scratch log.** Touched file paths are appended to `$VAULT/.session-scratch.log` for the SessionEnd reflection to consume.
 - **Stop — hot cache nudge.** If wiki pages changed this session, Claude is prompted to refresh `wiki/hot.md` before stopping.

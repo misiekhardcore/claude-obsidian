@@ -10,11 +10,26 @@ Read this file when a skill needs to understand hot-cache behavior. Do not prelo
 
 | Trigger | Action |
 |---------|--------|
-| Session start | Read `wiki/hot.md` silently. Do not announce. Do not report what was read. Just have the context. |
-| Post-compaction | Re-read `wiki/hot.md`. Hook-injected context does not survive compaction — this restores it. |
-| Pre-query (any mode) | Read `wiki/hot.md` first. If it answers the question, respond without opening other pages. |
+| Session start (when `bootstrap_read_hot=always`) | `wiki/hot.md` was injected by the hook — silently absorb the context. Do not announce. |
+| Session start (when `bootstrap_read_hot=on-demand` or `never`) | No injection occurred. Wiki skills read `wiki/hot.md` when they activate. |
+| Post-compaction (when `bootstrap_read_hot=always`) | Re-read `wiki/hot.md`. Hook-injected context does not survive compaction — this restores it. |
+| Pre-query (any mode) | Read `wiki/hot.md` first. If it answers the question, respond without opening other pages. When `bootstrap_read_hot=never`, treat this as a user preference to skip the auto-read unless the task clearly requires wiki context. |
 
-The hot cache costs ~500 tokens. Reading it first is always cheaper than reading index or individual pages.
+When kept under the 500-word budget, `wiki/hot.md` costs ~500 tokens to read — always cheaper than reading the index or individual pages. The "~2–3k tokens/turn" figure cited elsewhere refers to the per-turn cost of injecting hot.md at every SessionStart and PostCompact when `bootstrap_read_hot=always`; that cost grows further if hot.md drifts past its word budget.
+
+---
+
+## Auto-Read Gating
+
+The `claude-obsidian.bootstrap_read_hot` plugin config key controls whether `wiki/hot.md` is injected at session start and post-compaction. Set it via `/plugin manage` or by editing `~/.claude/settings.local.json`.
+
+| Value | Hook behavior | Skill behavior |
+|-------|---------------|----------------|
+| `always` | Inject `wiki/hot.md` on SessionStart and PostCompact | Skills read hot.md as usual |
+| `on-demand` *(default)* | Skip injection | Skills read hot.md when they activate |
+| `never` | Skip injection | Advisory signal — skills should avoid auto-reading hot.md unless the user explicitly asks or the task clearly requires wiki context. Not enforced in skill code today; treat as a user preference. |
+
+**Why the default is `on-demand`:** At ~2–3k tokens/turn, always injecting `wiki/hot.md` is a hidden per-session cost that accumulates across all sessions — including unrelated coding work. Wiki skills already read hot.md on activation, so `on-demand` preserves the benefit for wiki sessions while eliminating the cost for everything else. Restore the previous behavior with `bootstrap_read_hot: "always"`.
 
 ---
 
