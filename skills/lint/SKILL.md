@@ -30,6 +30,10 @@ Work through these in order:
    - **WARN** if word count > 500 (spec limit per `_shared/hot-cache-protocol.md`).
    - **FAIL** if word count > 750 (50 % buffer exceeded).
    - Remediation: move entries older than 2 weeks to `wiki/log.md`; trim `## Last Updated` to the 3–5 most recent items.
+10. **Notes inbox**. Scoped to `<vault_root>/notes/` only. Two checks:
+    - **Frontmatter gaps** — flag any `notes/*.md` (excluding `notes/index.md`) missing one of: `type`, `title`, `created`, `updated`, `source_project`, `status`. The `topic` and `tags` fields are optional and never flagged.
+    - **Index drift** — flag any file in `notes/` that is missing from `notes/index.md`, and any row in `notes/index.md` whose title text doesn't match any existing note's frontmatter `title:` field. Match against frontmatter `title:`, not filenames — filenames are slugs that may diverge from display titles after CAPTURE rewrites (AC4).
+    - **Explicitly skip** orphan checks, dead-link checks, stale-claim checks, and contradictions for `notes/`. These are wiki-canonical concerns and inappropriate for a transient inbox.
 
 ---
 
@@ -76,6 +80,17 @@ status: developing
 ## Hot Cache Size
 - hot.md: N words (spec: 500, delta: +N). Status: OK | WARN | FAIL
   - Suggest: move entries older than 2026-XX-XX to [[log]], trim ## Last Updated to top 3–5 items.
+
+## Notes Inbox
+
+Scope: `notes/` only. Frontmatter gaps and index drift; no orphan/dead-link/stale checks.
+
+### Frontmatter gaps
+- `notes/<filename>.md`: missing fields: <field>, <field>
+
+### Index drift
+- File missing from index: `notes/<filename>.md` (no row in `notes/index.md`)
+- Index row missing file: `notes/index.md` references "<title>" but no file resolves to it
 ```
 
 ---
