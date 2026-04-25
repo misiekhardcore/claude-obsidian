@@ -82,7 +82,7 @@ When the user opens this plugin for the first time:
 3. Hot cache auto-read depends on `claude-obsidian.bootstrap_read_hot` (default: `on-demand`):
    - `always` — `wiki/hot.md` was injected at session start by the hook; absorb it silently.
    - `on-demand` (default) — no injection occurred; wiki skills read `wiki/hot.md` when they activate. Saves ~2–3k tokens/turn for non-wiki sessions.
-   - `never` — same hook behavior as `on-demand`; additionally, skills should avoid auto-reading hot.md. Use when you never want background context loaded.
+   - `never` — same hook behavior as `on-demand`; treat this as a user preference to avoid loading `wiki/hot.md` unless the user explicitly asks for it or the current task clearly requires wiki context.
 4. If the user types `/wiki` (or "set up wiki"), follow the wiki skill's scaffold workflow
 
 ## Ingest Rules
