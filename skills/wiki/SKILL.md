@@ -28,6 +28,7 @@ Three layers:
 vault/
 ├── .raw/       # Layer 1: immutable source documents
 ├── wiki/       # Layer 2: LLM-generated knowledge base
+├── notes/      # Layer 2 inbox: verbatim quick-capture notes (see `notes` skill)
 └── CLAUDE.md   # Layer 3: schema and instructions (this plugin)
 ```
 
@@ -50,6 +51,10 @@ wiki/
 ├── questions/          # filed answers to user queries
 └── meta/               # dashboards, lint reports, conventions
 ```
+
+`notes/` is a top-level peer of `wiki/`, not a subfolder. It holds verbatim
+quick-capture inbox notes that haven't been polished into wiki pages yet. The
+`notes` skill owns reads/writes there; `/wiki lint` reports inbox drift.
 
 Dot-prefixed folders (`.raw/`) are hidden in Obsidian's file explorer and graph view. Use this for source documents.
 
@@ -75,6 +80,7 @@ Route to the correct operation based on what the user says:
 | "what do you know about X", "query:" | QUERY | `query` |
 | "lint", "health check", "clean up" | LINT | `lint` |
 | "save this", "file this", "/save" | SAVE | `save` |
+| "/note", "/dump", "note this", "todo:", "show my inbox", "/note process" | NOTE | `notes` |
 | "/autoresearch [topic]", "research [topic]" | AUTORESEARCH | `autoresearch` |
 | "/canvas", "add to canvas", "open canvas" | CANVAS | `canvas` |
 
@@ -114,11 +120,12 @@ Steps:
 3. Create full folder structure under `wiki/` based on the mode.
 4. Create domain pages + `_index.md` sub-indexes.
 5. Create `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`, `wiki/overview.md`.
-6. Create `_templates/` files for each note type.
-7. Apply visual customization. Read `references/css-snippets.md`. Create `.obsidian/snippets/vault-colors.css`.
-8. Create the vault CLAUDE.md using the template below.
-9. Initialize git. Read `references/git-setup.md`.
-10. Present the structure and ask: "Want to adjust anything before we start?"
+6. Create `notes/` (top-level peer of `wiki/`) and copy `_seed/notes/index.md` if missing — this is the inbox owned by the `notes` skill.
+7. Create `_templates/` files for each note type.
+8. Apply visual customization. Read `references/css-snippets.md`. Create `.obsidian/snippets/vault-colors.css`.
+9. Create the vault CLAUDE.md using the template below.
+10. Initialize git. Read `references/git-setup.md`.
+11. Present the structure and ask: "Want to adjust anything before we start?"
 
 ### Vault CLAUDE.md Template
 
