@@ -127,6 +127,57 @@ if [ -n "$SCRATCH_VAULT_PATH" ] && [ -d "$SCRATCH_VAULT_PATH/$SCRATCH" ]; then
 fi
 
 echo ""
+echo "=== rewrite-hook — PreToolUse Bash auto-rewrite ==="
+
+REWRITE_HOOK="$PLUGIN_ROOT/hooks/obsidian-cli-rewrite.sh"
+
+# Helper: run hook with a given command, return its stdout.
+run_hook() {
+  local cmd="$1"
+  printf '%s' "{\"tool_input\":{\"command\":$(printf '%s' "$cmd" | jq -R .)}}" | bash "$REWRITE_HOOK"
+}
+
+# 1. Raw `obsidian read` should be rewritten to the wrapper.
+out=$(run_hook "obsidian read path=wiki/hot.md")
+if echo "$out" | jq -e '.hookSpecificOutput.updatedInput.command | contains("obsidian-cli.sh") and contains("read path=wiki/hot.md")' >/dev/null 2>&1; then
+  pass "raw obsidian → wrapper rewrite emitted"
+else
+  fail "expected updatedInput.command to contain wrapper path; got: $(echo "$out" | jq -c '.hookSpecificOutput.updatedInput.command // "<none>"')"
+fi
+
+# 2. Already-wrapped commands must pass through unchanged (no JSON output).
+out=$(run_hook "scripts/obsidian-cli.sh read path=wiki/hot.md")
+if [ -z "$out" ]; then
+  pass "already-wrapped command — pass-through (no rewrite)"
+else
+  fail "expected pass-through; got: $out"
+fi
+
+# 3. `which obsidian` must NOT be rewritten (first token is `which`).
+out=$(run_hook "which obsidian")
+if [ -z "$out" ]; then
+  pass "which obsidian — pass-through (first token is which)"
+else
+  fail "expected pass-through for which obsidian; got: $out"
+fi
+
+# 4. `pgrep -f obsidian` must NOT be rewritten.
+out=$(run_hook "pgrep -f obsidian")
+if [ -z "$out" ]; then
+  pass "pgrep -f obsidian — pass-through"
+else
+  fail "expected pass-through for pgrep; got: $out"
+fi
+
+# 5. `obsidian version` should be rewritten.
+out=$(run_hook "obsidian version")
+if echo "$out" | jq -e '.hookSpecificOutput.updatedInput.command | endswith("version")' >/dev/null 2>&1; then
+  pass "obsidian version — rewritten"
+else
+  fail "obsidian version — expected rewrite ending with 'version'"
+fi
+
+echo ""
 echo "=== summary ==="
 echo "  pass=$PASS  fail=$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1

@@ -14,6 +14,8 @@ The wrapper takes the same verb + args you would pass to `obsidian`, plus its ow
 scripts/obsidian-cli.sh <verb> [arg=value ...]
 ```
 
+A PreToolUse Bash hook (`hooks/obsidian-cli-rewrite.sh`, RTK-style) transparently rewrites raw `obsidian <verb> ...` Bash calls into the wrapper form before they execute. So even if a skill (or a contributor in a fresh terminal) types `obsidian read path=...`, the actual command Bash runs is `"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" read path=...`. The rewrite is conservative: it only triggers when the **first token** of the command is exactly `obsidian` (so `which obsidian`, `pgrep obsidian`, `cat $obsidian_path` are untouched), and skips commands that already mention `obsidian-cli`.
+
 The wrapper:
 
 1. Calls `scripts/resolve-vault.sh` to get the vault path (`$VAULT`).

@@ -20,6 +20,7 @@ This affects every vault-touching skill once its conversion sub-issue lands. Fou
 - `tests/cli-smoke.sh` — 15 assertions on wrapper output shape and exit codes against the active vault.
 - `tests/fixtures/vault/` — minimal Obsidian vault used by the spike and future skill smoke tests.
 - SessionStart hook entry that pre-flights `obsidian version` and emits an actionable warning when Obsidian is missing or stopped (fail-soft — never blocks the session).
+- `hooks/obsidian-cli-rewrite.sh` — PreToolUse hook (matcher: `Bash`) that transparently rewrites raw `obsidian <verb>` invocations to call `scripts/obsidian-cli.sh` instead. RTK-style transparent rewrite via `hookSpecificOutput.updatedInput.command`. Conservative match: first token must be exactly `obsidian`; commands already mentioning `obsidian-cli` are untouched.
 
 ### Changed
 
