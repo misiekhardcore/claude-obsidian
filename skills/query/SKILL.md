@@ -10,7 +10,7 @@ The wiki has already done the synthesis work. Read strategically, answer precise
 
 ## Vault Reads Use the CLI Wrapper
 
-All vault reads go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh`, not the `Read` tool. The wrapper resolves the vault, normalizes exit codes, and decouples the skill from the absolute vault path. Contract: `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
+All vault reads go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh`, not the `Read` tool. The wrapper resolves the vault, normalizes exit codes, and decouples the skill from the absolute vault path.
 
 | Op | Wrapper invocation |
 |---|---|

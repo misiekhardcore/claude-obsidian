@@ -17,8 +17,7 @@ This affects every vault-touching skill once its conversion sub-issue lands. Fou
 
 ### Added
 
-- `scripts/obsidian-cli.sh` — wrapper that resolves the vault, derives the vault name (`basename`), pre-flights `obsidian version`, and normalizes exit codes per the contract in `_shared/cli.md`.
-- `_shared/cli.md` — invocation contract, exit-code table, format defaults, error patterns, escape-hatch policy, and the documented exception list.
+- `scripts/obsidian-cli.sh` — wrapper that resolves the vault, derives the vault name (`basename`), pre-flights `obsidian version`, and normalizes exit codes. Contract is documented inline in the script's header comment: exit-code table, error patterns, escape-hatch policy, and the documented exception list.
 - `scripts/cli-spike.sh` — empirical CLI probe; results pinned in `tests/spike-results/`. Re-run after every Obsidian CLI minor-version bump.
 - `tests/cli-smoke.sh` — 15 assertions on wrapper output shape and exit codes against the active vault.
 - `tests/fixtures/vault/` — minimal Obsidian vault used by the spike and future skill smoke tests.
@@ -40,11 +39,11 @@ This affects every vault-touching skill once its conversion sub-issue lands. Fou
 
 ### Empirical findings worth knowing
 
-These came out of `scripts/cli-spike.sh` and are pinned in `_shared/cli.md`:
+These came out of `scripts/cli-spike.sh` and are pinned in the wrapper / smoke header comments:
 
 - The Obsidian CLI **always returns exit 0**, regardless of success or failure. The wrapper detects errors by inspecting the first line of stdout (`Error: ...` or `Vault not found.`).
 - `vault=<name>` accepts a vault **name** (basename), not a path. `vault=/some/path` returns `Vault not found.`
-- `orphans`, `deadends`, `tasks`, and `properties` do not accept `format=json`; only `backlinks`, `tags`, `unresolved`, `outline`, `search`, `bookmarks`, and `aliases` do. The format-defaults table in `_shared/cli.md` reflects this.
+- `orphans`, `deadends`, `tasks`, and `properties` do not accept `format=json`; only `backlinks`, `tags`, `unresolved`, `outline`, `search`, `bookmarks`, and `aliases` do. The format-defaults table in `tests/cli-smoke.sh` reflects this.
 - Multiline `content="line one\nline two"` round-trips cleanly through `create` + `read`. No `source=/tmp/...` fallback is needed for hot-cache rewrites.
 
 ### Rollback (post-release)

@@ -5,7 +5,9 @@
 # tests/spike-results/<group>-<verb>-<case>.{out,err,exit}.
 #
 # The spike script always exits 0 — exit codes are the data, not the test.
-# Findings are pinned in _shared/cli.md after the run.
+# Re-run after every Obsidian CLI minor-version bump and update the wrapper
+# header (scripts/obsidian-cli.sh) and smoke header (tests/cli-smoke.sh) if
+# the contract has changed.
 #
 # Vault: defaults to the currently active Obsidian vault. Override with
 #   SPIKE_VAULT_NAME=<name> bash scripts/cli-spike.sh

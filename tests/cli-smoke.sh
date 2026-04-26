@@ -1,19 +1,45 @@
 #!/usr/bin/env bash
 # Smoke tests for scripts/obsidian-cli.sh.
 #
-# Asserts wrapper output shape and exit-code normalization per _shared/cli.md.
-# Runs a representative subset of verbs — exhaustive coverage is the spike's
-# job, not the smoke test's.
+# Asserts wrapper output shape and exit-code normalization. Exit-code
+# semantics, error-pattern detection, escape-hatch policy, and the documented
+# bypasses are described in the wrapper's header comment — this script
+# enforces them. Runs a representative subset of verbs; exhaustive coverage is
+# the spike's job, not the smoke's.
 #
-# Vault: runs against whatever vault is currently active in Obsidian
-# (via scripts/resolve-vault.sh). Assertions are deliberately content-agnostic
-# — the smoke test verifies wrapper *contract* (exit codes, error patterns,
-# format negotiation, multiline round-trip), not fixture-specific assertions.
+# Vault: runs against whatever vault is currently active in Obsidian (via
+# scripts/resolve-vault.sh). Assertions are deliberately content-agnostic —
+# the smoke verifies wrapper *contract* (exit codes, error patterns, format
+# negotiation, multiline round-trip), not fixture-specific assertions.
 # tests/fixtures/vault/ is committed as a stable test corpus for downstream
 # skill-conversion smoke tests; registering it with Obsidian for use here is
 # left to those follow-ups (the desktop CLI requires the target vault to be
 # registered, which can't be done non-interactively without manipulating
 # Obsidian's config file).
+#
+# ─── Format defaults per verb ────────────────────────────────────────────────
+# The wrapper does NOT rewrite format= arguments. Skills consuming structured
+# output must opt in explicitly. Verified empirically against CLI 1.12.7 by
+# scripts/cli-spike.sh; captures in tests/spike-results/.
+#
+#   Verb         Has format=?      Default   Skills should request
+#   ----------   --------------    -------   --------------------------------
+#   backlinks    json|tsv|csv      tsv       format=json
+#   tags         json|tsv|csv      tsv       format=json
+#   unresolved   json|tsv|csv      tsv       format=json
+#   bookmarks    json|tsv|csv      tsv       format=json
+#   outline      tree|md|json      tree      format=json
+#   search       text|json         text      format=json (or text for grep)
+#   aliases      —                 text      text — no JSON option
+#   orphans      —                 text      text — one path per line
+#   deadends     —                 text      text — one path per line
+#   tasks        —                 text      text — no JSON option
+#   properties   —                 text      text — no JSON option
+#   read         —                 raw body  raw bytes
+#
+# Empirical correction vs. the original epic plan: orphans, deadends, tasks,
+# and properties do NOT accept format=json. The wrapper does not synthesize
+# JSON for verbs the CLI does not natively format.
 #
 # Usage:
 #   bash tests/cli-smoke.sh

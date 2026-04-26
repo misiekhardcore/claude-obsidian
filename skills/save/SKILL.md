@@ -18,7 +18,7 @@ The wiki compounds. Save often.
 
 ## Vault Writes Use the CLI Wrapper
 
-All vault reads and writes go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh`, not Read/Write/Edit. The wrapper resolves the vault, normalizes exit codes, and ensures Obsidian's index is consistent with disk. Contract: `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
+All vault reads and writes go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh`, not Read/Write/Edit. The wrapper resolves the vault, normalizes exit codes, and ensures Obsidian's index is consistent with disk.
 
 | Op | Wrapper invocation |
 |---|---|
@@ -28,7 +28,7 @@ All vault reads and writes go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cl
 | Prepend to master index | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend file=wiki/index.md content="<entry>"` |
 | Rewrite hot cache | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh create path=wiki/hot.md content="<body>" overwrite` |
 
-Multiline content uses the CLI's `\n` escape (round-trip verified empirically — see `tests/spike-results/rmw-mutate-diff.out`). If a future spike reveals the round-trip is broken, fall back to `obsidian create source=/tmp/staging.md path=wiki/...` per `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
+Multiline content uses the CLI's `\n` escape (round-trip verified empirically — see `tests/spike-results/rmw-mutate-diff.out`). If a future spike reveals the round-trip is broken, fall back to `obsidian create source=/tmp/staging.md path=wiki/...`.
 
 `Read` is retained only for resources outside the vault. The skill no longer needs `Write` or `Edit`.
 
