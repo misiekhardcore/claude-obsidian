@@ -1,12 +1,24 @@
 ---
 name: query
 description: "Answer questions using the Obsidian wiki vault. Reads hot cache first, then index, then relevant pages. Synthesizes answers with citations. Files good answers back as wiki pages. Supports quick, standard, and deep modes. Triggers on: what do you know about, query:, what is, explain, summarize, find in wiki, search the wiki, based on the wiki, wiki query quick, wiki query deep."
-allowed-tools: Read Glob Grep
+allowed-tools: Bash Read Glob Grep
 ---
 
 # query: Query the Wiki
 
 The wiki has already done the synthesis work. Read strategically, answer precisely, and file good answers back so the knowledge compounds.
+
+## Vault Reads Use the CLI Wrapper
+
+All vault reads go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh`, not the `Read` tool. The wrapper resolves the vault, normalizes exit codes, and decouples the skill from the absolute vault path. Contract: `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
+
+| Op | Wrapper invocation |
+|---|---|
+| Hot cache | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh read path=wiki/hot.md` |
+| Master index | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh read path=wiki/index.md` |
+| Individual page | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh read path=wiki/<category>/<page>.md` |
+
+`Read` is retained only for resources outside the vault (skill references, plugin templates).
 
 ---
 
@@ -26,8 +38,8 @@ Three depths. Choose based on the question complexity.
 
 Use when the answer is likely in the hot cache or index summary.
 
-1. Read `wiki/hot.md`. If it answers the question, respond immediately.
-2. If not, read `wiki/index.md`. Scan descriptions for the answer.
+1. Read `wiki/hot.md` via `obsidian-cli.sh read path=wiki/hot.md`. If it answers the question, respond immediately.
+2. If not, read `wiki/index.md` via `obsidian-cli.sh read path=wiki/index.md`. Scan descriptions for the answer.
 3. If found in index summary, respond and do not open any pages.
 4. If not found, say "Not in quick cache. Run as standard query?"
 
@@ -37,9 +49,9 @@ Do not open individual wiki pages in quick mode.
 
 ## Standard Query Workflow
 
-1. **Read** `wiki/hot.md` first. It may already have the answer or directly relevant context.
-2. **Read** `wiki/index.md` to find the most relevant pages (scan for titles and descriptions).
-3. **Read** those pages. Follow wikilinks to depth-2 for key entities. No deeper.
+1. **Read** `wiki/hot.md` first via the wrapper. It may already have the answer or directly relevant context.
+2. **Read** `wiki/index.md` via the wrapper to find the most relevant pages (scan for titles and descriptions).
+3. **Read** those pages via `obsidian-cli.sh read path=wiki/<category>/<page>.md`. Follow wikilinks to depth-2 for key entities. No deeper.
 4. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
 5. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
 6. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
@@ -50,9 +62,9 @@ Do not open individual wiki pages in quick mode.
 
 Use for synthesis questions, comparisons, or "tell me everything about X."
 
-1. Read `wiki/hot.md` and `wiki/index.md`.
+1. Read `wiki/hot.md` and `wiki/index.md` via the wrapper.
 2. Identify all relevant sections (concepts, entities, sources, comparisons).
-3. Read every relevant page. No skipping.
+3. Read every relevant page via the wrapper. No skipping.
 4. If wiki coverage is thin, offer to supplement with web search.
 5. Synthesize a comprehensive answer with full citations.
 6. Always file the result back as a wiki page. Deep answers are too valuable to lose.

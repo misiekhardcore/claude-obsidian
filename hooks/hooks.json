@@ -6,6 +6,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; \"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh\" version >/dev/null 2>&1 || { echo \"Obsidian 1.12.7+ required and Obsidian must be running with the vault open\" >&2; exit 0; }"
+          },
+          {
+            "type": "command",
             "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; MODE=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-config.sh\" bootstrap_read_hot on-demand); [ \"$MODE\" = \"always\" ] && [ -f \"$VAULT/wiki/hot.md\" ] && cat \"$VAULT/wiki/hot.md\" || true"
           },
           {
