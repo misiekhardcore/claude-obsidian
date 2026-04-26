@@ -153,8 +153,17 @@ spike_closed() {
 cleanup_scratch() {
   echo
   echo "[cleanup]"
-  obsidian vault=$VAULT_NAME read path=$SCRATCH/created.md >/dev/null 2>&1 && \
-    echo "  scratch files were created in '$VAULT_NAME':$SCRATCH/ — remove manually if undesired"
+  # Best-effort scratch cleanup. Resolve the vault path so we can remove the
+  # whole scratch tree directly (the CLI has no batch-delete verb).
+  local vault_path
+  vault_path="$("$SCRIPT_DIR/resolve-vault.sh" 2>/dev/null || true)"
+  if [ -n "$vault_path" ] && [ -d "$vault_path/$SCRATCH" ]; then
+    rm -rf "$vault_path/$SCRATCH"
+    rm -f "$vault_path/Untitled.md"
+    echo "  removed $vault_path/$SCRATCH/ and stray Untitled.md"
+  else
+    echo "  no scratch directory to clean"
+  fi
 }
 
 main() {

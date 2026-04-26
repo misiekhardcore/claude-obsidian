@@ -5,6 +5,16 @@
 # Runs a representative subset of verbs — exhaustive coverage is the spike's
 # job, not the smoke test's.
 #
+# Vault: runs against whatever vault is currently active in Obsidian
+# (via scripts/resolve-vault.sh). Assertions are deliberately content-agnostic
+# — the smoke test verifies wrapper *contract* (exit codes, error patterns,
+# format negotiation, multiline round-trip), not fixture-specific assertions.
+# tests/fixtures/vault/ is committed as a stable test corpus for downstream
+# skill-conversion smoke tests; registering it with Obsidian for use here is
+# left to those follow-ups (the desktop CLI requires the target vault to be
+# registered, which can't be done non-interactively without manipulating
+# Obsidian's config file).
+#
 # Usage:
 #   bash tests/cli-smoke.sh
 #
@@ -91,7 +101,6 @@ esac
 
 # 6. Multiline create → read round-trip (verifies \n escapes round-trip).
 SCRATCH="_cli-smoke-scratch"
-SCRATCH_DIR="${VAULT:-}"
 # Resolve vault path the same way the wrapper does, for cleanup.
 SCRATCH_VAULT_PATH="$("$PLUGIN_ROOT/scripts/resolve-vault.sh")"
 "$WRAPPER" create "path=$SCRATCH/multiline.md" content="alpha\nbeta\ngamma" overwrite >/dev/null 2>&1

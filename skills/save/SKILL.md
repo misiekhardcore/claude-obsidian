@@ -24,7 +24,7 @@ All vault reads and writes go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cl
 |---|---|
 | Read template / existing page | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh read path=<path>` |
 | Create new wiki page | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh create path=wiki/<category>/<slug>.md content="<body>"` |
-| Append to operations log | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh append path=wiki/log.md content="<entry>"` |
+| Prepend latest entry to operations log | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend file=wiki/log.md content="<entry>"` |
 | Prepend to master index | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend file=wiki/index.md content="<entry>"` |
 | Rewrite hot cache | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh create path=wiki/hot.md content="<body>" overwrite` |
 
@@ -69,7 +69,7 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
      file=wiki/index.md \
      content="- [[<slug>]]: <one-line description>\n"
    ```
-8. **Append** to `wiki/log.md`. New entry at the TOP via the wrapper:
+8. **Prepend** the latest entry to `wiki/log.md` (new entry goes at the TOP):
    ```bash
    ${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend \
      file=wiki/log.md \
