@@ -7,30 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-The version bump and release entry will be added in a separate change. Until then, the work below ships under the existing `0.4.0` version. When the release lands, this section gets renamed to its semver heading.
+## [0.5.0] — 2026-04-26
 
-### Breaking Changes (planned)
+### Breaking Changes
 
-The plugin will talk to Obsidian through the official Obsidian CLI (1.12.7+) instead of the Local REST API + MCP server combination. Vaults must be open in a running Obsidian desktop instance for converted skills to read or write.
+`query` and `save` now talk to Obsidian through the official Obsidian CLI (1.12.7+) instead of the Local REST API + MCP server. The vault must be open in a running Obsidian desktop instance for these two skills to read or write ([#54]).
 
-This affects every vault-touching skill once its conversion sub-issue lands. Foundation in this PR covers `query` and `save` only; the remaining skills (`ingest`, `lint`, `notes`, `canvas`, `obsidian-bases`, `wiki`, `autoresearch`, `defuddle`) keep their existing direct-file / MCP behaviour and will be migrated in follow-up sub-issues. Mixed-mode coexistence is intentional — you do not need to wait for the full migration.
+The remaining vault-touching skills (`ingest`, `lint`, `notes`, `canvas`, `obsidian-bases`, `wiki`, `autoresearch`, `defuddle`) keep their existing direct-file / MCP behaviour and will be migrated in follow-up sub-issues. Mixed-mode coexistence is intentional — you do not need to wait for the full migration.
 
 ### Added
 
-- `scripts/obsidian-cli.sh` — wrapper that resolves the vault, derives the vault name (`basename`), pre-flights `obsidian version`, and normalizes exit codes. Contract is documented inline in the script's header comment: exit-code table, error patterns, escape-hatch policy, and the documented exception list.
-- `scripts/cli-spike.sh` — empirical CLI probe; results pinned in `tests/spike-results/`. Re-run after every Obsidian CLI minor-version bump.
-- `tests/cli-smoke.sh` — 15 assertions on wrapper output shape and exit codes against the active vault.
-- `tests/fixtures/vault/` — minimal Obsidian vault used by the spike and future skill smoke tests.
-- SessionStart hook entry that pre-flights `obsidian version` and emits an actionable warning when Obsidian is missing or stopped (fail-soft — never blocks the session).
-- `hooks/obsidian-cli-rewrite.sh` — PreToolUse hook (matcher: `Bash`) that transparently rewrites raw `obsidian <verb>` invocations to call `scripts/obsidian-cli.sh` instead. RTK-style transparent rewrite via `hookSpecificOutput.updatedInput.command`. Conservative match: first token must be exactly `obsidian`; commands already mentioning `obsidian-cli` are untouched.
+- `scripts/obsidian-cli.sh` — wrapper that resolves the vault, derives the vault name (`basename`), pre-flights `obsidian version`, and normalizes exit codes. Contract is documented inline in the script's header comment: exit-code table, error patterns, escape-hatch policy, and the documented exception list ([#54]).
+- `scripts/cli-spike.sh` — empirical CLI probe; results pinned in `tests/spike-results/`. Re-run after every Obsidian CLI minor-version bump ([#54]).
+- `tests/cli-smoke.sh` — 15 assertions on wrapper output shape and exit codes against the active vault ([#54]).
+- `tests/fixtures/vault/` — minimal Obsidian vault used by the spike and future skill smoke tests ([#54]).
+- SessionStart hook entry that pre-flights `obsidian version` and emits an actionable warning when Obsidian is missing or stopped (fail-soft — never blocks the session) ([#54]).
+- `hooks/obsidian-cli-rewrite.sh` — PreToolUse hook (matcher: `Bash`) that transparently rewrites raw `obsidian <verb>` invocations to call `scripts/obsidian-cli.sh` instead. RTK-style transparent rewrite via `hookSpecificOutput.updatedInput.command`. Conservative match: first token must be exactly `obsidian`; commands already mentioning `obsidian-cli` are untouched ([#54]).
 
 ### Changed
 
-- `skills/query/SKILL.md` — vault reads now go through `obsidian-cli.sh read path=...`. `Read` is retained for non-vault resources only. `allowed-tools` adds `Bash`.
-- `skills/save/SKILL.md` — vault reads, creates, appends, prepends, and overwrites go through the wrapper. `Write` and `Edit` are no longer in `allowed-tools` (the wrapper covers all vault writes).
-- No new `userConfig` keys; the SessionStart version probe is unconditional and fail-soft.
+- `skills/query/SKILL.md` — vault reads now go through `obsidian-cli.sh read path=...`. `Read` is retained for non-vault resources only. `allowed-tools` adds `Bash` ([#54]).
+- `skills/save/SKILL.md` — vault reads, creates, appends, prepends, and overwrites go through the wrapper. `Write` and `Edit` are no longer in `allowed-tools` (the wrapper covers all vault writes) ([#54]).
+- Trimmed wrapper-usage repetition from `query` and `save` SKILL.md — vault I/O conventions live in `CLAUDE.md` and `_shared/`, the skills no longer duplicate them ([#59]).
+- No new `userConfig` keys; the SessionStart version probe is unconditional and fail-soft ([#54]).
 
-### Migration (when this lands as 1.0.0)
+### Fixed
+
+- SessionEnd reflection hook restored on dash-based `/bin/sh`. The 0.4.0 fix used `nohup … & disown`, but `disown` is a bash builtin and dash aborts the script before the reflection runs. Dropping `disown` keeps the subshell detached enough to avoid SessionEnd cancellation while staying POSIX-compatible ([#57]).
+
+### Migration
 
 1. Install Obsidian 1.12.7 or newer.
 2. Enable the Obsidian CLI (Settings → Community plugins → Obsidian CLI; or follow the upstream install instructions).
@@ -46,7 +51,7 @@ These came out of `scripts/cli-spike.sh` and are pinned in the wrapper / smoke h
 - `orphans`, `deadends`, `tasks`, and `properties` do not accept `format=json`; only `backlinks`, `tags`, `unresolved`, `outline`, `search`, `bookmarks`, and `aliases` do. The format-defaults table in `tests/cli-smoke.sh` reflects this.
 - Multiline `content="line one\nline two"` round-trips cleanly through `create` + `read`. No `source=/tmp/...` fallback is needed for hot-cache rewrites.
 
-### Rollback (post-release)
+### Rollback
 
 If a regression blocks your work, pin the previous release:
 
@@ -94,6 +99,7 @@ The 0.4.0 plugin re-enables the Local REST API + MCP code path. After pinning, y
 - `resolve-vault.sh` falls back to `settings.local.json` for out-of-session invocations where `${user_config.*}` is unavailable ([#33], [#32]).
 - Hooks pass `vault_path` as an argument to `resolve-vault.sh` ([#29]).
 
+[0.5.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.5.0
 [0.4.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.4.0
 [0.3.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.3.0
 [0.2.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.2.0
@@ -123,3 +129,6 @@ The 0.4.0 plugin re-enables the Local REST API + MCP code path. After pinning, y
 [#43]: https://github.com/misiekhardcore/claude-obsidian/pull/43
 [#55]: https://github.com/misiekhardcore/claude-obsidian/issues/55
 [#56]: https://github.com/misiekhardcore/claude-obsidian/pull/56
+[#54]: https://github.com/misiekhardcore/claude-obsidian/pull/54
+[#57]: https://github.com/misiekhardcore/claude-obsidian/pull/57
+[#59]: https://github.com/misiekhardcore/claude-obsidian/pull/59
