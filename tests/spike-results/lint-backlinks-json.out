@@ -1,0 +1,68 @@
+[
+  {
+    "file": "notes/index.md"
+  },
+  {
+    "file": "wiki/comparisons/wiki-vs-rag.md"
+  },
+  {
+    "file": "wiki/concepts/_index.md"
+  },
+  {
+    "file": "wiki/concepts/hot-cache.md"
+  },
+  {
+    "file": "wiki/concepts/llm-wiki-pattern.md"
+  },
+  {
+    "file": "wiki/entities/_index.md"
+  },
+  {
+    "file": "wiki/getting-started.md"
+  },
+  {
+    "file": "wiki/hot.md"
+  },
+  {
+    "file": "wiki/log.md"
+  },
+  {
+    "file": "wiki/meta/authoring-style.md"
+  },
+  {
+    "file": "wiki/meta/claude-obsidian-v1.2.0-release-session.md"
+  },
+  {
+    "file": "wiki/meta/dashboard.md"
+  },
+  {
+    "file": "wiki/meta/full-audit-and-system-setup-session.md"
+  },
+  {
+    "file": "wiki/meta/lint-report-2026-04-22.md"
+  },
+  {
+    "file": "wiki/meta/lint-report-2026-04-24.md"
+  },
+  {
+    "file": "wiki/overview.md"
+  },
+  {
+    "file": "wiki/questions/how-does-the-llm-wiki-pattern-work.md"
+  },
+  {
+    "file": "wiki/solutions/_index.md"
+  },
+  {
+    "file": "wiki/sources/_index.md"
+  },
+  {
+    "file": "wiki/sources/llm-wiki-karpathy-gist.md"
+  },
+  {
+    "file": "wiki/sources/llm-wiki-research-2026-04-20.md"
+  },
+  {
+    "file": "wiki/Wiki Map.canvas"
+  }
+]
