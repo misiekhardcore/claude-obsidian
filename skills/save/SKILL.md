@@ -7,7 +7,7 @@ description: >
   Triggers on: "save this", "save that answer", "/save", "file this",
   "save to wiki", "save this session", "file this conversation", "keep this",
   "save this analysis", "add this to the wiki".
-allowed-tools: Read Write Edit Glob Grep
+allowed-tools: Bash Read Glob Grep
 ---
 
 # save: File Conversations Into the Wiki
@@ -15,6 +15,20 @@ allowed-tools: Read Write Edit Glob Grep
 Good answers and insights shouldn't disappear into chat history. This skill takes what was just discussed and files it as a permanent wiki page.
 
 The wiki compounds. Save often.
+
+## Vault Writes
+
+Vault reads and writes use the Obsidian CLI (see CLAUDE.md → Vault I/O for the global rule). The skill no longer needs `Write` or `Edit`; `Read` is reserved for resources outside the vault.
+
+| Op | Invocation |
+|---|---|
+| Read template / existing page | `obsidian read path=<path>` |
+| Create new wiki page | `obsidian create path=wiki/<category>/<slug>.md content="<body>"` |
+| Prepend latest entry to operations log | `obsidian prepend file=wiki/log.md content="<entry>"` |
+| Prepend to master index | `obsidian prepend file=wiki/index.md content="<entry>"` |
+| Rewrite hot cache | `obsidian create path=wiki/hot.md content="<body>" overwrite` |
+
+Multiline content uses the CLI's `\n` escape (round-trip verified empirically — see `tests/spike-results/rmw-mutate-diff.out`). If a future spike reveals the round-trip is broken, fall back to `obsidian create source=/tmp/staging.md path=wiki/...`.
 
 ---
 
@@ -40,17 +54,26 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
 2. **Ask** (if not already named): "What should I call this note?" Keep the name short and descriptive.
 3. **Determine** note type using the table above.
 4. **Extract** all relevant content from the conversation. Rewrite it in declarative present tense (not "the user asked" but the actual content itself).
-5. **Create** the note in the correct folder with full frontmatter.
-6. **Collect links**: identify any wiki pages mentioned in the conversation. Add them to `related` in frontmatter.
-7. **Update** `wiki/index.md`. Add the new entry at the top of the relevant section.
-8. **Append** to `wiki/log.md`. New entry at the TOP:
+5. **Create** the note:
+   ```bash
+   obsidian create \
+     path=wiki/<folder>/<slug>.md \
+     content="<frontmatter + body, with \n for newlines>"
    ```
-   ## [YYYY-MM-DD] save | Note Title
-   - Type: [note type]
-   - Location: wiki/[folder]/Note Title.md
-   - From: conversation on [brief topic description]
+6. **Collect links**: identify any wiki pages mentioned in the conversation. Include them in `related` in the frontmatter you pass via `content=`.
+7. **Update** `wiki/index.md`. Prepend the new entry under the relevant section:
+   ```bash
+   obsidian prepend \
+     file=wiki/index.md \
+     content="- [[<slug>]]: <one-line description>\n"
    ```
-9. **Update** `wiki/hot.md` to reflect the new addition. Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+8. **Prepend** the latest entry to `wiki/log.md` (new entry goes at the TOP):
+   ```bash
+   obsidian prepend \
+     file=wiki/log.md \
+     content="## [YYYY-MM-DD] save | Note Title\n- Type: [note type]\n- Location: wiki/[folder]/Note Title.md\n- From: conversation on [brief topic description]\n\n"
+   ```
+9. **Rewrite** `wiki/hot.md` via `obsidian create path=wiki/hot.md content="..." overwrite`. Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`. Multiline content uses `\n` escapes.
 10. **Confirm**: "Saved as [[Note Title]] in wiki/[folder]/."
 
 ---

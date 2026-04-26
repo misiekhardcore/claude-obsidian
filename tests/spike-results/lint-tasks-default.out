@@ -1,0 +1,8 @@
+- [x] **Frontmatter validation** — All 49 pages have required fields
+- [x] **Dead link detection** — 0 broken links (11 fixed)
+- [x] **Empty section detection** — Noted but deferred (content gaps, not lint issues)
+- [x] **Orphan page detection** — 0 orphans (1 reconnected)
+- [x] **Index consistency** — All entries valid (2 stale entries removed)
+- [x] **Stale page detection** — No seed pages >30 days old
+- [x] **Unlinked mentions** — All entities properly linked or unlinked
+- [x] **Cross-reference patterns** — Improved connectivity with new concept pages

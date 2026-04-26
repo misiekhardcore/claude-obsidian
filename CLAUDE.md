@@ -53,6 +53,21 @@ _attachments/      Images and PDFs referenced by wiki pages
 - **Generated knowledge:** `wiki/` — agent-owned, links to sources via wikilinks
 - **Manifest:** `.raw/.manifest.json` — delta tracking for ingested sources
 
+## Vault I/O
+
+All vault reads and writes go through the **Obsidian CLI**, not `Read`/`Write`/`Edit`/`cat`. The CLI keeps Obsidian's index consistent with disk and gives every skill a single, vault-aware code path.
+
+```bash
+obsidian read path=wiki/hot.md
+obsidian create path=wiki/concepts/foo.md content="..."
+obsidian append file=wiki/log.md content="..."
+obsidian prepend file=wiki/index.md content="..."
+```
+
+A PreToolUse Bash hook (`hooks/obsidian-cli-rewrite.sh`) transparently routes raw `obsidian <verb> ...` calls through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh`, which resolves the vault, pre-flights the connection, and normalizes exit codes (the upstream CLI always returns 0). See the wrapper's header comment for exit-code semantics, error patterns, escape hatches, and documented bypasses.
+
+`Read` is allowed only for resources outside the vault (skill references, plugin templates, external paths). `Write` / `Edit` are not used for vault paths.
+
 ## Skills Discovery
 
 All skills live in `skills/<name>/SKILL.md` and are auto-discovered by Claude Code via the plugin manifest.
