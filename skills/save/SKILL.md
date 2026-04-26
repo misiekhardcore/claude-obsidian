@@ -18,8 +18,6 @@ The wiki compounds. Save often.
 
 ## Vault Writes
 
-Vault reads and writes use the Obsidian CLI (see CLAUDE.md → Vault I/O for the global rule). The skill no longer needs `Write` or `Edit`; `Read` is reserved for resources outside the vault.
-
 | Op | Invocation |
 |---|---|
 | Read template / existing page | `obsidian read path=<path>` |
@@ -28,7 +26,7 @@ Vault reads and writes use the Obsidian CLI (see CLAUDE.md → Vault I/O for the
 | Prepend to master index | `obsidian prepend file=wiki/index.md content="<entry>"` |
 | Rewrite hot cache | `obsidian create path=wiki/hot.md content="<body>" overwrite` |
 
-Multiline content uses the CLI's `\n` escape (round-trip verified empirically — see `tests/spike-results/rmw-mutate-diff.out`). If a future spike reveals the round-trip is broken, fall back to `obsidian create source=/tmp/staging.md path=wiki/...`.
+Multiline content uses `\n` escapes inside `content="..."`.
 
 ---
 
@@ -73,7 +71,7 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
      file=wiki/log.md \
      content="## [YYYY-MM-DD] save | Note Title\n- Type: [note type]\n- Location: wiki/[folder]/Note Title.md\n- From: conversation on [brief topic description]\n\n"
    ```
-9. **Rewrite** `wiki/hot.md` via `obsidian create path=wiki/hot.md content="..." overwrite`. Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`. Multiline content uses `\n` escapes.
+9. **Rewrite** `wiki/hot.md` (use the `overwrite` flag). Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 10. **Confirm**: "Saved as [[Note Title]] in wiki/[folder]/."
 
 ---
