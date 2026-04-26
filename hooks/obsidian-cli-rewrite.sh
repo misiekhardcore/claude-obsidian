@@ -32,14 +32,16 @@ case "$CMD" in
   *obsidian-cli*) exit 0 ;;
 esac
 
-# First token (after leading whitespace) must be exactly `obsidian`.
-# `read -r FIRST REST` splits on the first whitespace.
-read -r FIRST REST <<<"$CMD"
-[ "$FIRST" = "obsidian" ] || exit 0
+# Rewrite ONLY the leading `obsidian` token on the first line. Preserves
+# multi-line commands (backslash continuations, here-docs, embedded newlines)
+# verbatim after the first token. Mid-string occurrences of `obsidian` (e.g.
+# inside content=, comments) are not touched. Leave ${CLAUDE_PLUGIN_ROOT}
+# unexpanded so the rewrite is portable — Bash expands it at execution time.
+REWRITTEN=$(printf '%s' "$CMD" | sed -E '1 s~^([[:space:]]*)obsidian([[:space:]]|$)~\1"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh"\2~')
 
-# Build the rewritten command. Leave ${CLAUDE_PLUGIN_ROOT} unexpanded so the
-# rewrite is portable across users — Bash will expand it at execution time.
-REWRITTEN="\"\${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh\" $REST"
+# No-op if the leading token wasn't `obsidian` (e.g. `which obsidian`,
+# `cat $obsidian_path`, `pgrep -f obsidian`).
+[ "$REWRITTEN" = "$CMD" ] && exit 0
 
 # Emit the rewritten tool_input. Preserve all other fields (e.g. `description`).
 ORIGINAL_INPUT=$(echo "$INPUT" | jq -c '.tool_input')

@@ -157,10 +157,12 @@ echo "=== rewrite-hook — PreToolUse Bash auto-rewrite ==="
 
 REWRITE_HOOK="$PLUGIN_ROOT/hooks/obsidian-cli-rewrite.sh"
 
-# Helper: run hook with a given command, return its stdout.
+# Helper: run hook with a given command, return its stdout. `jq -Rs` slurps
+# stdin as a single raw string so multi-line commands round-trip correctly
+# (plain `-R` would emit one JSON string per line and break the wrapping JSON).
 run_hook() {
   local cmd="$1"
-  printf '%s' "{\"tool_input\":{\"command\":$(printf '%s' "$cmd" | jq -R .)}}" | bash "$REWRITE_HOOK"
+  printf '%s' "{\"tool_input\":{\"command\":$(printf '%s' "$cmd" | jq -Rs .)}}" | bash "$REWRITE_HOOK"
 }
 
 # 1. Raw `obsidian read` should be rewritten to the wrapper.
@@ -201,6 +203,22 @@ if echo "$out" | jq -e '.hookSpecificOutput.updatedInput.command | endswith("ver
   pass "obsidian version — rewritten"
 else
   fail "obsidian version — expected rewrite ending with 'version'"
+fi
+
+# 6. Multi-line `obsidian create \ ...` must rewrite the leading token only and
+#    preserve continuation lines verbatim. Regression guard: a previous
+#    implementation used `read -r FIRST REST` which dropped everything after
+#    the first newline, silently truncating multi-line invocations from skills.
+multiline_cmd=$'obsidian create \\\n  path=wiki/foo.md \\\n  content="alpha\\nbeta"'
+out=$(run_hook "$multiline_cmd")
+rewritten=$(echo "$out" | jq -r '.hookSpecificOutput.updatedInput.command // empty')
+if [ -n "$rewritten" ] \
+   && echo "$rewritten" | head -n1 | grep -qF '"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" create' \
+   && echo "$rewritten" | grep -qF 'path=wiki/foo.md' \
+   && echo "$rewritten" | grep -qF 'content="alpha'; then
+  pass "multi-line rewrite preserves continuation lines"
+else
+  fail "expected multi-line rewrite to keep path/content args; got: $(printf '%s' "$rewritten" | head -c 200)"
 fi
 
 echo ""

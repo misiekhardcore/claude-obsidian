@@ -16,21 +16,19 @@ Good answers and insights shouldn't disappear into chat history. This skill take
 
 The wiki compounds. Save often.
 
-## Vault Writes Use the CLI Wrapper
+## Vault Writes
 
-All vault reads and writes go through `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh`, not Read/Write/Edit. The wrapper resolves the vault, normalizes exit codes, and ensures Obsidian's index is consistent with disk.
+Vault reads and writes use the Obsidian CLI (see CLAUDE.md → Vault I/O for the global rule). The skill no longer needs `Write` or `Edit`; `Read` is reserved for resources outside the vault.
 
-| Op | Wrapper invocation |
+| Op | Invocation |
 |---|---|
-| Read template / existing page | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh read path=<path>` |
-| Create new wiki page | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh create path=wiki/<category>/<slug>.md content="<body>"` |
-| Prepend latest entry to operations log | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend file=wiki/log.md content="<entry>"` |
-| Prepend to master index | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend file=wiki/index.md content="<entry>"` |
-| Rewrite hot cache | `${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh create path=wiki/hot.md content="<body>" overwrite` |
+| Read template / existing page | `obsidian read path=<path>` |
+| Create new wiki page | `obsidian create path=wiki/<category>/<slug>.md content="<body>"` |
+| Prepend latest entry to operations log | `obsidian prepend file=wiki/log.md content="<entry>"` |
+| Prepend to master index | `obsidian prepend file=wiki/index.md content="<entry>"` |
+| Rewrite hot cache | `obsidian create path=wiki/hot.md content="<body>" overwrite` |
 
 Multiline content uses the CLI's `\n` escape (round-trip verified empirically — see `tests/spike-results/rmw-mutate-diff.out`). If a future spike reveals the round-trip is broken, fall back to `obsidian create source=/tmp/staging.md path=wiki/...`.
-
-`Read` is retained only for resources outside the vault. The skill no longer needs `Write` or `Edit`.
 
 ---
 
@@ -56,26 +54,26 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
 2. **Ask** (if not already named): "What should I call this note?" Keep the name short and descriptive.
 3. **Determine** note type using the table above.
 4. **Extract** all relevant content from the conversation. Rewrite it in declarative present tense (not "the user asked" but the actual content itself).
-5. **Create** the note via the wrapper:
+5. **Create** the note:
    ```bash
-   ${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh create \
+   obsidian create \
      path=wiki/<folder>/<slug>.md \
      content="<frontmatter + body, with \n for newlines>"
    ```
 6. **Collect links**: identify any wiki pages mentioned in the conversation. Include them in `related` in the frontmatter you pass via `content=`.
 7. **Update** `wiki/index.md`. Prepend the new entry under the relevant section:
    ```bash
-   ${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend \
+   obsidian prepend \
      file=wiki/index.md \
      content="- [[<slug>]]: <one-line description>\n"
    ```
 8. **Prepend** the latest entry to `wiki/log.md` (new entry goes at the TOP):
    ```bash
-   ${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh prepend \
+   obsidian prepend \
      file=wiki/log.md \
      content="## [YYYY-MM-DD] save | Note Title\n- Type: [note type]\n- Location: wiki/[folder]/Note Title.md\n- From: conversation on [brief topic description]\n\n"
    ```
-9. **Rewrite** `wiki/hot.md` via `obsidian-cli.sh create path=wiki/hot.md content="..." overwrite`. Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`. Multiline content uses `\n` escapes.
+9. **Rewrite** `wiki/hot.md` via `obsidian create path=wiki/hot.md content="..." overwrite`. Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`. Multiline content uses `\n` escapes.
 10. **Confirm**: "Saved as [[Note Title]] in wiki/[folder]/."
 
 ---
