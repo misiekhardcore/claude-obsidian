@@ -34,7 +34,7 @@ Positional argument(s) — inline text, file path, and/or image paths:
    - Image (suffix in `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`) → collect for processing (see "Split — with images" below).
    - Binary (other) → abort: `Unsupported input type: <ext>. /braindump and capture skills accept text, markdown, and image inputs.`
 5. Path does not resolve and does not look like an image → treat `<arg>` verbatim as inline text. No error.
-6. **Image validation (all images):** Before split/vision-LLM, validate all image paths: must exist, be readable, and have a supported extension. If any path is missing/unreadable, abort: `Image not found or unreadable: <path>`. If unsupported extension, abort: `Unsupported input type: <ext>. /braindump and capture skills accept text, markdown, and image inputs.`
+6. **Image validation.** Before split/vision-LLM, validate all image paths per [§5 Supported image types and validation](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect). Abort on error.
 
 ---
 
@@ -60,14 +60,13 @@ If the combined split+image-assignment step fails due to vision processing error
 
 ## CAPTURE loop
 
+If any images were collected in input parsing, ensure `_attachments/` per [§5 Attachment directory](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) once before the loop.
+
 For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append to a note written by chunk K-1). Then:
 
 1. MATCH/NEW per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template) — skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
 2. MATCH or NEW path per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template); slug via [§3](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven).
-3. **Image attachment handling (if images assigned to this chunk):**
-   - Ensure `<vault_root>/_attachments/` exists (create silently if absent).
-   - NEW path: Move images to `<vault_root>/_attachments/<note-slug>.<ext>`, `<note-slug>-2.<ext>`, etc. Add `attachments: [...]` list to frontmatter. Embed images at end of body via `![[filename]]`.
-   - MATCH path: Generate new vision-LLM description (if images), append after `---` separator. Move images to `_attachments/` with existing note's slug + collision suffixes. Extend existing note's `attachments:` list.
+3. **Image attachment handling (if images assigned to this chunk).** Follow [§5](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) for naming, embed syntax, and `attachments:` frontmatter. MATCH path: generate a vision-LLM description of the assigned images and append after `---` separator.
 4. Index patch per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
 5. Record filename + success/failure. On error: append to failure list, continue — never abort the loop.
 

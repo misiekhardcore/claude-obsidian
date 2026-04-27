@@ -40,20 +40,13 @@ Steps:
 
 1. **Extract arguments** from the user's message. Everything after the trigger phrase, parsed as text snippets and/or file paths. Detect image paths (suffix in `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`) and text snippets, preserving order.
 
-2. **Image input detection and validation.** If any image path arguments are present:
-   - Validate each image path: must exist, be readable, and have a supported extension (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`).
-   - If any path is missing or unreadable, abort: `Image not found or unreadable: <path>`
-   - If any path has unsupported extension, abort: `Unsupported input type: <ext>. /braindump and capture skills accept text, markdown, and image inputs.`
+2. **Image pre-flight.** If any image paths are present: validate per [§5 Supported image types and validation](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) (abort on error), then ensure `_attachments/` per [§5 Attachment directory](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect).
 
-3. **Vision-LLM processing (image input).** If images are present:
-   - Collect all text snippets and all image paths from step 1, in order.
-   - Invoke vision-LLM with both text and images. LLM output: description (concise), vision-slug (≤40 chars, slug-format).
-   - If vision-LLM call fails, abort: `Vision processing failed: <reason>. Image not moved, note not created.`
-   - Use the LLM-generated description and vision-slug for the bullet.
+3. **Vision-LLM processing.** If images are present, follow [§5 Vision-LLM processing](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect). For `/daily`: LLM output is description (concise) and vision-slug (≤40 chars, slug-format). Use description and vision-slug for the bullet.
 
 4. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort with `No vault configured — run /wiki init first.` if unresolved.
 
-5. **Compute** today as `YYYY-MM-DD` and current local time as `HH:MM` (24-hour, zero-padded). Ensure `<vault_root>/_attachments/` exists (create silently if absent).
+5. **Compute** today as `YYYY-MM-DD` and current local time as `HH:MM` (24-hour, zero-padded).
 
 6. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently.
 
@@ -61,9 +54,7 @@ Steps:
 
 8. **Ensure heading:** if the file exists but `## Captures` is missing, append the heading at EOF before the bullet (idempotent — never duplicate).
 
-9. **Image attachment handling (if images present):**
-   - Move images to `<vault_root>/_attachments/<YYYY-MM-DD>-<vision-slug>.<ext>` (primary). Collision suffix: `<YYYY-MM-DD>-<vision-slug>-2.<ext>`, etc.
-   - For each image, create an embed line (indented 2 spaces below the bullet): `  ![[<filename>]]`
+9. **Image attachment handling (if images present).** Move images and generate embed lines per [§5 Image-to-note naming](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) and [§5 Embed syntax](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) (daily shape: embed indented two spaces on the line below the bullet).
 
 10. **Append** bullet(s) under `## Captures`:
     - Text-only: `- HH:MM <verbatim text>`
