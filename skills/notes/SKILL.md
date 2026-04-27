@@ -63,11 +63,7 @@ Steps:
    - **Filename is never renamed.** Drift between filename slug and rewritten `title` is acceptable.
 6. **NEW path** — create a new file:
    - **Title.** Derive a one-line summary (≤80 chars) of the verbatim text, stripping leading filler ("we need to", "can we check", "I think we should") so the substance leads. If the verbatim text is itself short, substantive, and one-line, use it as the title.
-   - **Slug.** Compute via the shared script — do not slugify in-prompt:
-     ```bash
-     slug=$(bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "$title" "$body")
-     ```
-     The script lowercases, replaces non-alphanumerics with `-`, collapses runs, trims, and applies word-boundary truncation at char 40 (hard-truncate when the first word is ≥ 40 chars). When the title slugifies to empty (all special chars), it falls back to a 40-char body slug. Exit 1 means both are empty — surface that as an error rather than inventing a name. The script is the source of truth for the slug rule; reuse it from `/daily` and `/braindump` once those land (epic #60).
+   - **Slug.** Compute via `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "$title" "$body"` — see that script's header for the contract. Do not slugify in-prompt. Exit 1 means both inputs slugify to empty; surface that as an error rather than inventing a name.
    - **Path:** `<vault_root>/notes/YYYY-MM-DD-<slug>.md`. If that filename already exists for today, append a counter suffix `-2`, `-3`, … incrementing. Different days never collide because the date prefix differs.
    - **Frontmatter** from the template below; body is the verbatim text. Topic and tags may be left empty (`""` and `[]`) — they're populated by the user later if needed.
 7. **Update `notes/index.md`** — patch in place, no full rewrite:
