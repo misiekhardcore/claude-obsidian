@@ -19,8 +19,8 @@ The bullet under `## Captures` uses the LLM description, with embeds indented tw
 
 ```
 - HH:MM <description>
-  ![[YYYY-MM-DD-vision-slug.png]]
-  ![[YYYY-MM-DD-vision-slug-2.png]]
+  ![[<YYYY-MM-DD>-<vision-slug>.png]]
+  ![[<YYYY-MM-DD>-<vision-slug>-2.png]]
 ```
 
 Multiple images: all embeds appear indented under the same bullet, in input order.
