@@ -19,6 +19,7 @@ Then enable the plugin and set `vault_path` (absolute path to your Obsidian vaul
 - `lint` — find orphan pages, dead links, stale claims
 - `save` — save the current conversation or insight into the vault
 - `notes` — quick inbox capture (`/note`, `/dump`); list and process flows for triage
+- `daily` — append-only chronological log (`/daily`); timestamped bullets in `daily/YYYY-MM-DD.md`
 - `autoresearch` — autonomous iterative research loop
 - `canvas` — create / update Obsidian canvas files
 - `defuddle` — strip clutter from web pages before ingestion
@@ -31,11 +32,11 @@ Then enable the plugin and set `vault_path` (absolute path to your Obsidian vaul
 <vault_path>/
   wiki/          agent-generated knowledge (hot.md, index.md, concepts/, entities/, sources/)
   notes/         inbox: verbatim quick-capture notes (owned by `notes` skill)
+  daily/         chronological daily log — one file per day (owned by `daily` skill)
   .raw/          immutable source documents + .manifest.json
   _templates/    Obsidian Templater templates
   _attachments/  images + PDFs referenced by wiki pages
   .obsidian/     (user-owned) Obsidian app config
-  daily/         (optional) daily notes if the user enables them
 ```
 
 ## Hooks

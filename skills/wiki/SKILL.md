@@ -121,11 +121,12 @@ Steps:
 4. Create domain pages + `_index.md` sub-indexes.
 5. Create `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`, `wiki/overview.md`.
 6. Create `notes/` (top-level peer of `wiki/`) and copy `_seed/notes/index.md` if missing — this is the inbox owned by the `notes` skill.
-7. Create `_templates/` files for each note type.
-8. Apply visual customization. Read `references/css-snippets.md`. Create `.obsidian/snippets/vault-colors.css`.
-9. Create the vault CLAUDE.md using the template below.
-10. Initialize git. Read `references/git-setup.md`.
-11. Present the structure and ask: "Want to adjust anything before we start?"
+7. Create `daily/` (top-level peer of `wiki/`) and copy `_seed/daily/example-daily.md` if the directory is missing — this is the append-only log owned by the `daily` skill. If `daily/` already exists, skip without disturbing existing files.
+8. Create `_templates/` files for each note type.
+9. Apply visual customization. Read `references/css-snippets.md`. Create `.obsidian/snippets/vault-colors.css`.
+10. Create the vault CLAUDE.md using the template below.
+11. Initialize git. Read `references/git-setup.md`.
+12. Present the structure and ask: "Want to adjust anything before we start?"
 
 ### Vault CLAUDE.md Template
 
