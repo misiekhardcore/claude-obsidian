@@ -159,6 +159,8 @@ Synthesize a day's full capture record into a polished prose summary with option
    Closed daily/YYYY-MM-DD.md
    ```
 
+   Do **not** print the synthesis prose, the input context, the reasoning, or any other output. One line only.
+
 ### Prompt template (for step 6)
 
 ```
