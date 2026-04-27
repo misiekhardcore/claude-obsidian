@@ -38,6 +38,8 @@ wiki/              Claude-generated knowledge base
   sources/         Summaries linked to original materials
 notes/             Inbox: verbatim quick-capture notes (owned by `notes` skill)
   index.md         Pending + Deferred bullet list
+daily/             Chronological daily log (owned by `daily` skill)
+  YYYY-MM-DD.md    One file per day, append-only bullets under ## Captures
 .raw/              Source documents — immutable, never modified by agents
 _templates/        Obsidian Templater templates
 _attachments/      Images and PDFs referenced by wiki pages
@@ -82,6 +84,7 @@ All skills live in `skills/<name>/SKILL.md` and are auto-discovered by Claude Co
 | `lint` | lint the wiki, health check, find orphans, dead links |
 | `save` | `/save`, file this conversation, save insight |
 | `notes` | `/note`, `/dump`, note this, todo:, show my inbox, `/note process` |
+| `daily` | `/daily`, daily note this, log to today, log this, add to today's log |
 | `autoresearch` | autoresearch, autonomous research loop |
 | `canvas` | `/canvas`, add to canvas, create canvas |
 | `defuddle` | clean this url, defuddle, strip clutter |
