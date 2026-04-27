@@ -64,7 +64,7 @@ Pass the dump body to a **single LLM reasoning step** (think step, not a separat
 
 Output: an ordered list of chunks (strings). Each chunk is a verbatim excerpt from the original dump.
 
-**If split returns zero chunks** (LLM error, empty result, or the body is blank after parsing) → abort:
+**If split returns zero chunks** (unexpected empty result from the reasoning step, or the body is blank after parsing) → hard-abort immediately, no retry:
 ```
 /braindump split returned no chunks. Original text not captured.
 ```
@@ -98,7 +98,7 @@ Captured N notes:
 …
 ```
 
-Filenames in chunk order. No NEW/MATCH labels — silent routing principle. No diff. No reasoning.
+Use `note` (singular) when N=1, `notes` (plural) otherwise. Filenames in chunk order. No NEW/MATCH labels — silent routing principle. No diff. No reasoning.
 
 If any chunks failed (per AC-13):
 
@@ -107,8 +107,13 @@ Captured N notes:
 - notes/YYYY-MM-DD-<slug>.md
 …
 
-Failed: K chunks. <one-line reason per failure>
+Failed: K chunks.
+- <one-line reason for failure 1>
+- <one-line reason for failure 2>
+…
 ```
+
+Use `chunk` (singular) when K=1, `chunks` (plural) otherwise.
 
 ---
 
@@ -136,7 +141,7 @@ Captured 3 notes:
 user> /braindump The slug truncation rule needs to account for multi-byte unicode characters — right now it can split in the middle of a grapheme cluster, which breaks vault filenames on some filesystems.
 # Split: 1 chunk (single atomic idea, just long)
 assistant>
-Captured 1 notes:
+Captured 1 note:
 - notes/2026-04-27-slug-truncation-multibyte-unicode.md
 ```
 
@@ -176,5 +181,6 @@ Captured 2 notes:
 - notes/2026-04-27-check-lint-score-before-prs.md
 - notes/2026-04-27-daily-skill-confirmation-dark-mode.md
 
-Failed: 1 chunks. notes/: permission denied writing 2026-04-27-hot-cache-size-growing.md
+Failed: 1 chunk.
+- notes/: permission denied writing 2026-04-27-hot-cache-size-growing.md
 ```
