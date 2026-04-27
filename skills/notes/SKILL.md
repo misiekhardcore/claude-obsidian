@@ -44,14 +44,15 @@ Goal: persist the user's verbatim text with minimal metadata. No conversation co
 
 Steps:
 
-1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, parse everything after the trigger as a space-separated list of text snippets, image paths, and/or URLs. Preserve order.
+1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, capture everything after the trigger phrase as a single raw argument string. Scan it non-destructively for image-path tokens (any token that resolves to a path or carries a supported image extension) and URL tokens. Treat all remaining non-path, non-URL tokens as a single verbatim text segment — joined in their original order with single spaces. Preserve the relative order of text, paths, and URLs as they appeared in the input.
 
 2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/notes/references/image-capture.md`. Follow those files for the full image-input path; skip steps 3–4 below.
 
 3. **URL detection (text-only, no images).** If the argument is a single URL:
    - Prompt exactly once: `Detected URL: <url>. Ingest via /ingest? [y/n]`
-   - If `y` → invoke `/ingest`. On success: `Ingested via /ingest: <wiki-page>`. Exit.
-   - If `n` → proceed, treating the URL as verbatim text.
+   - Read one response only. Treat case-insensitive `y` or `yes` as consent. Treat any other response (including `n`, `no`, empty input, or arbitrary text) as "no". Do not re-prompt.
+   - If consent → invoke `/ingest`. On success: `Ingested via /ingest: <wiki-page>`. Exit.
+   - Otherwise → proceed, treating the URL as verbatim text.
 
 4. **Extract text for MATCH/NEW.** Everything after the trigger phrase, verbatim — no rewriting, no summarising.
 

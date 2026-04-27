@@ -17,7 +17,7 @@ For `/note`, the vision-LLM call must return:
 
 ## MATCH/NEW integration
 
-Use the LLM-generated `title`, `topic`, and `tags` as the input to the MATCH/NEW heuristic (§4 of `capture-pipeline.md`). Raw image data is not used for matching.
+For the §4 MATCH/NEW decision, use the LLM-generated `description` as the `New note text` input. Do not substitute the separate `title`, `topic`, or `tags` fields into the §4 decision prompt — those are used for the note's frontmatter only. Raw image data is not used for matching.
 
 On MATCH path: use the LLM description from the initial call as the appended body content. Do not re-invoke vision-LLM.
 
@@ -41,7 +41,8 @@ The note body is the LLM-generated `description`. Embed lines appear at the end,
 When the extracted argument is a single URL and no images are present:
 
 1. Prompt exactly once: `Detected URL: <url>. Ingest via /ingest? [y/n]`
-2. If `y` → invoke `/ingest` with the URL. On success: `Ingested via /ingest: <wiki-page>`. Exit; do not create a note.
-3. If `n` → proceed to standard CAPTURE, treating the URL as verbatim text.
+2. Read one response only. Treat case-insensitive `y` or `yes` as consent. Treat any other response (including `n`, `no`, empty input, or arbitrary text) as "no". Do not re-prompt.
+3. If consent → invoke `/ingest` with the URL. On success: `Ingested via /ingest: <wiki-page>`. Exit; do not create a note.
+4. Otherwise → proceed to standard CAPTURE, treating the URL as verbatim text.
 
 `/daily` and `/braindump` receive URLs → no prompt; captured verbatim.
