@@ -9,7 +9,7 @@ description: >
   "show my inbox", "/note list", "what's in notes",
   "/note process", "process my notes", "process the inbox",
   "triage the inbox".
-allowed-tools: Read Write Edit Glob Grep Bash
+allowed-tools: Bash Read Glob Grep
 ---
 
 # notes: Inbox Capture for the Vault
@@ -78,7 +78,7 @@ Goal: show pending and deferred notes for triage.
 
 Steps:
 
-1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`. Use `mcp__obsidian-vault__obsidian_batch_get_file_contents` when available — one batched read beats N sequential ones once the inbox grows past a handful of notes.
+1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`. For each note file, call `obsidian properties format=json path=notes/<filename>` to extract frontmatter as JSON. Inbox is bounded by user discipline; serial reads are acceptable.
 2. Sort by `updated` descending.
 3. Render flat reverse-chronological bullets:
 
