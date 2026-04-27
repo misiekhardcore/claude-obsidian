@@ -1,9 +1,8 @@
 ---
 name: daily
 description: >
-  Append a timestamped bullet to today's daily log in the vault. Append-only
-  chronological capture — no MATCH/NEW decision, no inbox triage. Fast path for
-  progress notes, time-anchored observations, and in-the-moment thoughts.
+  Append a timestamped bullet to today's daily log in the vault. Each call
+  adds one line to <vault_root>/daily/YYYY-MM-DD.md — no inbox, no triage.
   Triggers on: "/daily", "daily note this", "log to today", "log this",
   "add to today's log", "daily log:".
 allowed-tools: Read Write Edit Bash
