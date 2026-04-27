@@ -149,13 +149,6 @@ If the new content broadens the note's scope, rewrite `title:` to cover the unio
 
 Image-input handling — validation, vision-LLM invocation, move mechanics, embed syntax, frontmatter, and error handling — is documented in [`_shared/image-capture.md`](${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md).
 
-Per-skill specifics (output contracts, integration shape) live in each skill's `references/image-capture.md`:
-- Notes: `skills/notes/references/image-capture.md`
-- Daily: `skills/daily/references/image-capture.md`
-- Braindump: `skills/braindump/references/image-capture.md`
-
-Skills load these files on-demand when images are present in the user's input.
-
 ---
 
 ## 6. Index patching (notes/index.md)
