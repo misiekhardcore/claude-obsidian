@@ -8,7 +8,7 @@ description: >
   Triggers on: "/autoresearch", "autoresearch", "research [topic]", "deep dive into [topic]",
   "investigate [topic]", "find everything about [topic]", "research and file",
   "go research", "build a wiki on".
-allowed-tools: Read Write Edit Glob Grep WebFetch WebSearch
+allowed-tools: Bash Read Glob Grep WebFetch WebSearch
 ---
 
 # autoresearch: Autonomous Research Loop
