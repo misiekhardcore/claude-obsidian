@@ -7,11 +7,13 @@ Section headings are **stable anchors** — do not reorder. Future splits patch 
 
 ## 1. Vault path resolution
 
-Resolve `<vault_root>` exactly the same way `wiki` does:
+Resolve `<vault_root>` by delegating to `scripts/resolve-vault.sh`, which is the canonical implementation used by `wiki`.
 
-1. Project setting `claude-obsidian.vault_path` (via `~/.claude/settings.local.json`, then `~/.claude/settings.json`).
+Resolution order (matches the script exactly):
+
+1. Legacy explicit path passed as `$1` to `scripts/resolve-vault.sh`, if provided.
 2. CWD if it contains a `wiki/` subdirectory.
-3. `scripts/resolve-vault.sh` (handles all of the above via shell):
+3. Project setting `claude-obsidian.vault_path` (via `~/.claude/settings.local.json`, then `~/.claude/settings.json`).
 
 ```bash
 VAULT=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") || {
