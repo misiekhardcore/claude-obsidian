@@ -35,8 +35,11 @@ Positional argument(s) — inline text and/or file paths:
 1. Empty or whitespace-only → abort: `/braindump requires text or a file path.`
 2. Parse input as space-separated text snippets and/or file paths.
 3. For each path argument, resolve: absolute when `<arg>` starts with `/`; otherwise relative to `<vault_root>` (not CWD).
-4. Path resolves to a readable text file (`.md`, `.txt`, `.markdown`, or first 4 KB decodes as UTF-8) → use file contents as body.
-5. Path does not resolve → treat `<arg>` verbatim as inline text. No error.
+4. Path resolves to a readable text file → use file contents as body.
+5. Path resolves to a readable file that is neither a supported text file nor a supported image type → abort: `Unsupported input type: <ext>. /braindump accepts text, markdown, and image inputs.`
+6. Path does not resolve:
+   - If `<arg>` looks like a supported image input by extension → abort: `Image not found or unreadable: <path>`
+   - Otherwise → treat `<arg>` verbatim as inline text. No error.
 
 ---
 

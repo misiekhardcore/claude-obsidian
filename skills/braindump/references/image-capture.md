@@ -8,7 +8,7 @@ Read after `_shared/image-capture.md` when images are present in a `/braindump` 
 
 Parse the argument list as space-separated text snippets and image paths. Collect image paths separately from text. Validate all image paths per `_shared/image-capture.md` before the split step.
 
-If a path resolves to a readable text file (`.md`, `.txt`, `.markdown`, or first 4 KB decodes as UTF-8) → use file contents as body text. If it resolves to an image → collect for processing below. If unresolvable → treat as inline text verbatim.
+If a path resolves to a readable text file (`.md`, `.txt`, `.markdown`, or first 4 KB decodes as UTF-8) → use file contents as body text. If it resolves to a supported image type → collect for processing below. If it resolves to a readable file that is neither a supported text file nor a supported image type → abort: `Unsupported input type: <ext>. /braindump accepts text, markdown, and image inputs.` If unresolvable → treat as inline text verbatim.
 
 ---
 
@@ -45,7 +45,7 @@ Ensure `_attachments/` **once before the CAPTURE loop** — not per chunk. See `
 For each chunk:
 
 - If images are assigned to this chunk: follow `_shared/image-capture.md` for move, naming, embed, and `attachments:` frontmatter.
-- On MATCH path: generate a vision-LLM description of the assigned images and append it after the `---` separator.
+- On MATCH path: reuse the initial vision output for this chunk's assigned images and append that description after the `---` separator. Do not re-invoke vision.
 - Use the chunk's note slug + collision suffix for attachment filenames.
 
 ---
