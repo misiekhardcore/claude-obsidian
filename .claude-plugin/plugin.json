@@ -1,6 +1,6 @@
 {
   "name": "claude-obsidian",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Claude + Obsidian knowledge companion. Sets up a persistent, compounding wiki vault. Covers memory management, session notetaking, knowledge organization, and agent context across projects.",
   "author": {
     "name": "Michał Konopski",
