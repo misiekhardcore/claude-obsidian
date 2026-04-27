@@ -5,7 +5,7 @@ description: >
   adds one line to <vault_root>/daily/YYYY-MM-DD.md — no inbox, no triage.
   Triggers on: "/daily", "daily note this", "log to today", "log this",
   "add to today's log", "daily log:".
-allowed-tools: Read Write Edit Bash
+allowed-tools: Read Write Edit Glob Bash
 ---
 
 # daily: Chronological Daily Log
@@ -26,9 +26,9 @@ No vault configured — run /wiki init first.
 
 ## Operations
 
-| User says | Operation |
-|-----------|-----------|
-| `/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"` | CAPTURE |
+| User says                                                                                                              | Operation |
+| ---------------------------------------------------------------------------------------------------------------------- | --------- |
+| `/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"` | CAPTURE   |
 
 No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis are handled by `/daily-close`.
 
@@ -38,21 +38,32 @@ No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis
 
 Steps:
 
-1. **Extract** the verbatim text from the user's message. Everything after the trigger phrase, preserved exactly — no rewriting, no summarising.
-2. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort with `No vault configured — run /wiki init first.` if unresolved.
-3. **Compute** today as `YYYY-MM-DD` and current local time as `HH:MM` (24-hour, zero-padded).
-4. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently.
-5. **Ensure file:** if `<vault_root>/daily/YYYY-MM-DD.md` does not exist, create it per [§7 Daily page append shape](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#7-daily-page-append-shape) — frontmatter from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) plus an empty `## Captures` section.
-6. **Ensure heading:** if the file exists but `## Captures` is missing, append the heading at EOF before the bullet (idempotent — never duplicate).
-7. **Append** one bullet under `## Captures`:
+1. **Extract arguments** from the user's message. Everything after the trigger phrase. Scan for image-path tokens (any token that resolves to a path or carries a supported image extension); keep them separate. Join the remaining non-path tokens as the verbatim text segment in original order with single spaces. Do not include image-path tokens in the verbatim text.
+
+2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/daily/references/image-capture.md`. Use those files to determine the image-specific bullet text and attachment handling only. Then continue with steps 3–10 below for the normal daily append flow — resolve `<vault_root>`, compute date/time, ensure daily file, ensure `## Captures`, append the generated content, bump `updated:`, and confirm.
+
+3. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort with `No vault configured — run /wiki init first.` if unresolved.
+
+4. **Compute** today as `YYYY-MM-DD` and current local time as `HH:MM` (24-hour, zero-padded).
+
+5. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently.
+
+6. **Ensure file:** if `<vault_root>/daily/YYYY-MM-DD.md` does not exist, create it per [§7](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#7-daily-page-append-shape) — frontmatter from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) plus an empty `## Captures` section.
+
+7. **Ensure heading:** if `## Captures` is missing, append it at EOF before the bullet (idempotent — never duplicate).
+
+8. **Append** one bullet under `## Captures`:
+
    ```
    - HH:MM <verbatim text>
    ```
-8. **Bump** `updated:` in frontmatter to today.
-9. **Confirm** with exactly one line:
-   ```
-   Logged to daily/YYYY-MM-DD.md
-   ```
+
+9. **Bump** `updated:` in frontmatter to today.
+
+10. **Confirm** with exactly one line:
+    ```
+    Logged to daily/YYYY-MM-DD.md
+    ```
 
 Do **not** print the diff, the reasoning, or any other output. One line only.
 
@@ -74,6 +85,7 @@ See [§2 Frontmatter schema — daily shape](${CLAUDE_PLUGIN_ROOT}/_shared/captu
 ## Examples
 
 **First call of the day (file does not exist):**
+
 ```
 user> /daily shipped the /note slug rewrite
 # daily/2026-04-27.md created with frontmatter + ## Captures heading
@@ -81,6 +93,7 @@ assistant> Logged to daily/2026-04-27.md
 ```
 
 **Subsequent call (file exists, heading present):**
+
 ```
 user> log to today: pairing session with @dana on the wiki lint refactor
 # one bullet appended under ## Captures
@@ -88,6 +101,7 @@ assistant> Logged to daily/2026-04-27.md
 ```
 
 **Two calls in the same minute:**
+
 ```
 user> /daily standup done
 assistant> Logged to daily/2026-04-27.md
@@ -98,6 +112,7 @@ assistant> Logged to daily/2026-04-27.md
 ```
 
 **No vault configured:**
+
 ```
 user> /daily fixed the flaky test
 assistant> No vault configured — run /wiki init first.

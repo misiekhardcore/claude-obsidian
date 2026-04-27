@@ -145,9 +145,9 @@ If the new content broadens the note's scope, rewrite `title:` to cover the unio
 
 ---
 
-## 5. Attachment handling (placeholder for sub-issue E)
+## 5. Attachment handling (image input + URL redirect)
 
-Reserved for #64 — image input across capture skills.
+Image-input handling — validation, vision-LLM invocation, move mechanics, embed syntax, frontmatter, and error handling — is documented in [`_shared/image-capture.md`](${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md).
 
 ---
 
@@ -186,7 +186,6 @@ updated: YYYY-MM-DD
 ---
 
 ## Captures
-
 ```
 
 ### Append rule

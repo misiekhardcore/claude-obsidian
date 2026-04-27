@@ -16,6 +16,12 @@ Long-form text that shouldn't interrupt flow — planning sessions, retros, desi
 
 ---
 
+## Image routing
+
+If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/braindump/references/image-capture.md` before parsing input.
+
+---
+
 ## Vault path
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with `No vault configured — run /wiki init first.`
@@ -24,14 +30,16 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 
 ## Input parsing
 
-Positional argument — inline text or file path:
+Positional argument(s) — inline text and/or file paths:
 
 1. Empty or whitespace-only → abort: `/braindump requires text or a file path.`
-2. Resolve as path: absolute when `<arg>` starts with `/`; otherwise relative to `<vault_root>` (not CWD).
-3. Path resolves to a readable regular file:
-   - Text if extension is `.md`, `.txt`, or `.markdown` **OR** first 4 KB decodes as UTF-8 → use file contents as body.
-   - Binary → abort: `Binary inputs not supported in /braindump — wait for sub-issue E (rich capture inputs).`
-4. Path does not resolve → treat `<arg>` verbatim as inline text. No error.
+2. Parse input as space-separated text snippets and/or file paths.
+3. For each path argument, resolve: absolute when `<arg>` starts with `/`; otherwise relative to `<vault_root>` (not CWD).
+4. Path resolves to a readable text file → use file contents as body.
+5. Path resolves to a readable file that is neither a supported text file nor a supported image type → abort: `Unsupported input type: <ext>. /braindump accepts text, markdown, and image inputs.`
+6. Path does not resolve:
+   - If `<arg>` looks like a supported image input by extension → abort: `Image not found or unreadable: <path>`
+   - Otherwise → treat `<arg>` verbatim as inline text. No error.
 
 ---
 
@@ -91,6 +99,7 @@ Failed: K chunks.            ← "chunk" singular when K=1
 ## Examples
 
 **Multi-thought:**
+
 ```
 user> /braindump I keep forgetting to check the lint score before PRs. Also need to revisit the hot cache size — it's been growing. And the daily skill confirmation message looks wrong in dark mode.
 assistant>
@@ -101,6 +110,7 @@ Captured 3 notes:
 ```
 
 **Single thought (no spurious split):**
+
 ```
 user> /braindump The slug truncation rule needs to account for multi-byte unicode characters — right now it can split in the middle of a grapheme cluster, which breaks vault filenames on some filesystems.
 assistant>
@@ -109,6 +119,7 @@ Captured 1 note:
 ```
 
 **File input (vault-relative):**
+
 ```
 user> /braindump retro-notes/2026-04-feature-retro.txt
 # resolved as <vault_root>/retro-notes/2026-04-feature-retro.txt
@@ -119,6 +130,7 @@ Captured N notes:
 ```
 
 **One chunk fails:**
+
 ```
 assistant>
 Captured 2 notes:
