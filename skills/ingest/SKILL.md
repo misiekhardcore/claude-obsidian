@@ -1,7 +1,7 @@
 ---
 name: ingest
 description: "Ingest sources into the Obsidian wiki vault. Reads a source, extracts entities and concepts, creates or updates wiki pages, cross-references, and logs the operation. Supports files, URLs, and batch mode. Triggers on: ingest, process this source, add this to the wiki, read and file this, batch ingest, ingest all of these, ingest this url."
-allowed-tools: Read Write Edit Glob Grep Bash WebFetch
+allowed-tools: Bash Read Glob Grep WebFetch
 ---
 
 # ingest: Source Ingestion
@@ -46,6 +46,20 @@ Before ingesting any file, check `.raw/.manifest.json` to avoid re-processing un
 2. Write the updated manifest back.
 
 Skip delta checking if the user says "force ingest" or "re-ingest".
+
+---
+
+## Vault I/O Pattern
+
+All vault reads and writes use the `obsidian` CLI:
+- **Read:** `obsidian read path=wiki/<category>/<page>.md`
+- **Create:** `obsidian create path=wiki/<category>/<page>.md content="<body>"` (use `overwrite` flag to replace)
+- **Append:** `obsidian append path=wiki/<page>.md content="<entry>"`
+- **Prepend:** `obsidian prepend path=wiki/<page>.md content="<entry>"`
+
+Multiline `content=` uses `\n` for newlines and `\t` for tabs. Both round-trip correctly.
+
+**Exception:** `.raw/.manifest.json` stays as `jq + mv` (CLI has no JSON-mutate verb per `_shared/cli.md §6`).
 
 ---
 

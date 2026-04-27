@@ -8,6 +8,9 @@ Conventions for adding skills and shared protocols to this plugin.
 
 ```
 _shared/          Cross-skill reference docs — read on demand by any skill that needs them
+scripts/          Utility scripts
+  obsidian-cli.sh Wrapper for the Obsidian CLI (canonical vault-touch primitive)
+  resolve-vault.sh Vault path resolution logic
 skills/<name>/    One directory per skill
   SKILL.md        The skill entrypoint — loaded when the skill is invoked
   references/     Skill-local reference docs, not needed by other skills

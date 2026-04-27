@@ -5,7 +5,7 @@ description: >
   missing cross-references, frontmatter gaps, and empty sections. Creates or updates
   Dataview dashboards. Generates canvas maps. Triggers on: "lint", "health check",
   "clean up wiki", "check the wiki", "wiki maintenance", "find orphans", "wiki audit".
-allowed-tools: Read Write Edit Glob Grep
+allowed-tools: Bash Read Glob Grep
 ---
 
 # lint: Wiki Health Check
@@ -16,10 +16,15 @@ Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. 
 
 ## Lint Checks
 
+Use the native `obsidian` CLI verbs for efficient data gathering:
+- Orphan pages: `obsidian orphans` (returns one path per line)
+- Dead links: `obsidian deadends` (returns one path per line)
+- Unresolved links: `obsidian unresolved format=json` (returns `[{"link": "..."}]`)
+
 Work through these in order:
 
-1. **Orphan pages**. Wiki pages with no inbound wikilinks. They exist but nothing points to them.
-2. **Dead links**. Wikilinks that reference a page that does not exist.
+1. **Orphan pages**. Use `obsidian orphans` to enumerate. Wiki pages with no inbound wikilinks. They exist but nothing points to them.
+2. **Dead links**. Use `obsidian deadends` to enumerate. Wikilinks that reference a page that does not exist.
 3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated.
 4. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
 5. **Missing cross-references**. Entities mentioned in a page but not linked.
