@@ -19,12 +19,15 @@ The text split and image-to-chunk assignment happen in a **single LLM reasoning 
 > Split the text into atomic thoughts (one self-contained idea, observation, question, or proposal per chunk). Simultaneously, for each image decide which chunk it relates to most strongly. One image may be assigned to at most one chunk. If no chunk relates strongly, mark the image as unassigned. Return: the split chunks in order, plus an assignment map `{image_path: chunk_index_or_null}`.
 
 If this combined step fails due to vision processing error → abort:
+
 ```
 Vision processing failed: <reason>. Image not moved, note not created.
 ```
+
 Do not enter the CAPTURE loop.
 
 Zero chunks returned → hard-abort, no retry:
+
 ```
 /braindump split returned no chunks. Original text not captured.
 ```
@@ -40,6 +43,7 @@ Ensure `_attachments/` **once before the CAPTURE loop** — not per chunk. See `
 ## Per-chunk image handling (inside CAPTURE loop)
 
 For each chunk:
+
 - If images are assigned to this chunk: follow `_shared/image-capture.md` for move, naming, embed, and `attachments:` frontmatter.
 - On MATCH path: generate a vision-LLM description of the assigned images and append it after the `---` separator.
 - Use the chunk's note slug + collision suffix for attachment filenames.
@@ -49,6 +53,7 @@ For each chunk:
 ## Unassigned images
 
 After the main loop, if any images remain unassigned:
+
 1. Move each image to `_attachments/` as `<date>-braindump-unassigned-N.<ext>` (N starts at 1).
 2. Create one final note with body: `Unassigned images from braindump on YYYY-MM-DD`. Include embed lines and `attachments:` frontmatter.
 3. Include this note in the confirmation count and file list.

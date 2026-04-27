@@ -186,7 +186,6 @@ updated: YYYY-MM-DD
 ---
 
 ## Captures
-
 ```
 
 ### Append rule

@@ -7,6 +7,7 @@ Read after `_shared/image-capture.md` when images are present in a `/note` captu
 ## Vision-LLM output contract
 
 For `/note`, the vision-LLM call must return:
+
 - `title` — ≤80 chars, plain text
 - `topic` — subject grouping (may be empty)
 - `description` — verbatim OCR content + scene description

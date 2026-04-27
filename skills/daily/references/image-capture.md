@@ -7,6 +7,7 @@ Read after `_shared/image-capture.md` when images are present in a `/daily` capt
 ## Vision-LLM output contract
 
 For `/daily`, the vision-LLM call must return:
+
 - `description` — concise description of image content (≤140 chars preferred)
 - `vision-slug` — ≤40 chars, slug-format; used as the attachment filename stem
 

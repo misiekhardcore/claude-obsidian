@@ -4,9 +4,7 @@ All capture skills that accept image input follow this contract. Read this file 
 
 ---
 
-## Supported image types and validation
-
-Supported extensions: `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`.
+## Image validation
 
 Validate ALL image paths before any vision-LLM call or file move:
 
@@ -43,9 +41,11 @@ Single LLM call including all images + any text argument in the user's input.
 - On MATCH path: use the description from the initial call — do not re-invoke.
 
 On failure:
+
 ```
 Vision processing failed: <reason>. Image not moved, note not created.
 ```
+
 Never move files if vision processing fails.
 
 ---
@@ -64,6 +64,7 @@ Move (not copy) images from their source path to `<vault_root>/_attachments/`. N
 ## Embed syntax
 
 Embed images in note body using Obsidian embed syntax:
+
 ```
 ![[filename.png]]
 ```

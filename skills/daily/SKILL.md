@@ -26,9 +26,9 @@ No vault configured — run /wiki init first.
 
 ## Operations
 
-| User says | Operation |
-|-----------|-----------|
-| `/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"` | CAPTURE |
+| User says                                                                                                              | Operation |
+| ---------------------------------------------------------------------------------------------------------------------- | --------- |
+| `/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"` | CAPTURE   |
 
 No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis are handled by `/daily-close` (sub-issue C).
 
@@ -53,6 +53,7 @@ Steps:
 7. **Ensure heading:** if `## Captures` is missing, append it at EOF before the bullet (idempotent — never duplicate).
 
 8. **Append** one bullet under `## Captures`:
+
    ```
    - HH:MM <verbatim text>
    ```
@@ -84,6 +85,7 @@ See [§2 Frontmatter schema — daily shape](${CLAUDE_PLUGIN_ROOT}/_shared/captu
 ## Examples
 
 **First call of the day (file does not exist):**
+
 ```
 user> /daily shipped the /note slug rewrite
 # daily/2026-04-27.md created with frontmatter + ## Captures heading
@@ -91,6 +93,7 @@ assistant> Logged to daily/2026-04-27.md
 ```
 
 **Subsequent call (file exists, heading present):**
+
 ```
 user> log to today: pairing session with @dana on the wiki lint refactor
 # one bullet appended under ## Captures
@@ -98,6 +101,7 @@ assistant> Logged to daily/2026-04-27.md
 ```
 
 **Two calls in the same minute:**
+
 ```
 user> /daily standup done
 assistant> Logged to daily/2026-04-27.md
@@ -108,8 +112,8 @@ assistant> Logged to daily/2026-04-27.md
 ```
 
 **No vault configured:**
+
 ```
 user> /daily fixed the flaky test
 assistant> No vault configured — run /wiki init first.
 ```
-

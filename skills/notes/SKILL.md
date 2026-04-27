@@ -28,11 +28,11 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 
 ## Operations
 
-| User says | Operation | Handled by |
-|-----------|-----------|------------|
-| `/note <text>`, `/dump <text>`, "note this …", "remember this for later", "add to inbox …", "todo: …" | CAPTURE | this skill |
-| `/note list`, "show my inbox", "what's in notes" | LIST | this skill |
-| `/note process`, "process my notes", "triage the inbox" | PROCESS | this skill |
+| User says                                                                                             | Operation | Handled by |
+| ----------------------------------------------------------------------------------------------------- | --------- | ---------- |
+| `/note <text>`, `/dump <text>`, "note this …", "remember this for later", "add to inbox …", "todo: …" | CAPTURE   | this skill |
+| `/note list`, "show my inbox", "what's in notes"                                                      | LIST      | this skill |
+| `/note process`, "process my notes", "triage the inbox"                                               | PROCESS   | this skill |
 
 Capture, list, and process do not prompt for tags, types, or confirmations beyond the per-note action prompt in PROCESS.
 
@@ -80,6 +80,7 @@ Steps:
 1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`. Use `mcp__obsidian-vault__obsidian_batch_get_file_contents` when available — one batched read beats N sequential ones once the inbox grows past a handful of notes.
 2. Sort by `updated` descending.
 3. Render flat reverse-chronological bullets:
+
    ```
    Pending notes (N):
 
@@ -90,7 +91,9 @@ Steps:
 
    - [~] YYYY-MM-DD [source_project] title
    ```
+
    Glyphs: `[ ]` pending, `[~]` deferred. Always include both sections; show `(none)` under a section that's empty.
+
 4. **Filter `--project=<basename>`** — when present, only show notes whose `source_project` matches. Honour the same flag in natural-language form (`"show my inbox for claude-obsidian"`).
 
 `/note list` includes pending + deferred. `/note process` iterates pending only by default; pass `--include-deferred` to walk both.
@@ -105,6 +108,7 @@ Steps:
 
 1. Enumerate pending notes (skip `status: deferred` unless `--include-deferred`). Sort by `updated` ascending — oldest first. If there are no notes to process, print `Inbox is empty.` and exit.
 2. For each note, read full frontmatter + body and display:
+
    ```
    [N/total] YYYY-MM-DD [source_project]
    title: <title>
@@ -113,11 +117,12 @@ Steps:
 
    Action? [s]ave / [d]efer / [x]delete / [q]uit
    ```
+
 3. Wait for the user's single-letter action. Loop on invalid input.
 4. **`s` (save)** — invoke the `save` skill via the Skill tool, passing the note body, the frontmatter, and an explicit note name: `"Save this as: <title>"` so the save skill's step 2 name-prompt is pre-satisfied and the interactive loop is not broken. On success:
    - Delete `<vault_root>/notes/<filename>`.
    - Remove the corresponding row from `notes/index.md`.
-   On `/save` failure, leave the note untouched and surface the error.
+     On `/save` failure, leave the note untouched and surface the error.
 5. **`d` (defer)** — patch the note's frontmatter: `status: deferred`, bump `updated:` to today. Move the row in `notes/index.md` from `## Pending` to `## Deferred`.
 6. **`x` (delete)** — delete the file unconditionally. Remove the corresponding row from `notes/index.md`.
 7. **`q` (quit)** — exit the loop. Remaining notes stay pending.
@@ -144,12 +149,14 @@ See [§6 Index patching](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-ind
 ## Examples
 
 **Capture (NEW):**
+
 ```
 user> /note inbox count missing from /wiki status
 assistant> Captured to notes/2026-04-25-inbox-count-missing-from-wiki-status.md
 ```
 
 **Capture (NEW, filler stripped from title):**
+
 ```
 user> /note we need to check why claude-workflow is not using 'wt' for worktrees but the git cli directly
 # title summarised to "claude-workflow uses git CLI instead of wt for worktrees"
@@ -158,12 +165,14 @@ assistant> Captured to notes/2026-04-26-claude-workflow-uses-git-cli-instead.md
 ```
 
 **Capture (MATCH-append, scope unchanged):**
+
 ```
 user> note this: still seeing the same flaky behaviour on macOS
 assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
 ```
 
 **Capture (MATCH-append with title rewrite):**
+
 ```
 user> /dump same issue now reproduces on Linux too
 # existing note title was "flaky macOS runner"; new content broadens scope
@@ -172,6 +181,7 @@ assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
 ```
 
 **List, filtered:**
+
 ```
 user> /note list --project=claude-obsidian
 assistant>
@@ -186,6 +196,7 @@ Deferred (1):
 ```
 
 **Process:**
+
 ```
 user> /note process
 assistant>
@@ -201,6 +212,7 @@ assistant> Saved as [[Confidence threshold reuse]] in wiki/concepts/. Note delet
 ```
 
 **URL redirect (yes):**
+
 ```
 user> /note https://example.com/article
 assistant> Detected URL: https://example.com/article. Ingest via /ingest? [y/n]
@@ -210,6 +222,7 @@ assistant> Ingested via /ingest: [[Article Title]]
 ```
 
 **URL redirect (no):**
+
 ```
 user> /note https://example.com/article
 assistant> Detected URL: https://example.com/article. Ingest via /ingest? [y/n]
