@@ -16,6 +16,12 @@ Long-form text that shouldn't interrupt flow — planning sessions, retros, desi
 
 ---
 
+## Image routing
+
+If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/braindump/references/image-capture.md` before parsing input.
+
+---
+
 ## Vault path
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with `No vault configured — run /wiki init first.`
@@ -24,21 +30,17 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 
 ## Input parsing
 
-Positional argument(s) — inline text, file path, and/or image paths:
+Positional argument(s) — inline text and/or file paths:
 
 1. Empty or whitespace-only → abort: `/braindump requires text or a file path.`
-2. Parse input as space-separated list of text snippets, file paths, and/or image paths.
+2. Parse input as space-separated text snippets and/or file paths.
 3. For each path argument, resolve: absolute when `<arg>` starts with `/`; otherwise relative to `<vault_root>` (not CWD).
-4. Path resolves to a readable regular file:
-   - Text (`.md`, `.txt`, `.markdown`, or first 4 KB decodes as UTF-8) → use file contents as body.
-   - Image → collect for processing (see "Split — with images" below).
-   - Binary (other) → abort: `Unsupported input type: <ext>. /braindump and capture skills accept text, markdown, and image inputs.`
+4. Path resolves to a readable text file (`.md`, `.txt`, `.markdown`, or first 4 KB decodes as UTF-8) → use file contents as body.
 5. Path does not resolve → treat `<arg>` verbatim as inline text. No error.
-6. **Image validation.** Before split/vision-LLM, validate all image paths per [§5 Supported image types and validation](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect). Abort on error.
 
 ---
 
-## Split — atomic-thought rubric (with image-to-chunk assignment)
+## Split — atomic-thought rubric
 
 Single LLM reasoning step (think step, not a tool call):
 
@@ -49,33 +51,21 @@ Single LLM reasoning step (think step, not a tool call):
 > **Do not split** mid-claim, mid-example, or mid-argument. **Do not merge** two distinct claims. **Single thought in → single chunk out.**
 >
 > **Preserve verbatim:** boundaries are chosen, content is unchanged.
->
-> **Image-to-chunk assignment** (if images present): For each image, decide which (if any) of the resulting chunks it relates to most strongly. One image assigned to at most one chunk. If no chunk relates strongly, mark image as unassigned. Return assignment map: `{image_path: chunk_index_or_null}`.
 
 Zero chunks (unexpected empty result from the reasoning step) → hard-abort, no retry: `/braindump split returned no chunks. Original text not captured.`
-
-If the combined split+image-assignment step fails due to vision processing error (network, rate limit, etc.) → abort: `Vision processing failed: <reason>. Image not moved, note not created.` Do not enter the CAPTURE loop.
 
 ---
 
 ## CAPTURE loop
 
-If any images were collected in input parsing, ensure `_attachments/` per [§5 Attachment directory](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) once before the loop.
-
 For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append to a note written by chunk K-1). Then:
 
 1. MATCH/NEW per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template) — skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
 2. MATCH or NEW path per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template); slug via [§3](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven).
-3. **Image attachment handling (if images assigned to this chunk).** Follow [§5](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) for naming, embed syntax, and `attachments:` frontmatter. MATCH path: generate a vision-LLM description of the assigned images and append after `---` separator.
-4. Index patch per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
-5. Record filename + success/failure. On error: append to failure list, continue — never abort the loop.
+3. Index patch per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
+4. Record filename + success/failure. On error: append to failure list, continue — never abort the loop.
 
 `source_project` = `basename(cwd)`. Frontmatter: note shape from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily), no braindump provenance.
-
-**Unassigned images:** After the main loop, if any images were marked unassigned by the split step:
-- Move images to `_attachments/` under fallback slug: `<date>-braindump-unassigned-N.<ext>` (date is today, N starts at 1).
-- Create one final note with body: `Unassigned images from braindump on YYYY-MM-DD`, embeds listed, `attachments:` field populated.
-- Record this note in the confirmation output (see below).
 
 ---
 
@@ -87,7 +77,7 @@ Captured N notes:            ← "note" singular when N=1
 …
 ```
 
-No NEW/MATCH labels. No diff. No reasoning. Image attachments are invisible in the confirmation output (not listed separately).
+No NEW/MATCH labels. No diff. No reasoning.
 
 If any chunks failed:
 
@@ -100,8 +90,6 @@ Failed: K chunks.            ← "chunk" singular when K=1
 - <one-line reason per failure>
 …
 ```
-
-If unassigned images exist after the main loop, they are included in the notes count and listed in the confirmation (one entry for the unassigned-images note).
 
 ---
 
@@ -144,28 +132,4 @@ Captured 2 notes:
 
 Failed: 1 chunk.
 - notes/: permission denied writing 2026-04-27-hot-cache-size-growing.md
-```
-
-**Text + images with assignment:**
-```
-user> /braindump We need better error messages. Also the sidebar performance has regressed lately. And here are the architecture sketches from yesterday's session. /path/to/arch-sketch.jpg /path/to/perf-graph.png
-# split produces 3 chunks: "error messages", "sidebar perf", and (implicit) "sketches/graphs"
-# image-to-chunk assignment: arch-sketch → chunk 3, perf-graph → chunk 2
-assistant>
-Captured 3 notes:
-- notes/2026-04-27-better-error-messages.md
-- notes/2026-04-27-sidebar-performance-regressed.md
-- notes/2026-04-27-architecture-sketches-from-session.md
-```
-
-**Mixed with unassigned image:**
-```
-user> /braindump Three thoughts on API design. Plus this random photo. /path/to/design-idea.png /path/to/random-photo.jpg
-# split produces 3 chunks; design-idea → chunk 1; random-photo → unassigned
-assistant>
-Captured 4 notes:
-- notes/2026-04-27-api-design-thought-1.md
-- notes/2026-04-27-api-design-thought-2.md
-- notes/2026-04-27-api-design-thought-3.md
-- notes/2026-04-27-unassigned-images-from-braindump.md
 ```
