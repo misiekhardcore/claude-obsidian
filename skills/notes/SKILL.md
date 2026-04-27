@@ -62,10 +62,13 @@ Steps:
    - If the new content broadens the note's scope, **rewrite `title:`** to a phrase covering the union. Bump `updated:` to today. Frontmatter `topic:` and `tags:` may be widened as needed; never narrowed.
    - **Filename is never renamed.** Drift between filename slug and rewritten `title` is acceptable.
 6. **NEW path** — create a new file:
-   - Slug from title: lowercase, non-alphanumerics → `-`, collapse runs, trim leading/trailing `-`, truncate to 40 chars. If a file with that name exists for today, append `-2`, `-3`, etc.
-   - Path: `<vault_root>/notes/YYYY-MM-DD-<slug>.md`.
-   - Frontmatter from the template below; body is the verbatim text.
-   - For NEW captures the title is the user's text trimmed to a one-line summary (≤80 chars). If the verbatim text is itself short and one-line, use it as the title. Topic and tags may be left empty (`""` and `[]`) — they're populated by the user later if needed.
+   - **Title first.** Derive a one-line summary (≤80 chars) of the verbatim text, stripping leading filler ("we need to", "can we check", "I think we should") so the substance leads. If the verbatim text is itself short, substantive, and one-line, use it as the title. Trim leading/trailing whitespace before slugifying.
+   - **Slug from the title.** Lowercase, non-alphanumerics → `-`, collapse runs, trim leading/trailing `-`. Length rules:
+     - ≤ 40 chars → use whole.
+     - \> 40 chars → truncate at the **last `-` before char 40** (word-boundary). If no `-` exists before char 40 (first word ≥ 40 chars), hard-truncate at char 40.
+     - empty/whitespace after trimming (title slugifies to nothing — all special chars) → **fall back** to the body-derived 40-char slug: lowercase verbatim body, non-alphanumerics → `-`, collapse runs, trim, hard-truncate to 40 chars.
+   - **Path:** `<vault_root>/notes/YYYY-MM-DD-<slug>.md`. If that filename already exists for today, append a counter suffix `-2`, `-3`, … incrementing. Different days never collide because the date prefix differs.
+   - **Frontmatter** from the template below; body is the verbatim text. Topic and tags may be left empty (`""` and `[]`) — they're populated by the user later if needed.
 7. **Update `notes/index.md`** — patch in place, no full rewrite:
    - On NEW: prepend a row under `## Pending`.
    - On MATCH: find the existing row by the **pre-rewrite title** (the title the file had before this operation). Bump its date to today; if the title was rewritten, replace the title text. Never add a duplicate row.
@@ -206,6 +209,14 @@ Patch the index on every CAPTURE/PROCESS action — never re-render from scratch
 ```
 user> /note inbox count missing from /wiki status
 assistant> Captured to notes/2026-04-25-inbox-count-missing-from-wiki-status.md
+```
+
+**Capture (NEW, filler stripped from title):**
+```
+user> /note we need to check why claude-workflow is not using 'wt' for worktrees but the git cli directly
+# title summarised to "claude-workflow uses git CLI instead of wt for worktrees"
+# slug exceeds 40 chars; truncated at last `-` before char 40
+assistant> Captured to notes/2026-04-26-claude-workflow-uses-git-cli-instead.md
 ```
 
 **Capture (MATCH-append, scope unchanged):**
