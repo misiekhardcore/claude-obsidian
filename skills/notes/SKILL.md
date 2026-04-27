@@ -46,31 +46,28 @@ Steps:
 
 1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, parse everything after the trigger as a space-separated list of text snippets, image paths, and/or URLs. Preserve order.
 
-2. **URL detection (text-only case).** If the extracted argument is a single URL and contains no images:
+2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/notes/references/image-capture.md`. Follow those files for the full image-input path; skip steps 3–4 below.
+
+3. **URL detection (text-only, no images).** If the argument is a single URL:
    - Prompt exactly once: `Detected URL: <url>. Ingest via /ingest? [y/n]`
-   - If user responds `y`: invoke `/ingest` with the URL via the Skill tool. On success, display: `Ingested via /ingest: <wiki-page>`. Exit; do not create a note.
-   - If user responds `n`: proceed to step 3 (standard CAPTURE), treating the URL as verbatim text.
+   - If `y` → invoke `/ingest`. On success: `Ingested via /ingest: <wiki-page>`. Exit.
+   - If `n` → proceed, treating the URL as verbatim text.
 
-3. **Image validation.** If any image paths are present, validate per [§5 Supported image types and validation](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect). Abort on error.
+4. **Extract text for MATCH/NEW.** Everything after the trigger phrase, verbatim — no rewriting, no summarising.
 
-4. **Vision-LLM processing.** If images are present, follow [§5 Vision-LLM processing](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect). For `/note`: LLM output is title (≤80 chars), topic, description (verbatim OCR + scene), tags. Use LLM title/topic/tags for MATCH/NEW; use LLM description as note body (embeds appended at end).
+5. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`. If `<vault_root>/notes/` does not exist, create the directory and initialise `notes/index.md` from `_seed/notes/index.md`.
 
-5. **Extract text for MATCH/NEW.** If no images, extract the verbatim text from the user's message. For `/note <text>` and `/dump <text>`, the text is everything after the trigger. For natural-language triggers (`"note this: …"`, `"todo: …"`), extract the substring after the trigger phrase. Preserve the original wording exactly — no rewriting, no summarising. If images are present and step 4 succeeded, the "text for MATCH/NEW" is the LLM-generated description.
-6. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`. If `<vault_root>/notes/` does not exist, create the directory and initialise `notes/index.md` from the template at `_seed/notes/index.md`; then continue. Ensure `_attachments/` per [§5 Attachment directory](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect).
+6. **Enumerate** existing notes and decide MATCH or NEW per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template). Skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
 
-7. **Enumerate** existing notes and decide MATCH or NEW per [§4 MATCH/NEW heuristic](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template). Use the LLM-generated title/topic/tags (if images present) or the extracted verbatim text (text-only input) for the decision.
+7. **MATCH or NEW path** per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template). Slug via [§3](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven). Frontmatter from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily); body is verbatim text.
 
-8. **Image attachment handling.** Follow [§5](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) for naming, embed syntax, `attachments:` frontmatter, and MATCH path mechanics. On the MATCH path, use the LLM description from step 4 — do not call vision-LLM again.
+8. **Update `notes/index.md`** per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
 
-9. **MATCH path** or **NEW path** — follow [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template) exactly. Slug computation uses [§3 Slug rule](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven). Frontmatter shape from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily); body is verbatim text or LLM-generated description (with embeds appended if images present).
-
-10. **Update `notes/index.md`** per [§6 Index patching](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
-
-11. **Confirm** with one terse line. Two shapes only:
+9. **Confirm** with one terse line:
    - NEW: `Captured to notes/YYYY-MM-DD-<slug>.md`
    - MATCH: `Appended to notes/YYYY-MM-DD-<slug>.md`
 
-Do **not** print the diff, the match reasoning, the candidate list, or attachment details. Capture is a fire-and-forget action.
+Do **not** print the diff, the match reasoning, or attachment details.
 
 ---
 
@@ -219,28 +216,4 @@ assistant> Detected URL: https://example.com/article. Ingest via /ingest? [y/n]
 user> n
 # standard CAPTURE proceeds, URL captured as text
 assistant> Captured to notes/2026-04-27-example-article-url.md
-```
-
-**Image input (single image, new note):**
-```
-user> /note /path/to/screenshot.png
-# vision-LLM processes image, generates title + description
-# image moved to _attachments/screenshot.png
-assistant> Captured to notes/2026-04-27-screenshot.md
-```
-
-**Mixed text + image:**
-```
-user> /note ideas from the whiteboard session /path/to/photo.jpg
-# vision-LLM sees text + image, generates combined title + description
-# image moved to _attachments/ideas-from-whiteboard-session.jpg
-assistant> Captured to notes/2026-04-27-ideas-from-whiteboard-session.md
-```
-
-**Multi-image input:**
-```
-user> /note /path/to/img1.png /path/to/img2.png /path/to/img3.png
-# single note created, vision-LLM sees all 3 images
-# images moved to _attachments/multi-image.png, multi-image-2.png, multi-image-3.png
-assistant> Captured to notes/2026-04-27-multi-image.md
 ```
