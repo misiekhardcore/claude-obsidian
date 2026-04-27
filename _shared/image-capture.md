@@ -94,4 +94,4 @@ When MATCH is decided and the input includes images:
 2. Append the new description after the `---` separator (per §4 MATCH shape).
 3. Move images to `_attachments/` with the existing note's slug + collision indices.
 4. Extend the existing `attachments:` frontmatter list with the new filenames.
-5. Do not recompute the note's title.
+5. Apply the normal MATCH title behavior: keep the existing `title:` unless the newly appended content broadens the note's scope, in which case rewrite `title:` to cover the union. A title rewrite does **not** change the existing note slug used for attachment filenames.
