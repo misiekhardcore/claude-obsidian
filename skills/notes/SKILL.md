@@ -62,11 +62,12 @@ Steps:
    - If the new content broadens the note's scope, **rewrite `title:`** to a phrase covering the union. Bump `updated:` to today. Frontmatter `topic:` and `tags:` may be widened as needed; never narrowed.
    - **Filename is never renamed.** Drift between filename slug and rewritten `title` is acceptable.
 6. **NEW path** — create a new file:
-   - **Title first.** Derive a one-line summary (≤80 chars) of the verbatim text, stripping leading filler ("we need to", "can we check", "I think we should") so the substance leads. If the verbatim text is itself short, substantive, and one-line, use it as the title. Trim leading/trailing whitespace before slugifying.
-   - **Slug from the title.** Lowercase, non-alphanumerics → `-`, collapse runs, trim leading/trailing `-`. Length rules:
-     - ≤ 40 chars → use whole.
-     - \> 40 chars → truncate at the **last `-` before char 40** (word-boundary). If no `-` exists before char 40 (first word ≥ 40 chars), hard-truncate at char 40.
-     - empty/whitespace after trimming (title slugifies to nothing — all special chars) → **fall back** to the body-derived 40-char slug: lowercase verbatim body, non-alphanumerics → `-`, collapse runs, trim, hard-truncate to 40 chars.
+   - **Title.** Derive a one-line summary (≤80 chars) of the verbatim text, stripping leading filler ("we need to", "can we check", "I think we should") so the substance leads. If the verbatim text is itself short, substantive, and one-line, use it as the title.
+   - **Slug.** Compute via the shared script — do not slugify in-prompt:
+     ```bash
+     slug=$(bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "$title" "$body")
+     ```
+     The script lowercases, replaces non-alphanumerics with `-`, collapses runs, trims, and applies word-boundary truncation at char 40 (hard-truncate when the first word is ≥ 40 chars). When the title slugifies to empty (all special chars), it falls back to a 40-char body slug. Exit 1 means both are empty — surface that as an error rather than inventing a name. The script is the source of truth for the slug rule; reuse it from `/daily` and `/braindump` once those land (epic #60).
    - **Path:** `<vault_root>/notes/YYYY-MM-DD-<slug>.md`. If that filename already exists for today, append a counter suffix `-2`, `-3`, … incrementing. Different days never collide because the date prefix differs.
    - **Frontmatter** from the template below; body is the verbatim text. Topic and tags may be left empty (`""` and `[]`) — they're populated by the user later if needed.
 7. **Update `notes/index.md`** — patch in place, no full rewrite:
