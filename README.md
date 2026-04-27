@@ -4,12 +4,25 @@ Obsidian wiki plugin for Claude Code — personal knowledge vault with LLM-assis
 
 ## Install
 
+**Prerequisites:**
+- Obsidian 1.12.7+ (shipped with the native CLI in 2026)
+- The Obsidian binary on your `PATH` (or Flatpak alias; see `skills/wiki/references/cli-setup.md`)
+
+**Plugin installation:**
 ```bash
 claude plugin marketplace add misiekhardcore/claude-obsidian
 claude plugin install claude-obsidian@claude-obsidian
 ```
 
-Then enable the plugin and set `vault_path` (absolute path to your Obsidian vault) when Claude Code prompts for user configuration.
+**Vault registration:**
+1. Set `vault_path` when Claude Code prompts for user configuration
+2. Register your vault with the CLI (one-time, per vault):
+   ```bash
+   obsidian register vault=/absolute/path/to/vault
+   ```
+3. Verify registration: `obsidian list vaults`
+
+For detailed CLI setup (troubleshooting, Flatpak, sanity checks), see `skills/wiki/references/cli-setup.md`.
 
 ## Skills
 
