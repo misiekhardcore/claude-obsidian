@@ -20,6 +20,7 @@ Then enable the plugin and set `vault_path` (absolute path to your Obsidian vaul
 - `save` — save the current conversation or insight into the vault
 - `notes` — quick inbox capture (`/note`, `/dump`); list and process flows for triage
 - `daily` — append-only chronological log (`/daily`); timestamped bullets in `daily/YYYY-MM-DD.md`
+- `braindump` — split long-form text into atomic notes (`/braindump`); each chunk filed via the full capture pipeline
 - `autoresearch` — autonomous iterative research loop
 - `canvas` — create / update Obsidian canvas files
 - `defuddle` — strip clutter from web pages before ingestion
