@@ -54,6 +54,8 @@ Single LLM reasoning step (think step, not a tool call):
 
 Zero chunks (unexpected empty result from the reasoning step) → hard-abort, no retry: `/braindump split returned no chunks. Original text not captured.`
 
+If the combined split+image-assignment step fails due to vision processing error (network, rate limit, etc.) → abort: `Vision processing failed: <reason>. Image not moved, note not created.` Do not enter the CAPTURE loop.
+
 ---
 
 ## CAPTURE loop
