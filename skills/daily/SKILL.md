@@ -38,7 +38,7 @@ No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis
 
 Steps:
 
-1. **Extract arguments** from the user's message. Everything after the trigger phrase, parsed as text snippets and/or file paths. Detect image paths (suffix in `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`) and text snippets, preserving order.
+1. **Extract arguments** from the user's message. Everything after the trigger phrase, parsed as text snippets and/or image paths, preserving order.
 
 2. **Image pre-flight.** If any image paths are present: validate per [§5 Supported image types and validation](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect) (abort on error), then ensure `_attachments/` per [§5 Attachment directory](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect).
 

@@ -27,13 +27,13 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 Positional argument(s) — inline text, file path, and/or image paths:
 
 1. Empty or whitespace-only → abort: `/braindump requires text or a file path.`
-2. Parse input as space-separated list of text snippets and/or file paths. Detect image paths (suffix in `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`), text files, and text snippets.
+2. Parse input as space-separated list of text snippets, file paths, and/or image paths.
 3. For each path argument, resolve: absolute when `<arg>` starts with `/`; otherwise relative to `<vault_root>` (not CWD).
 4. Path resolves to a readable regular file:
-   - Text if extension is `.md`, `.txt`, or `.markdown` **OR** first 4 KB decodes as UTF-8 → use file contents as body.
-   - Image (suffix in `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`) → collect for processing (see "Split — with images" below).
+   - Text (`.md`, `.txt`, `.markdown`, or first 4 KB decodes as UTF-8) → use file contents as body.
+   - Image → collect for processing (see "Split — with images" below).
    - Binary (other) → abort: `Unsupported input type: <ext>. /braindump and capture skills accept text, markdown, and image inputs.`
-5. Path does not resolve and does not look like an image → treat `<arg>` verbatim as inline text. No error.
+5. Path does not resolve → treat `<arg>` verbatim as inline text. No error.
 6. **Image validation.** Before split/vision-LLM, validate all image paths per [§5 Supported image types and validation](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#5-attachment-handling-image-input--url-redirect). Abort on error.
 
 ---

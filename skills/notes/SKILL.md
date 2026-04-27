@@ -44,9 +44,9 @@ Goal: persist the user's verbatim text with minimal metadata. No conversation co
 
 Steps:
 
-1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, parse everything after the trigger as a space-separated list of text snippets and/or file paths. Detect image paths (suffix in `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`), text snippets, and URLs (start with `http://` or `https://`). Preserve order.
+1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, parse everything after the trigger as a space-separated list of text snippets, image paths, and/or URLs. Preserve order.
 
-2. **URL detection (text-only case).** If the extracted argument is a single string starting with `http://` or `https://` and contains no images:
+2. **URL detection (text-only case).** If the extracted argument is a single URL and contains no images:
    - Prompt exactly once: `Detected URL: <url>. Ingest via /ingest? [y/n]`
    - If user responds `y`: invoke `/ingest` with the URL via the Skill tool. On success, display: `Ingested via /ingest: <wiki-page>`. Exit; do not create a note.
    - If user responds `n`: proceed to step 3 (standard CAPTURE), treating the URL as verbatim text.
