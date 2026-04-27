@@ -39,7 +39,6 @@ Next steps:
        - Dataview
        - Templater
        - Obsidian Git
-       - Local REST API  (required for the plugin to reach the vault)
-       - Tray  (keeps Obsidian + REST API alive when the window is closed)
+       - Tray  (keeps Obsidian alive when the window is closed)
   4. Run /wiki in Claude Code to scaffold your knowledge base.
 EOF

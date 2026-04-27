@@ -2,8 +2,11 @@
 # Standalone wiki-lint runner intended for system cron.
 #
 # One-shot: invokes the lint skill via the `claude` CLI and stamps the lastrun
-# marker on success. Exits non-zero on resolve-vault failure (so cron surfaces
-# the error in mail/logs); lint-skill output flows through to stdout/stderr.
+# marker on success. Exits non-zero on resolve-vault failure or when Obsidian
+# is unreachable (so cron surfaces the error in mail/logs); lint-skill output
+# flows through to stdout/stderr.
+#
+# Requires Obsidian to be running — the CLI cannot reach a closed vault.
 #
 # Usage (example crontab — weekly, Sunday 03:00):
 #   0 3 * * 0 /absolute/path/to/claude-obsidian/bin/wiki-lint-cron.sh
@@ -20,6 +23,9 @@ fi
 
 VAULT=$("${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") || exit 1
 
-claude -p "Run the wiki-lint skill on $VAULT. Report briefly." || exit $?
+claude -p "Run the wiki-lint skill on $VAULT. Report briefly." || {
+  echo "[wiki-lint-cron] lint skill failed — is Obsidian running?" >&2
+  exit 1
+}
 
 date +%s > "$VAULT/.wiki-lint.lastrun"
