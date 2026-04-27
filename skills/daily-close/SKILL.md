@@ -40,7 +40,7 @@ No vault configured — run /wiki init first.
    - Count bullets under `## Captures` in the daily file.
    - If zero bullets, scan for date-matched activity:
      - List `<vault_root>/notes/*.md` and read **frontmatter only**. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD` AND `status: pending`.
-     - List `<vault_root>/wiki/**/*.md` and read **frontmatter only**. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD`.
+     - List `<vault_root>/wiki/**/*.md` and read **frontmatter only**. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD`. Exclude `wiki/hot.md` and `wiki/index.md` (they are always read in full in step 5).
    - If both zero bullets AND no matching notes or wiki pages → abort with `Nothing to synthesize for YYYY-MM-DD.` (no LLM call fired).
 
 5. **Gather synthesis input** (frontmatter-first: bodies read only for matched files):
@@ -54,8 +54,19 @@ No vault configured — run /wiki init first.
 
 7. **Write synthesized section** to the daily file:
    - No existing `## Summary` section → append after the last bullet in `## Captures`.
-   - Existing `## Summary` section → remove it (and any `## Follow-ups` beneath it) and write the new one in its place. Idempotent.
-   - Structure: `## Summary` followed by prose, then `## Follow-ups` with bulleted items (omit the heading and bullets entirely when no follow-ups).
+   - Existing `## Summary` section → remove from the `## Summary` heading through any immediately following `## Follow-ups` section, stopping at the next level-2 heading that is **not** `## Follow-ups`, or at EOF if none exists; then write the new section in its place. Idempotent.
+   - Structure: `## Summary` followed by prose, then optional `## Follow-ups` with bulleted items (omit the heading and bullets entirely when no follow-ups).
+
+### Atomic write requirement
+
+When updating the daily file, do **not** write directly into the target file in place.
+
+Required write strategy:
+1. Read the existing daily file and construct the full replacement content in memory.
+2. Write that full replacement content to a temporary file in the **same directory** as the daily file.
+3. Only after the temporary file has been written successfully, rename/move it over the original daily file in a single replace step.
+4. If any step before the final rename/move fails, abort with the filesystem error and leave the original daily file unchanged.
+5. Best-effort cleanup: remove the temporary file if it still exists after a failed write.
 
 8. **Bump `updated:`** in the daily file's frontmatter to today's date (the close-run date, even when closing a past day).
 
@@ -85,16 +96,16 @@ You are synthesizing a daily capture log for {{ date }}.
 ### Pending Notes
 {{ pending_notes_content_if_any }}
 
-### Wiki Pages Updated Today
+### Wiki Pages Updated on {{ date }}
 {{ wiki_pages_content_if_any }}
 
 ## Context
 
 ### Hot Cache
-{{ wiki/hot.md }}
+{{ hot_md_content }}
 
 ### Wiki Index
-{{ wiki/index.md }}
+{{ index_md_content }}
 
 ## Task
 
