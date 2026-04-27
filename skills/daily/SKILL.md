@@ -30,7 +30,7 @@ No vault configured — run /wiki init first.
 |-----------|-----------|
 | `/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"` | CAPTURE |
 
-No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis are handled by `/daily-close` (sub-issue C).
+No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis are handled by `/daily-close`.
 
 ---
 
