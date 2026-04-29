@@ -21,10 +21,3 @@ Install in **Settings → Community plugins → Browse**.
 | Plugin | Why we need it |
 |--------|----------------|
 | **Templater** | Resolves `<% tp.file.title %>` and `<% tp.date.now(...) %>` in `_templates/*.md` so new notes get auto-populated frontmatter. Without it, new notes ship with raw template syntax. |
-
----
-
-## Notes
-
-- **Dataview is no longer required.** Bases replaces the legacy `dashboard.md` queries with `dashboard.base`. Dataview can still be installed for personal queries, but no skill in this repo emits Dataview blocks.
-- **Obsidian Git is not used.** Vault git history is managed outside the plugin layer.
