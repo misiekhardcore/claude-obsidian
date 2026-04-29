@@ -73,7 +73,7 @@ The plugin does **not** auto-schedule `wiki-lint`. Claude Code has no native cro
 A ready-to-schedule runner ships at `bin/wiki-lint-cron.sh`. It:
 
 1. Resolves the vault path via `scripts/resolve-vault.sh` (exits non-zero if no vault is configured, so cron surfaces the error in mail/logs).
-2. Invokes the `lint` skill through `claude -p` with pre-authorization to auto-fix every category the skill classifies as 'safe to auto-fix' (missing frontmatter, stubs for missing entities, wikilinks for unlinked mentions). Categories that need human judgment (orphan deletion, contradiction resolution, duplicate merging) remain advisory and surface in the lint report only — run `/lint` interactively to act on those.
+2. Invokes the `lint` skill through `claude -p` with pre-authorization to auto-fix every category the skill classifies as 'safe to auto-fix' and commit the changes.
 3. On success, stamps `$VAULT/.wiki-lint.lastrun` with the current Unix timestamp.
 
 The runner derives `CLAUDE_PLUGIN_ROOT` from its own path when the env var isn't set, so it works from cron without a Claude Code session.
