@@ -6,6 +6,13 @@
 # is unreachable (so cron surfaces the error in mail/logs); lint-skill output
 # flows through to stdout/stderr.
 #
+# Runs unattended: pre-authorizes the lint skill to auto-fix every category
+# it classifies as 'safe to auto-fix' (missing frontmatter, stubs for missing
+# entities, wikilinks for unlinked mentions). Categories that need human
+# judgment (orphan deletion, contradiction resolution, duplicate merging)
+# remain advisory and surface in the lint report only. Run `/lint` interactively
+# to act on those.
+#
 # Requires Obsidian to be running — the CLI cannot reach a closed vault.
 #
 # Usage (example crontab — weekly, Sunday 03:00):
@@ -23,7 +30,7 @@ fi
 
 VAULT=$("${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") || exit 1
 
-claude -p "Run the wiki-lint skill on $VAULT. Report briefly." || {
+claude -p "Run the wiki-lint skill on $VAULT. This is an unattended scheduled run — do not ask for confirmation. Auto-fix every issue the skill classifies as 'safe to auto-fix' (missing frontmatter fields, stub pages for missing entities, wikilinks for unlinked mentions). Do not delete orphan pages, resolve contradictions, or merge duplicates — flag those in the report only. Write the lint report and report briefly." || {
   echo "[wiki-lint-cron] lint skill failed — is Obsidian running?" >&2
   exit 1
 }
