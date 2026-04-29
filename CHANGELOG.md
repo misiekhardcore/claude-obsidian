@@ -20,9 +20,18 @@ Closes the CLI migration epic ([#48]). With this release, **all** vault I/O acro
 ### Changed
 
 - `_seed/FIRST_RUN.md` no longer instructs new users to install Local REST API or Tray. Templater remains the only required community plugin; CLI registration is the new third step ([#53]).
-- `_shared/capture-pipeline.md` bulk-frontmatter step now uses `obsidian properties format=json` instead of the MCP `batch_get_file_contents` fallback ([#53]).
+- `_shared/capture-pipeline.md` and `skills/notes/SKILL.md` now use `obsidian properties path=<file>` for frontmatter scans (the `properties` verb has no `format=json` support — fix references the empirical contract in `_shared/cli.md` §3) ([#53]).
 - `skills/wiki/references/cli-setup.md` Examples section is filled with end-to-end snippets for ingest, query, save, and the lint primitives surfaced by the CLI (`orphans`, `deadends`, `unresolved`, `backlinks`) ([#53]).
-- Plugin manifest bumped to `1.0.0` ([#53]).
+- `skills/daily/SKILL.md`, `skills/daily-close/SKILL.md`, `skills/braindump/SKILL.md`, and `skills/obsidian-bases/SKILL.md` now route every vault read and write through the `obsidian` CLI. `Write` and `Edit` are dropped from `allowed-tools`; atomic frontmatter rewrites use `obsidian create overwrite=true`; date-matched activity scans use `obsidian properties path=<file>` per candidate ([#53]).
+- `skills/obsidian-markdown/SKILL.md` `allowed-tools` trimmed to `Read` — this is a reference-text-only skill, never writes vault pages ([#53]).
+- `commands/wiki.md` SCAFFOLD step 3 no longer probes for an MCP server; it now checks vault registration via `obsidian list vaults` ([#53]).
+- `_shared/vault-structure.md` solution-page example renamed from `configure-mcp-server` to `register-vault-with-cli` ([#53]).
+- `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` bumped to `1.0.0` ([#53]).
+- `README.md` and `CLAUDE.md` skill listings now include `daily-close` (shipped in #69 but missed by both inventories) ([#53]).
+
+### Added
+
+- `commands/daily-close.md` and `commands/braindump.md` — slash-command stub files for `/daily-close` and `/braindump`. Both skills already advertised those triggers; without the command files they only auto-loaded via skill-description match and didn't appear in Claude Code's slash menu ([#53]).
 
 ### Migration
 
