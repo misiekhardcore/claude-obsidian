@@ -30,7 +30,7 @@ fi
 
 VAULT=$("${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") || exit 1
 
-claude -p "Run the wiki-lint skill on $VAULT. This is an unattended scheduled run — do not ask for confirmation. Auto-fix every issue the skill classifies as 'safe to auto-fix' (missing frontmatter fields, stub pages for missing entities, wikilinks for unlinked mentions). Do not delete orphan pages, resolve contradictions, or merge duplicates — flag those in the report only. Write the lint report and report briefly." || {
+claude -p "Run the wiki-lint skill on $VAULT. This is an unattended scheduled run — do not ask for confirmation. Auto-fix every issue the skill classifies as 'safe to auto-fix'. Write the lint report and report briefly. Commit and push the changes as 'chore: lint vault <datetime>'" || {
   echo "[wiki-lint-cron] lint skill failed — is Obsidian running?" >&2
   exit 1
 }
