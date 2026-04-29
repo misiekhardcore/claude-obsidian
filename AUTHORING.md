@@ -8,6 +8,9 @@ Conventions for adding skills and shared protocols to this plugin.
 
 ```
 _shared/          Cross-skill reference docs — read on demand by any skill that needs them
+scripts/          Utility scripts
+  obsidian-cli.sh Wrapper for the Obsidian CLI (canonical vault-touch primitive)
+  resolve-vault.sh Vault path resolution logic
 skills/<name>/    One directory per skill
   SKILL.md        The skill entrypoint — loaded when the skill is invoked
   references/     Skill-local reference docs, not needed by other skills
@@ -27,6 +30,28 @@ Current shared docs:
 - `_shared/vault-structure.md` — vault directory map, confidence tagging semantics, typed-relationship semantics
 - `_shared/frontmatter.md` — universal YAML field schema, status/confidence values, typed relationship YAML shape
 - `_shared/hot-cache-protocol.md` — when to read/write `wiki/hot.md` and what to put in it
+- `_shared/cli.md` — empirical Obsidian CLI contract (exit codes, error patterns, escape hatches)
+
+---
+
+## Vault Operations: CLI Wrapper
+
+All vault reads and writes must go through `scripts/obsidian-cli.sh`, the canonical vault-touch primitive. The wrapper resolves the vault, pre-flights the Obsidian connection, and normalizes exit codes.
+
+```bash
+# Read a file
+"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" read path=wiki/hot.md
+
+# Create a file
+"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" create path=wiki/concepts/foo.md content="..."
+
+# Append to a file
+"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" append path=wiki/index.md content="- New entry"
+```
+
+A PreToolUse Bash hook (`hooks/obsidian-cli-rewrite.sh`) transparently rewrites raw `obsidian <verb> ...` invocations to the wrapper, but skills should call the wrapper explicitly for clarity.
+
+For error handling, exit-code semantics, and escape hatches (commands, eval), see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
 
 ---
 

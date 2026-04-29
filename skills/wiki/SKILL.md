@@ -103,7 +103,7 @@ bash "${CLAUDE_PLUGIN_ROOT}/bin/wiki-init.sh" "${user_config.vault_path}"
 1. If the vault path argument is empty, prints `Configure vault path first: enable the plugin and enter your vault path when prompted` and exits 0 — no error, no further action.
 2. Calls `bin/setup-vault.sh` to create `.obsidian/`, `.raw/`, `wiki/`, `_templates/` and the Obsidian config files.
 3. Calls `bin/copy-templates.sh` to copy `_templates/*.md` into the vault, skipping files that already exist.
-4. Prints next steps: open Obsidian at the vault path, enable community plugins (Dataview, Templater, Obsidian Git), then run `/wiki` to scaffold the knowledge base.
+4. Prints next steps: open Obsidian at the vault path, enable the Bases core plugin, install the Templater community plugin, then run `/wiki` to scaffold the knowledge base.
 
 Re-running is safe: every step guards existing files.
 

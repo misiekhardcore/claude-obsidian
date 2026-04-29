@@ -35,10 +35,9 @@ cat <<EOF
 Next steps:
   1. Open $VAULT/FIRST_RUN.md for detailed setup instructions.
   2. Open Obsidian → Manage Vaults → Open folder as vault → select: $VAULT
-  3. Enable community plugins when prompted, then install:
-       - Dataview
+  3. Enable the **Bases** core plugin (Settings → Core plugins).
+  4. Enable community plugins when prompted, then install:
        - Templater
-       - Obsidian Git
        - Tray  (keeps Obsidian alive when the window is closed)
-  4. Run /wiki in Claude Code to scaffold your knowledge base.
+  5. Run /wiki in Claude Code to scaffold your knowledge base.
 EOF

@@ -115,10 +115,11 @@ Single-source ingests via `/wiki-ingest` require an interactive discussion befor
 
 The `/autoresearch` pipeline is exempt — it is intentionally autonomous.
 
-## MCP (Optional)
+## CLI Setup
 
-If you configured the MCP server, Claude can read and write vault notes directly via the `obsidian-vault` server.
-See `skills/wiki/references/mcp-setup.md` for setup instructions.
+Vault reads and writes go through the **Obsidian CLI** (shipped with Obsidian 1.12.7+). No MCP server, no plugins, no TLS workarounds required.
+
+See `skills/wiki/references/cli-setup.md` for installation and registration steps.
 
 ## Maintenance
 

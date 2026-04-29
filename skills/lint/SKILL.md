@@ -3,7 +3,7 @@ name: lint
 description: >
   Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims,
   missing cross-references, frontmatter gaps, and empty sections. Creates or updates
-  Dataview dashboards. Generates canvas maps. Triggers on: "lint", "health check",
+  Bases dashboards. Generates canvas maps. Triggers on: "lint", "health check",
   "clean up wiki", "check the wiki", "wiki maintenance", "find orphans", "wiki audit".
 allowed-tools: Read Write Edit Glob Grep
 ---
@@ -121,38 +121,59 @@ During lint, flag pages that violate the style guide:
 
 ---
 
-## Dataview Dashboard
+## Bases Dashboard
 
-Create or update `wiki/meta/dashboard.md` with these queries:
+Create or update `wiki/meta/dashboard.base` (a Bases file — see `skills/obsidian-bases/SKILL.md` for syntax). One file, four views over the wiki:
 
-````markdown
----
-type: meta
-title: "Dashboard"
-updated: YYYY-MM-DD
----
-# Wiki Dashboard
+```yaml
+filters:
+  and:
+    - file.inFolder("wiki/")
+    - not:
+        - file.inFolder("wiki/meta")
 
-## Recent Activity
-```dataview
-TABLE type, status, updated FROM "wiki" SORT updated DESC LIMIT 15
+views:
+  - type: table
+    name: "Recent Activity"
+    limit: 15
+    order:
+      - file.name
+      - type
+      - status
+      - updated
+
+  - type: list
+    name: "Seed Pages (Need Development)"
+    filters: 'status == "seed"'
+    order:
+      - file.name
+      - updated
+
+  - type: list
+    name: "Entities Missing Sources"
+    filters:
+      and:
+        - file.inFolder("wiki/entities/")
+        - or:
+            - "!sources"
+            - "length(sources) == 0"
+    order:
+      - file.name
+
+  - type: list
+    name: "Open Questions"
+    filters:
+      and:
+        - file.inFolder("wiki/questions/")
+        - 'answer_quality == "draft"'
+    order:
+      - file.name
+      - created
 ```
 
-## Seed Pages (Need Development)
-```dataview
-LIST FROM "wiki" WHERE status = "seed" SORT updated ASC
-```
+**Note on sort direction:** Bases YAML does not encode per-property sort direction in `order:`. After Obsidian renders the view, click a column header to flip ASC/DESC; the choice persists. Use `groupBy.direction:` for grouping order if needed.
 
-## Entities Missing Sources
-```dataview
-LIST FROM "wiki/entities" WHERE !sources OR length(sources) = 0
-```
-
-## Open Questions
-```dataview
-LIST FROM "wiki/questions" WHERE answer_quality = "draft" SORT created DESC
-```
-````
+**Embedding:** add `![[dashboard.base]]` (or `![[dashboard.base#Recent Activity]]` for a single view) inside any wiki page to surface the dashboard.
 
 ---
 
