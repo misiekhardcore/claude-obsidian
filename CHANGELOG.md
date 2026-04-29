@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-04-29
+
+Closes the CLI migration epic ([#48]). With this release, **all** vault I/O across every skill and hook routes through the Obsidian CLI; the Local REST API + MCP code path is gone.
+
+### Breaking Changes
+
+- **Obsidian 1.12.7+ is now a hard prerequisite.** The plugin no longer ships any non-CLI vault-access path. Sessions still start when Obsidian is closed (the SessionStart probe is fail-soft), but skills that touch the vault will error until Obsidian is running with the registered vault open.
+- **MCP server `obsidian-vault` is fully removed.** No skill, hook, script, or shared reference still calls `mcp__obsidian-vault__*`. Setup docs no longer mention the Local REST API community plugin, the Tray plugin, or the `NODE_TLS_REJECT_UNAUTHORIZED=0` workaround.
+- **For external plugin authors:** the `mcp__obsidian-vault__*` tool surface is gone in 1.0.0. Migrate to the `obsidian` CLI via Bash; see `_shared/cli.md` for the empirical contract (exit codes, output formats, escape-hatch policy) and `skills/wiki/references/cli-setup.md` for end-to-end examples ([#53]).
+
+### Changed
+
+- `_seed/FIRST_RUN.md` no longer instructs new users to install Local REST API or Tray. Templater remains the only required community plugin; CLI registration is the new third step ([#53]).
+- `_shared/capture-pipeline.md` bulk-frontmatter step now uses `obsidian properties format=json` instead of the MCP `batch_get_file_contents` fallback ([#53]).
+- `skills/wiki/references/cli-setup.md` Examples section is filled with end-to-end snippets for ingest, query, save, and the lint primitives surfaced by the CLI (`orphans`, `deadends`, `unresolved`, `backlinks`) ([#53]).
+- Plugin manifest bumped to `1.0.0` ([#53]).
+
+### Migration
+
+1. Confirm you are on Obsidian 1.12.7 or newer.
+2. If you skipped 0.5.0: register your vault with the CLI once — `obsidian register vault=/absolute/path/to/vault`.
+3. Optional cleanup of stale background state from older releases:
+   ```bash
+   pkill -f mcp-obsidian
+   ```
+   You can also disable or uninstall the Local REST API community plugin if nothing else on your machine uses it.
+4. No vault-side migrations required; existing wiki content is read/written unchanged.
+
+### Rollback
+
+If a regression blocks your work, pin the previous release:
+
+```bash
+/plugin install claude-obsidian@0.5.1
+```
+
+For a fully MCP-based rollback (no CLI dependency at all), pin `0.4.0`, re-enable the Local REST API community plugin, and follow the legacy `mcp-setup.md` (preserved in git history at the `v0.4.0` tag).
+
 ## [0.5.0] — 2026-04-26
 
 ### Breaking Changes
@@ -99,6 +137,7 @@ The 0.4.0 plugin re-enables the Local REST API + MCP code path. After pinning, y
 - `resolve-vault.sh` falls back to `settings.local.json` for out-of-session invocations where `${user_config.*}` is unavailable ([#33], [#32]).
 - Hooks pass `vault_path` as an argument to `resolve-vault.sh` ([#29]).
 
+[1.0.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v1.0.0
 [0.5.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.5.0
 [0.4.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.4.0
 [0.3.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.3.0
@@ -132,3 +171,5 @@ The 0.4.0 plugin re-enables the Local REST API + MCP code path. After pinning, y
 [#54]: https://github.com/misiekhardcore/claude-obsidian/pull/54
 [#57]: https://github.com/misiekhardcore/claude-obsidian/pull/57
 [#59]: https://github.com/misiekhardcore/claude-obsidian/pull/59
+[#48]: https://github.com/misiekhardcore/claude-obsidian/issues/48
+[#53]: https://github.com/misiekhardcore/claude-obsidian/issues/53

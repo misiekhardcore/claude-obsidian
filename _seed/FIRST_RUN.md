@@ -28,11 +28,14 @@ In **Settings → Community Plugins → Browse**, install:
 | Plugin | Purpose |
 |--------|---------|
 | **Templater** | Use the templates in `_templates/` to create new pages |
-| **Local REST API** | Exposes the vault so the `claude-obsidian` plugin can read and write pages |
-| **Tray** | Keeps Obsidian running in the system tray so the REST API stays available when the window is closed |
 
-After installing **Local REST API**, open its settings, copy the API key, and
-paste it into the `claude-obsidian` plugin settings so Claude can reach the vault.
+That's it for plugins. The `claude-obsidian` plugin reaches the vault through
+the **Obsidian CLI** (shipped with Obsidian 1.12.7+) — no community plugins,
+TLS bypasses, or API keys required. Just keep Obsidian running with this vault
+open while you work.
+
+See `skills/wiki/references/cli-setup.md` for the one-time CLI registration
+step (`obsidian register vault=...`) and a sanity check.
 
 ---
 
