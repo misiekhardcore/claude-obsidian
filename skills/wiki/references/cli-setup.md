@@ -122,7 +122,75 @@ If Obsidian is closed or the CLI is not installed:
 
 ## Examples
 
-TBD — follow-up PR #52 will add practical examples (ingest a source, query the wiki, etc.).
+End-to-end snippets pulled from the converted skills. All vault I/O routes through the wrapper; the `obsidian` invocations below are transparently rewritten to `scripts/obsidian-cli.sh` by the PreToolUse hook.
+
+### Ingest a source
+
+```bash
+# 1. Pull the raw source into .raw/ (direct file op — non-vault path)
+curl -sL "$URL" > .raw/article-2026-04-29.md
+
+# 2. Read existing index for cross-reference candidates
+obsidian read path=wiki/index.md
+
+# 3. Create the new wiki page
+obsidian create path=wiki/concepts/distributed-tracing.md content="---
+title: Distributed Tracing
+type: concept
+tags: [observability]
+---
+
+# Distributed Tracing
+
+See [[opentelemetry]] for the data model.
+"
+
+# 4. Append a one-line entry to the index and the operations log
+obsidian append path=wiki/index.md content="- [[distributed-tracing]] — span-level request correlation"
+obsidian append path=wiki/log.md content="- 2026-04-29 ingested distributed-tracing from .raw/article-2026-04-29.md"
+```
+
+### Query the wiki
+
+```bash
+# Hot cache first (cheap)
+obsidian read path=wiki/hot.md
+
+# Full-text search across the vault, JSON for parsing
+obsidian search query="rate limiting" format=json
+
+# Pull backlinks for a known page to walk the graph
+obsidian backlinks path=wiki/concepts/distributed-tracing.md format=json
+
+# Read the candidate page
+obsidian read path=wiki/concepts/distributed-tracing.md
+```
+
+### Save a conversation insight
+
+```bash
+# Overwrite-safe create for a new note
+obsidian create path=wiki/concepts/cache-stampede.md overwrite=true content="---
+title: Cache Stampede
+type: concept
+---
+
+# Cache Stampede
+
+Triggered when many clients miss the cache simultaneously..."
+
+# Prepend a TL;DR to an existing page
+obsidian prepend path=wiki/concepts/caching.md content="> See also: [[cache-stampede]]"
+```
+
+### Lint primitives (issue #45 data layer)
+
+```bash
+obsidian orphans
+obsidian deadends
+obsidian unresolved format=json
+obsidian backlinks path=wiki/index.md format=json
+```
 
 ---
 

@@ -13,7 +13,7 @@ Read this file when a skill needs to understand vault layout or interpret page m
 | `wiki/concepts/` | `concept` | Patterns, techniques, ideas, how-things-work explanations | Title Case or kebab-case slug; no "the" prefix |
 | `wiki/entities/` | `entity` | Named real-world things: people, tools, products, orgs, repos | Proper noun as named in the source |
 | `wiki/sources/` | `source` | One page per ingested source — metadata, key findings, links to derived pages | `<slug>` matching the `.raw/` filename |
-| `wiki/solutions/` | `solution` | Concrete recipes: how to accomplish a specific task end-to-end | Verb phrase, e.g. `configure-mcp-server` |
+| `wiki/solutions/` | `solution` | Concrete recipes: how to accomplish a specific task end-to-end | Verb phrase, e.g. `register-vault-with-cli` |
 | `wiki/comparisons/` | `comparison` | Side-by-side analysis of 2+ alternatives | `<A>-vs-<B>` or `comparing-<topic>` |
 | `wiki/questions/` | `question` | Open questions; closed questions link to the answer | Question as written, e.g. `why-tokens-compound` |
 | `wiki/domains/` | `domain` | Top-level topic groupings; each domain has its own `_index.md` and may contain sub-directories | kebab-case domain name, e.g. `machine-learning` |
@@ -23,7 +23,7 @@ Read this file when a skill needs to understand vault layout or interpret page m
 - `wiki/concepts/LLM Wiki Pattern.md` — a technique (concept)
 - `wiki/entities/Andrej Karpathy.md` — a person (entity)
 - `wiki/sources/llm-wiki-karpathy-gist.md` — the ingest record for a specific source
-- `wiki/solutions/configure-mcp-server.md` — step-by-step recipe (solution)
+- `wiki/solutions/register-vault-with-cli.md` — step-by-step recipe (solution)
 
 ---
 

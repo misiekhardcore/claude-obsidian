@@ -7,12 +7,16 @@ description: >
   CAPTURE pipeline (MATCH/NEW per chunk). Triage later via /note process.
   Triggers on: "/braindump", "brain dump this", "dump the following thoughts",
   "dump these thoughts", "braindump:", "split this into notes".
-allowed-tools: Read Write Edit Glob Grep Bash
+allowed-tools: Bash Read Glob Grep
 ---
 
 # braindump: Long-Form → Atomic Notes
 
 Long-form text that shouldn't interrupt flow — planning sessions, retros, design ramblings. `/braindump` splits the stream into atomic thoughts and files each through the standard CAPTURE pipeline. Chunks land in `notes/` indistinguishable from `/note` captures; triage with `/note process`.
+
+## Vault I/O
+
+This skill writes inbox notes by re-running the per-chunk CAPTURE flow defined in [`_shared/capture-pipeline.md`](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md). All vault writes (note files, `notes/index.md` patches) flow through the `obsidian` CLI per the pipeline contract. `Read` is retained for non-vault input file ingestion (vault-relative or absolute text/markdown paths passed as arguments).
 
 ---
 

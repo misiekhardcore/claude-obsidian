@@ -27,9 +27,9 @@ Surface the script's stdout to the user verbatim.
 
 ## SCAFFOLD (default)
 
-1. Check if Obsidian is installed. If not, offer to install it (see `skills/wiki/references/plugins.md`).
+1. Check if Obsidian is installed (1.12.7+). If not, offer to install it (see `skills/wiki/references/plugins.md`).
 2. Check if this directory has a vault (look for `.obsidian/` folder). If yes, report current vault state.
-3. Check if the MCP server is configured (`claude mcp list`). If not, ask if the user wants to set it up.
+3. Check if the vault is registered with the Obsidian CLI (`obsidian list vaults`). If not, point the user at `skills/wiki/references/cli-setup.md` for the one-time `obsidian register` step.
 4. Ask ONE question: "What is this vault for?"
 
 Then build the entire wiki structure based on the answer. Don't ask more questions. Scaffold it, show what was created, and ask: "Want to adjust anything before we start?"

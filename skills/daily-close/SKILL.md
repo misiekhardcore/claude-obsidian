@@ -6,12 +6,16 @@ description: >
   date-matched inbox notes, date-matched wiki pages, hot cache, and index.
   Synthesis only — does not triage or clear the inbox.
   Triggers on: "/daily-close", "close today", "wrap up today", "synthesize today".
-allowed-tools: Read Write Edit Glob Bash
+allowed-tools: Bash Read Glob
 ---
 
 # daily-close: End-of-Day Synthesis
 
 Synthesize `<vault_root>/daily/YYYY-MM-DD.md` into a polished prose summary with optional follow-ups. Reads the day's captures, any inbox notes and wiki pages dated to that day, plus `wiki/hot.md` and `wiki/index.md` for cross-reference context. Appends a `## Summary` section (and optional `## Follow-ups`) to the daily file. Re-running replaces the prior summary — idempotent.
+
+## Vault I/O
+
+This skill reads the daily file, dated inbox notes, dated wiki pages, `wiki/hot.md`, and `wiki/index.md`, then writes the synthesized result back to the daily file. All operations go through the `obsidian` CLI: `read` for reads, `properties path=<file>` for date-matched frontmatter scans, and `create overwrite=true` for the atomic synthesis write. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, multiline `content=` escapes, and the `overwrite` flag semantics.
 
 ---
 
@@ -34,41 +38,40 @@ No vault configured — run /wiki init first.
    - Argument provided → validate it matches `YYYY-MM-DD` format. Abort with `Invalid date: <arg>. Expected YYYY-MM-DD.` if not parseable.
    - Once parsed, check whether the date is in the future. Abort with `Cannot close a future date: <date>.` if future.
 
-3. **Check daily file existence:** If `<vault_root>/daily/YYYY-MM-DD.md` does not exist, abort with `No daily file for YYYY-MM-DD.` (do not auto-create).
+3. **Check daily file existence:** call `obsidian read path=daily/YYYY-MM-DD.md`. Treat exit 1 with `Error: File "..." not found.` as the file-missing branch and abort with `No daily file for YYYY-MM-DD.` (do not auto-create).
 
 4. **Check for empty day:** Scan for content worth synthesizing:
-   - Count bullets under `## Captures` in the daily file.
+   - Count bullets under `## Captures` in the daily file content from step 3.
    - If zero bullets, scan for date-matched activity:
-     - List `<vault_root>/notes/*.md` and read **frontmatter only**. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD` AND `status: pending`.
-     - List `<vault_root>/wiki/**/*.md` and read **frontmatter only**. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD`. Exclude `wiki/hot.md` and `wiki/index.md` (they are always read in full in step 5).
+     - Glob `<vault_root>/notes/*.md` and call `obsidian properties path=notes/<file>` per candidate. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD` AND `status: pending`.
+     - Glob `<vault_root>/wiki/**/*.md` and call `obsidian properties path=wiki/<file>` per candidate. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD`. Exclude `wiki/hot.md` and `wiki/index.md` (they are always read in full in step 5).
    - If both zero bullets AND no matching notes or wiki pages → abort with `Nothing to synthesize for YYYY-MM-DD.` (no LLM call fired).
 
 5. **Gather synthesis input** (frontmatter-first: bodies read only for matched files):
-   - Full daily file (`daily/YYYY-MM-DD.md`, frontmatter + captures).
-   - Each pending note matched in step 4 (frontmatter + body).
-   - Each wiki page matched in step 4 (frontmatter + body).
-   - `wiki/hot.md` in full.
-   - `wiki/index.md` in full.
+   - Full daily file (already read in step 3 — reuse the content).
+   - Each pending note matched in step 4: `obsidian read path=notes/<file>` (frontmatter + body).
+   - Each wiki page matched in step 4: `obsidian read path=wiki/<file>` (frontmatter + body).
+   - `obsidian read path=wiki/hot.md` in full.
+   - `obsidian read path=wiki/index.md` in full.
 
 6. **Call LLM for synthesis** using the prompt template below. If the call fails, abort with `Synthesis failed: <reason>.` and leave the daily file unchanged.
 
-7. **Write synthesized section** to the daily file:
-   - No existing `## Summary` section → append after the last bullet in `## Captures`.
-   - Existing `## Summary` section → remove from the `## Summary` heading through any immediately following `## Follow-ups` section, stopping at the next level-2 heading that is **not** `## Follow-ups`, or at EOF if none exists; then write the new section in its place. Idempotent.
+7. **Construct the updated file content in memory:**
+   - No existing `## Summary` section → append the new section after the last bullet in `## Captures`.
+   - Existing `## Summary` section → remove from the `## Summary` heading through any immediately following `## Follow-ups` section, stopping at the next level-2 heading that is **not** `## Follow-ups`, or at EOF if none exists; insert the new section in its place. Idempotent.
    - Structure: `## Summary` followed by prose, then optional `## Follow-ups` with bulleted items (omit the heading and bullets entirely when no follow-ups).
+   - Bump `updated:` in the frontmatter to today's date (the close-run date, even when closing a past day).
 
-### Atomic write requirement
+8. **Atomic write back via the CLI:**
 
-When updating the daily file, do **not** write directly into the target file in place.
+   ```bash
+   obsidian create \
+     path=daily/YYYY-MM-DD.md \
+     overwrite=true \
+     content="<full updated file content with \n escapes>"
+   ```
 
-Required write strategy:
-1. Read the existing daily file and construct the full replacement content in memory.
-2. Write that full replacement content to a temporary file in the **same directory** as the daily file.
-3. Only after the temporary file has been written successfully, rename/move it over the original daily file in a single replace step.
-4. If any step before the final rename/move fails, abort with the filesystem error and leave the original daily file unchanged.
-5. Best-effort cleanup: remove the temporary file if it still exists after a failed write.
-
-8. **Bump `updated:`** in the daily file's frontmatter to today's date (the close-run date, even when closing a past day).
+   The `overwrite` flag replaces the file in one operation; the wrapper keeps Obsidian's index consistent. If the call returns non-zero, abort with the wrapper's error and leave the daily file unchanged (the upstream CLI either succeeds atomically or reports an error before mutating).
 
 9. **Confirm** with exactly one line:
    ```
