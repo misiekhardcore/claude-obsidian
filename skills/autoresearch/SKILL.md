@@ -8,7 +8,7 @@ description: >
   Triggers on: "/autoresearch", "autoresearch", "research [topic]", "deep dive into [topic]",
   "investigate [topic]", "find everything about [topic]", "research and file",
   "go research", "build a wiki on".
-allowed-tools: Read Write Edit Glob Grep WebFetch WebSearch
+allowed-tools: Bash Read Glob Grep WebFetch WebSearch
 ---
 
 # autoresearch: Autonomous Research Loop
@@ -22,6 +22,12 @@ This is based on Karpathy's autoresearch pattern: a configurable program defines
 ## Before Starting
 
 Read `references/program.md` to load the research objectives and constraints. This file is user-configurable. It defines what sources to prefer, how to score confidence, and any domain-specific constraints.
+
+---
+
+## Vault I/O
+
+All vault writes (sources, concepts, entities, synthesis page, index, log, hot cache) go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
 
 ---
 
