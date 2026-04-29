@@ -96,7 +96,7 @@ Used by `/note` CAPTURE only. `/daily` is append-only (no MATCH/NEW — see §7)
 
 ### Enumeration
 
-List `<vault_root>/notes/*.md` and read **frontmatter only** for each (title, topic, tags). Skip bodies. Skip `notes/index.md` and any file with `status: deferred`. Cap at the **20 most recent by `updated:`**. Use `obsidian properties format=json` for bulk frontmatter retrieval; fall back to per-file `obsidian read path=notes/<file>.md` only if `properties` is unavailable.
+List `<vault_root>/notes/*.md` and read **frontmatter only** for each (title, topic, tags). Skip bodies. Skip `notes/index.md` and any file with `status: deferred`. Cap at the **20 most recent by `updated:`**. Use `obsidian properties path=notes/<file>` per candidate (returns the YAML frontmatter block as plain text — no `format=json` support; see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3).
 
 ### Decision prompt
 

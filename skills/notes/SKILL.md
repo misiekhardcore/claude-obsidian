@@ -78,7 +78,7 @@ Goal: show pending and deferred notes for triage.
 
 Steps:
 
-1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`. For each note file, call `obsidian properties format=json path=notes/<filename>` to extract frontmatter as JSON. Inbox is bounded by user discipline; serial reads are acceptable.
+1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`. For each note file, call `obsidian properties path=notes/<filename>` to extract the YAML frontmatter block (plain-text output; no `format=json` support — see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3). Inbox is bounded by user discipline; serial reads are acceptable.
 2. Sort by `updated` descending.
 3. Render flat reverse-chronological bullets:
 

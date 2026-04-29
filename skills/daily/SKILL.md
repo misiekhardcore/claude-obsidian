@@ -5,12 +5,18 @@ description: >
   adds one line to <vault_root>/daily/YYYY-MM-DD.md — no inbox, no triage.
   Triggers on: "/daily", "daily note this", "log to today", "log this",
   "add to today's log", "daily log:".
-allowed-tools: Read Write Edit Glob Bash
+allowed-tools: Bash Read Glob
 ---
 
 # daily: Chronological Daily Log
 
 Append a timestamped bullet to `<vault_root>/daily/YYYY-MM-DD.md`. No MATCH/NEW decision, no inbox, no triage. Every invocation adds one bullet. Use `/note` for knowledge fragments worth triaging later; use `/daily` for time-anchored observations, progress notes, and anything that belongs to the day.
+
+## Vault I/O
+
+This skill creates and updates `<vault_root>/daily/YYYY-MM-DD.md`. All vault writes go through the `obsidian` CLI (`create`, `read`, `append`, `create overwrite=true` for atomic frontmatter rewrites). See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, multiline `content=` escapes, and the `overwrite` flag.
+
+The local `daily/` directory is filesystem state, not a vault page; create it via `mkdir -p` if missing (the CLI does not create parent directories).
 
 ---
 
@@ -40,27 +46,36 @@ Steps:
 
 1. **Extract arguments** from the user's message. Everything after the trigger phrase. Scan for image-path tokens (any token that resolves to a path or carries a supported image extension); keep them separate. Join the remaining non-path tokens as the verbatim text segment in original order with single spaces. Do not include image-path tokens in the verbatim text.
 
-2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/daily/references/image-capture.md`. Use those files to determine the image-specific bullet text and attachment handling only. Then continue with steps 3–10 below for the normal daily append flow — resolve `<vault_root>`, compute date/time, ensure daily file, ensure `## Captures`, append the generated content, bump `updated:`, and confirm.
+2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/daily/references/image-capture.md`. Use those files to determine the image-specific bullet text and attachment handling only. Then continue with steps 3–9 below for the normal daily append flow — resolve `<vault_root>`, compute date/time, ensure daily directory, probe and write the daily file via the CLI, and confirm.
 
 3. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort with `No vault configured — run /wiki init first.` if unresolved.
 
 4. **Compute** today as `YYYY-MM-DD` and current local time as `HH:MM` (24-hour, zero-padded).
 
-5. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently.
+5. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently with `mkdir -p`. (Local directory creation, not a vault page op.)
 
-6. **Ensure file:** if `<vault_root>/daily/YYYY-MM-DD.md` does not exist, create it per [§7](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#7-daily-page-append-shape) — frontmatter from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) plus an empty `## Captures` section.
+6. **Probe the file:** call `obsidian read path=daily/YYYY-MM-DD.md`. Treat exit 1 with `Error: File "..." not found.` as the file-missing branch.
 
-7. **Ensure heading:** if `## Captures` is missing, append it at EOF before the bullet (idempotent — never duplicate).
+7. **File-missing branch:** create the file with frontmatter from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) plus an empty `## Captures` section, plus the new bullet, in one atomic write:
 
-8. **Append** one bullet under `## Captures`:
-
+   ```bash
+   obsidian create \
+     path=daily/YYYY-MM-DD.md \
+     content="---\ntype: daily\ndate: YYYY-MM-DD\ncreated: YYYY-MM-DD\nupdated: YYYY-MM-DD\n---\n\n## Captures\n- HH:MM <verbatim text>\n"
    ```
-   - HH:MM <verbatim text>
+
+8. **File-exists branch:** parse the file content from step 6. If the `## Captures` heading is present, append one bullet under it; if it is missing, append the heading and the bullet at EOF. Bump `updated:` in the frontmatter to today. Then write the full updated content back atomically:
+
+   ```bash
+   obsidian create \
+     path=daily/YYYY-MM-DD.md \
+     overwrite=true \
+     content="<full updated file content with \n escapes>"
    ```
 
-9. **Bump** `updated:` in frontmatter to today.
+   The `overwrite` flag replaces the file in one operation; no temp-file dance is required at the skill layer (Obsidian's index stays consistent through the wrapper).
 
-10. **Confirm** with exactly one line:
+9. **Confirm** with exactly one line:
     ```
     Logged to daily/YYYY-MM-DD.md
     ```
