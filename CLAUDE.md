@@ -85,6 +85,7 @@ All skills live in `skills/<name>/SKILL.md` and are auto-discovered by Claude Co
 | `save` | `/save`, file this conversation, save insight |
 | `notes` | `/note`, `/dump`, note this, todo:, show my inbox, `/note process` |
 | `daily` | `/daily`, daily note this, log to today, log this, add to today's log |
+| `daily-close` | `/daily-close`, close today, wrap up today, synthesize today |
 | `braindump` | `/braindump`, brain dump this, dump the following thoughts, dump these thoughts, braindump:, split this into notes |
 | `autoresearch` | autoresearch, autonomous research loop |
 | `canvas` | `/canvas`, add to canvas, create canvas |

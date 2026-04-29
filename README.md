@@ -33,6 +33,7 @@ For detailed CLI setup (troubleshooting, Flatpak, sanity checks), see `skills/wi
 - `save` — save the current conversation or insight into the vault
 - `notes` — quick inbox capture (`/note`, `/dump`); list and process flows for triage
 - `daily` — append-only chronological log (`/daily`); timestamped bullets in `daily/YYYY-MM-DD.md`
+- `daily-close` — end-of-day synthesis (`/daily-close`, "close today", "wrap up today"); appends a polished `## Summary` to today's daily file, idempotent on re-run
 - `braindump` — split long-form text into atomic notes (`/braindump`, "brain dump this", "split this into notes"); each chunk filed via the full capture pipeline
 - `autoresearch` — autonomous iterative research loop
 - `canvas` — create / update Obsidian canvas files

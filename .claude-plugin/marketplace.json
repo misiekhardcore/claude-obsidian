@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "claude-obsidian: Claude + Obsidian knowledge companion by Michał Konopski",
-    "version": "0.5.1"
+    "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "claude-obsidian",
       "source": "./",
       "description": "Claude + Obsidian knowledge companion. Sets up a persistent, compounding wiki vault.",
-      "version": "0.5.1",
+      "version": "1.0.0",
       "author": {
         "name": "Michał Konopski",
         "url": "https://github.com/misiekhardcore"
