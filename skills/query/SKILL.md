@@ -8,13 +8,11 @@ allowed-tools: Bash Read Glob Grep
 
 The wiki has already done the synthesis work. Read strategically, answer precisely, and file good answers back so the knowledge compounds.
 
-## Vault Reads
+## Vault I/O
 
-| Op | Invocation |
-|---|---|
-| Hot cache | `obsidian read path=wiki/hot.md` |
-| Master index | `obsidian read path=wiki/index.md` |
-| Individual page | `obsidian read path=wiki/<category>/<page>.md` |
+This skill reads `wiki/hot.md`, `wiki/index.md`, and individual pages under `wiki/<category>/`. All reads go through the `obsidian` CLI.
+
+See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, output formats, and exit-code handling.
 
 ---
 

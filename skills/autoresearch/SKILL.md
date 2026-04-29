@@ -25,6 +25,12 @@ Read `references/program.md` to load the research objectives and constraints. Th
 
 ---
 
+## Vault I/O
+
+All vault writes (sources, concepts, entities, synthesis page, index, log, hot cache) go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
+
+---
+
 ## Research Loop
 
 ```

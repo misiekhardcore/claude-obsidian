@@ -49,17 +49,11 @@ Skip delta checking if the user says "force ingest" or "re-ingest".
 
 ---
 
-## Vault I/O Pattern
+## Vault I/O
 
-All vault reads and writes use the `obsidian` CLI:
-- **Read:** `obsidian read path=wiki/<category>/<page>.md`
-- **Create:** `obsidian create path=wiki/<category>/<page>.md content="<body>"` (use `overwrite` flag to replace)
-- **Append:** `obsidian append path=wiki/<page>.md content="<entry>"`
-- **Prepend:** `obsidian prepend path=wiki/<page>.md content="<entry>"`
+All vault reads and writes go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
 
-Multiline `content=` uses `\n` for newlines and `\t` for tabs. Both round-trip correctly.
-
-**Exception:** `.raw/.manifest.json` stays as `jq + mv` (CLI has no JSON-mutate verb per `_shared/cli.md §6`).
+`.raw/.manifest.json` is one of the documented bypasses: mutate it via `jq + mv` (no JSON-mutate verb).
 
 ---
 

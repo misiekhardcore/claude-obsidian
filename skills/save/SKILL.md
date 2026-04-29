@@ -16,17 +16,11 @@ Good answers and insights shouldn't disappear into chat history. This skill take
 
 The wiki compounds. Save often.
 
-## Vault Writes
+## Vault I/O
 
-| Op | Invocation |
-|---|---|
-| Read template / existing page | `obsidian read path=<path>` |
-| Create new wiki page | `obsidian create path=wiki/<category>/<slug>.md content="<body>"` |
-| Prepend latest entry to operations log | `obsidian prepend file=wiki/log.md content="<entry>"` |
-| Prepend to master index | `obsidian prepend file=wiki/index.md content="<entry>"` |
-| Rewrite hot cache | `obsidian create path=wiki/hot.md content="<body>" overwrite` |
+This skill reads templates and existing pages, creates a new note, prepends entries to `wiki/log.md` and `wiki/index.md`, and overwrites `wiki/hot.md`. All operations go through the `obsidian` CLI.
 
-Multiline content uses `\n` escapes inside `content="..."`.
+See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, the `overwrite` flag, and multiline `content=` escaping.
 
 ---
 
