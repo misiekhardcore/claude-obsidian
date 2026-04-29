@@ -27,9 +27,7 @@ In **Settings → Community Plugins → Browse**, install:
 
 | Plugin | Purpose |
 |--------|---------|
-| **Dataview** | Query your wiki pages as a database |
 | **Templater** | Use the templates in `_templates/` to create new pages |
-| **Obsidian Git** | Sync vault changes to git automatically |
 | **Local REST API** | Exposes the vault so the `claude-obsidian` plugin can read and write pages |
 | **Tray** | Keeps Obsidian running in the system tray so the REST API stays available when the window is closed |
 
@@ -101,7 +99,6 @@ Keep the structural pages (`hot.md`, `index.md`, `log.md`, `overview.md`).
 | Snippet | Purpose |
 |---------|---------|
 | `vault-colors` | Colour-codes `wiki/` folders in the file explorer |
-| `ITS-Dataview-Cards` | Use ` ```dataviewjs ` with `.cards` for card grids |
 | `ITS-Image-Adjustments` | Append `\|100` to image embeds for sizing |
 
 ### Views

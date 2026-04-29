@@ -21,7 +21,7 @@ The script handles everything:
 
 - If `${user_config.vault_path}` is empty, prints `Configure vault path first: enable the plugin and enter your vault path when prompted` and exits 0.
 - Delegates to `bin/setup-vault.sh` (vault directories + Obsidian config) and `bin/copy-templates.sh` (idempotent template copy).
-- Prints the next steps (open Obsidian, install Dataview/Templater/Obsidian Git, run `/wiki` to scaffold).
+- Prints the next steps (open Obsidian, enable the Bases core plugin, install Templater, run `/wiki` to scaffold).
 
 Surface the script's stdout to the user verbatim.
 
