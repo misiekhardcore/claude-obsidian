@@ -10,7 +10,7 @@ Every page, no exceptions:
 
 ```yaml
 ---
-type: <source|entity|concept|domain|comparison|question|meta>
+type: <source|entity|concept|domain|comparison|question|meta|synthesis|solution|initiative|session|reference|decision>
 title: "Human-Readable Title"
 created: 2026-04-07
 updated: 2026-04-07
@@ -105,11 +105,12 @@ first_mentioned: "[[Source Title]]"
 
 ```yaml
 complexity: intermediate  # basic | intermediate | advanced
-domain: ""
 aliases:
   - "alternative name"
   - "abbreviation"
 ```
+
+Note: concept (and other leaf) pages do NOT declare hub membership via a `domain:` field. Hub membership is forward-only: hubs declare leaves via `related:`; leaves resolve to hubs via backlinks. See `vault-structure.md` Hub Membership.
 
 ### comparison
 
