@@ -119,11 +119,10 @@ Steps:
 3. **Create** source summary in `wiki/sources/`. Use the source frontmatter schema from `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 4. **Create or update** entity pages for every person, org, product, and repo mentioned. One page per entity.
 5. **Create or update** concept pages for significant ideas and frameworks.
-6. **Update** relevant domain page(s) and their `_index.md` sub-indexes.
-7. **Update** `wiki/overview.md` if the big picture changed.
-8. **Update** `wiki/index.md`. Add entries for all new pages.
-9. **Update** `wiki/hot.md` with this ingest's context.
-10. **Append** to `wiki/log.md` (new entries at the TOP):
+6. **Update** relevant domain hubs at `wiki/domains/<slug>/_index.md` if any new leaves match an existing hub's tag — append the new leaves to the hub's `related:` list and bump the hub's `page_count:`. Do not write a `domain:` field on the leaves.
+7. **Update** `wiki/index.md`. Add entries for all new pages.
+8. **Update** `wiki/hot.md` with this ingest's context.
+9. **Append** to `wiki/log.md` (new entries at the TOP):
     ```markdown
     ## [YYYY-MM-DD] ingest | Source Title
     - Source: `.raw/articles/filename.md`
@@ -132,7 +131,7 @@ Steps:
     - Pages updated: [[Page 3]], [[Page 4]]
     - Key insight: One sentence on what is new.
     ```
-11. **Check for contradictions.** If new info conflicts with existing pages, add `> [!contradiction]` callouts on both pages.
+10. **Check for contradictions.** If new info conflicts with existing pages, add `> [!contradiction]` callouts on both pages.
 
 ---
 

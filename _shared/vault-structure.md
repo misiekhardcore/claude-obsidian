@@ -16,14 +16,32 @@ Read this file when a skill needs to understand vault layout or interpret page m
 | `wiki/solutions/` | `solution` | Concrete recipes: how to accomplish a specific task end-to-end | Verb phrase, e.g. `register-vault-with-cli` |
 | `wiki/comparisons/` | `comparison` | Side-by-side analysis of 2+ alternatives | `<A>-vs-<B>` or `comparing-<topic>` |
 | `wiki/questions/` | `question` | Open questions; closed questions link to the answer | Question as written, e.g. `why-tokens-compound` |
-| `wiki/domains/` | `domain` | Top-level topic groupings; each domain has its own `_index.md` and may contain sub-directories | kebab-case domain name, e.g. `machine-learning` |
-| `wiki/meta/` | `meta` | Index files, log, hot cache, overview — structural pages | Short functional names: `index`, `log`, `hot` |
+| `wiki/domains/` | `domain` | Universal hub root for topic and project hubs; each hub is `wiki/domains/<slug>/_index.md` | kebab-case slug, e.g. `machine-learning`, `sophia` |
+| `wiki/meta/` | `meta` | Index files, log, hot cache, dashboards — structural pages | Short functional names: `index`, `log`, `hot` |
 
 **Examples:**
 - `wiki/concepts/LLM Wiki Pattern.md` — a technique (concept)
 - `wiki/entities/Andrej Karpathy.md` — a person (entity)
 - `wiki/sources/llm-wiki-karpathy-gist.md` — the ingest record for a specific source
 - `wiki/solutions/register-vault-with-cli.md` — step-by-step recipe (solution)
+- `wiki/domains/knowledge-management/_index.md` — a topic hub curating concepts/entities/sources across folders
+
+> Per-folder `<folder>/_index.md` files are **not** part of this layout. Curation lives only in `wiki/domains/<slug>/_index.md`. Folders like `concepts/`, `entities/`, `solutions/`, `sources/` are flat directories of leaves; navigation crosses them via domain hubs and backlinks.
+
+---
+
+## Hub Membership
+
+Domain hubs link to leaves; **leaves do not declare hub membership**. There is no `domain:` field on a leaf. To resolve a leaf to its containing hub, the agent runs `obsidian backlinks path=<leaf> format=json` and filters the result for entries whose frontmatter has `type: domain`.
+
+| Direction | How it is encoded |
+|-----------|------------------|
+| Hub → leaf | `related:` wikilink in `wiki/domains/<slug>/_index.md` (forward link) |
+| Leaf → hub | Backlink resolution (`obsidian backlinks` filtered by `type: domain`); never a frontmatter field |
+
+This forward-only model keeps hub membership in one file per cluster (the hub itself), avoids the dual-write problem, and lets a leaf belong to multiple hubs without per-leaf frontmatter churn.
+
+Below the threshold for a hub (≈10 leaves), no hub exists; queries fall back to grep + tags + backlinks. See `${CLAUDE_PLUGIN_ROOT}/skills/lint/SKILL.md` for the hub promotion / demotion thresholds.
 
 ---
 

@@ -10,7 +10,7 @@ Every page, no exceptions:
 
 ```yaml
 ---
-type: <source|entity|concept|domain|comparison|question|overview|meta>
+type: <source|entity|concept|domain|comparison|question|meta>
 title: "Human-Readable Title"
 created: 2026-04-07
 updated: 2026-04-07
@@ -133,10 +133,16 @@ answer_quality: solid   # draft | solid | definitive
 
 ### domain
 
+Domain pages are the **hub layer** for cross-folder topic and project clusters. They live under `wiki/domains/<slug>/_index.md` and curate leaves via forward-only wikilinks. Leaves do not declare hub membership; the agent traverses leaf→hub via backlinks of `type: domain`.
+
 ```yaml
 subdomain_of: ""        # leave empty for top-level domains
 page_count: 0
+scope: topic            # topic | project — `topic` covers a subject area; `project` covers a single repo or initiative
+owns_folder: false      # true | false — `true` only when the hub also owns the directory of leaves under it (rare)
 ```
+
+`scope:` defaults to `topic`. `owns_folder:` defaults to `false` — most hubs curate leaves that live elsewhere in the vault (`concepts/`, `entities/`, `solutions/`, `sources/`).
 
 ---
 

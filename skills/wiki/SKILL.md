@@ -36,21 +36,20 @@ Standard wiki structure:
 
 ```
 wiki/
-├── index.md            # master catalog of all pages
+├── index.md            # master flat registry of all pages, grouped by type
 ├── log.md              # chronological record of all operations
 ├── hot.md              # hot cache: recent context summary (~500 words)
-├── overview.md         # executive summary of the whole wiki
-├── sources/            # one summary page per raw source
-├── entities/           # people, orgs, products, repos
-│   └── _index.md
-├── concepts/           # ideas, patterns, frameworks
-│   └── _index.md
-├── domains/            # top-level topic areas
-│   └── _index.md
-├── comparisons/        # side-by-side analyses
-├── questions/          # filed answers to user queries
+├── sources/            # one summary page per raw source (flat)
+├── entities/           # people, orgs, products, repos (flat)
+├── concepts/           # ideas, patterns, frameworks (flat)
+├── solutions/          # concrete recipes (flat)
+├── comparisons/        # side-by-side analyses (flat)
+├── questions/          # filed answers to user queries (flat)
+├── domains/            # topic and project hubs — wiki/domains/<slug>/_index.md
 └── meta/               # dashboards, lint reports, conventions
 ```
+
+Folders below `wiki/` are **flat directories of leaves**. Cross-folder navigation goes through `wiki/domains/<slug>/_index.md` hubs and through backlinks. There is no per-folder `<folder>/_index.md`.
 
 `notes/` is a top-level peer of `wiki/`, not a subfolder. It holds verbatim
 quick-capture inbox notes that haven't been polished into wiki pages yet. The
@@ -76,6 +75,7 @@ Route to the correct operation based on what the user says:
 |-----------|-----------|-----------|
 | "/wiki init", "init vault", "bootstrap vault" | INIT | this skill |
 | "scaffold", "set up vault", "create wiki" | SCAFFOLD | this skill |
+| "/wiki promote <tag>", "promote tag", "scaffold a hub" | PROMOTE | this skill |
 | "ingest [source]", "process this", "add this" | INGEST | `ingest` |
 | "what do you know about X", "query:" | QUERY | `query` |
 | "lint", "health check", "clean up" | LINT | `lint` |
@@ -117,9 +117,9 @@ Steps:
 
 1. Determine the wiki mode. Read `references/modes.md` to show the 6 options and pick the best fit.
 2. Ask: "What is this vault for?" (one question, then proceed).
-3. Create full folder structure under `wiki/` based on the mode.
-4. Create domain pages + `_index.md` sub-indexes.
-5. Create `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`, `wiki/overview.md`.
+3. Create full folder structure under `wiki/` based on the mode. Folders like `concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/`, `questions/` are created flat — no `_index.md` inside them.
+4. Skip per-folder `_index.md` scaffolding entirely. Domain hubs are created lazily by `/wiki promote <tag>` when a tag-cluster reaches the threshold (≥10 leaves), not during the initial scaffold.
+5. Create `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`.
 6. Create `notes/` (top-level peer of `wiki/`) and copy `_seed/notes/index.md` if missing — this is the inbox owned by the `notes` skill.
 7. Create `daily/` (top-level peer of `wiki/`) and copy `_seed/daily/example-daily.md` if the directory is missing — this is the append-only log owned by the `daily` skill. If `daily/` already exists, skip without disturbing existing files.
 8. Create `_templates/` files for each note type.
@@ -163,6 +163,75 @@ Created: YYYY-MM-DD
 
 ---
 
+## PROMOTE Operation
+
+Trigger: `/wiki promote <tag>`, "promote tag", "scaffold a hub for X".
+
+Goal: scaffold `wiki/domains/<tag>/_index.md` from a tag-cluster of leaves. The hub starts pre-populated and ready for human curation.
+
+Use this when `/lint` reports a **promotion candidate** (a tag-cluster of ≥10 leaves with no domain hub) or when the user asks to scaffold a hub directly.
+
+Steps:
+
+1. **Resolve the tag.** Take the tag argument (e.g. `knowledge-management`). Strip a leading `#` if present. The slug for the hub directory is the tag verbatim (kebab-case).
+2. **Collect cluster leaves.** Find all leaves under `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/solutions/` whose `tags:` frontmatter contains the resolved tag. Use `obsidian search query=tag:<tag>` or grep equivalents.
+3. **Bail if the cluster is too small.** If fewer than 5 leaves match, refuse and report: "Cluster has N leaves; below the hub threshold (5). Suggest growing the cluster first or running `/lint` for promotion candidates."
+4. **Bail if the hub already exists.** If `wiki/domains/<tag>/_index.md` exists, refuse and report the existing hub. Do not overwrite.
+5. **Create the hub** at `wiki/domains/<tag>/_index.md` via `obsidian create`. Frontmatter:
+   ```yaml
+   ---
+   type: domain
+   title: "<Title Case of tag>"
+   scope: topic                # set to project if the user said it is a project hub
+   owns_folder: false
+   subdomain_of: ""
+   page_count: <N>             # length of the related list below
+   created: YYYY-MM-DD
+   updated: YYYY-MM-DD
+   tags: [domain, <tag>]
+   status: developing
+   confidence: EXTRACTED
+   evidence: []
+   related:
+     - "[[<leaf-1>]]"
+     - "[[<leaf-2>]]"
+     - ...
+   ---
+   ```
+6. **Body template.** Pre-populate stub sections grouped by leaf type so the curator can annotate later:
+   ```markdown
+   # <Title Case of tag>
+
+   <one-paragraph stub: replace with hub description>
+
+   ## Concepts
+   - [[<concept-leaf-1>]] — <one-line description>
+   - ...
+
+   ## Entities
+   - [[<entity-leaf-1>]] — <one-line description>
+   - ...
+
+   ## Sources
+   - [[<source-leaf-1>]] — <one-line description>
+   - ...
+
+   ## Solutions
+   - [[<solution-leaf-1>]] — <one-line description>
+   - ...
+   ```
+   Empty sections (no leaves of that type) can be omitted. The one-line description should be the leaf's own description if its frontmatter has one, otherwise leave it as `<TODO: describe>` for the human curator.
+7. **Update `wiki/index.md`.** Prepend an entry under the `## Domains` section.
+8. **Update `wiki/hot.md`.** Add the new hub to the `## Recent Changes` list per the hot-cache protocol.
+9. **Update `wiki/log.md`.** Prepend a `## [YYYY-MM-DD] promote | <tag>` entry noting the new hub and the cluster size.
+10. **Confirm.** "Scaffolded [[domains/<tag>/_index]] with N pre-populated leaves. Open it in Obsidian to curate descriptions and section ordering."
+
+**Idempotency:** safe to re-run via the existence guard at step 4. To regenerate, the user must delete or rename the existing hub first.
+
+**Forward-only contract.** This skill does not write any frontmatter on the leaves it links to. Hub membership lives in the hub's `related:` field; the leaf→hub direction is resolved via backlinks.
+
+---
+
 ## Cross-Project Referencing
 
 This is the force multiplier. Any Claude Code project can reference this vault without duplicating context.
@@ -175,8 +244,8 @@ Path: ~/path/to/vault
 
 When you need context not already in this project:
 1. Read wiki/hot.md first (recent context, ~500 words)
-2. If not enough, read wiki/index.md (full catalog)
-3. If you need domain specifics, read wiki/<domain>/_index.md
+2. Tag-match the question against leaves; check wiki/domains/<tag>/_index.md for a curated hub
+3. If no hub matches, read wiki/index.md (master flat registry)
 4. Only then read individual wiki pages
 
 Do NOT read the wiki for:
@@ -196,7 +265,7 @@ Your job as the LLM:
 2. Scaffold wiki structure from user's domain description
 3. Route ingest, query, and lint to the correct sub-skill
 4. Maintain hot cache after every operation
-5. Always update index, sub-indexes, log, and hot cache on changes
+5. Always update `wiki/index.md`, the relevant `wiki/domains/<slug>/_index.md` hubs, log, and hot cache on changes
 6. Always use frontmatter and wikilinks
 7. Never modify .raw/ sources
 
