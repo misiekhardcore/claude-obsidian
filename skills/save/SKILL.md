@@ -100,6 +100,10 @@ decision_date: YYYY-MM-DD
 status: active
 ```
 
+### Forward-only hub membership
+
+Do **not** write a `domain:` field on any leaf you save. Hub membership is forward-only — the `wiki/domains/<slug>/_index.md` hub is responsible for linking out to its leaves; the leaf does not declare which hub it belongs to. The leaf's tags are enough for `/lint` and `/wiki promote` to discover it later. If a relevant hub already exists, append the new leaf to that hub's `related:` list as a separate operation; do not encode the relationship on the leaf.
+
 ---
 
 ## Writing Style

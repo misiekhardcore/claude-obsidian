@@ -10,7 +10,7 @@ Every page, no exceptions:
 
 ```yaml
 ---
-type: <source|entity|concept|domain|comparison|question|overview|meta>
+type: <source|entity|concept|domain|comparison|question|meta|synthesis|solution|initiative|session|reference|decision>
 title: "Human-Readable Title"
 created: 2026-04-07
 updated: 2026-04-07
@@ -105,11 +105,12 @@ first_mentioned: "[[Source Title]]"
 
 ```yaml
 complexity: intermediate  # basic | intermediate | advanced
-domain: ""
 aliases:
   - "alternative name"
   - "abbreviation"
 ```
+
+Note: concept (and other leaf) pages do NOT declare hub membership via a `domain:` field. Hub membership is forward-only: hubs declare leaves via `related:`; leaves resolve to hubs via backlinks. See `vault-structure.md` Hub Membership.
 
 ### comparison
 
@@ -133,10 +134,15 @@ answer_quality: solid   # draft | solid | definitive
 
 ### domain
 
+Domain pages are the **hub layer** for cross-folder clusters. They live under `wiki/domains/<slug>/_index.md` and curate leaves via forward-only wikilinks. Leaves do not declare hub membership; the agent traverses leaf→hub via backlinks of `type: domain`.
+
 ```yaml
 subdomain_of: ""        # leave empty for top-level domains
 page_count: 0
+owns_folder: false      # true | false — `true` only when the hub also owns the directory of leaves under it (rare)
 ```
+
+`owns_folder:` defaults to `false` — most hubs curate leaves that live elsewhere in the vault (`concepts/`, `entities/`, `solutions/`, `sources/`).
 
 ---
 

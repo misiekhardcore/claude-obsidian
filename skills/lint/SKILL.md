@@ -37,7 +37,10 @@ Work through these in order:
    - **FAIL** if word count > 750 (50 % buffer exceeded).
    - Remediation: move entries older than 2 weeks to `wiki/log.md`; trim `## Last Updated` to the 3–5 most recent items.
 10. **Backlink density**. For every page under `wiki/` (skip `wiki/meta/` and `notes/`), compute the inbound count via `obsidian backlinks path=<page>` and the outbound count from the page's frontmatter `related:` length plus inline wikilinks. Flag pages where `inbound ≥ 3` **and** `outbound ≤ 1` — heavily cited but weakly linking. These pages are retrieval-late under the forward-only `related:` model, so surfacing them prompts targeted cross-linking. Compute on demand; no backlink index is persisted.
-11. **Notes inbox**. Scoped to `<vault_root>/notes/` only. Two checks:
+11. **Hub promotion candidates**. Group all leaves under `wiki/concepts/`, `wiki/entities/`, `wiki/solutions/`, `wiki/sources/` by their primary tag (the first non-type tag in `tags:`). For each tag-cluster of **≥ 10 leaves**, check whether `wiki/domains/<cluster-tag>/_index.md` exists. If it does not, surface the cluster as a **promotion candidate** — recommend running `/wiki promote <tag>` to scaffold a domain hub. Threshold rationale: clusters below ~10 leaves are noisy; LYT MOC heuristics put the mental-squeeze trigger around this size.
+12. **Hub stale-count drift**. For every `wiki/domains/<slug>/_index.md`, compare the hub's frontmatter `page_count:` to the actual inbound count returned by `obsidian backlinks path=wiki/domains/<slug>/_index.md format=json`. Flag drift **> 20 %** (in either direction). Suggest resync — either update `page_count:` to the live count or re-curate the `related:` list to match reality.
+13. **Hub demotion candidates**. For every `wiki/domains/<slug>/_index.md`, count the leaves linked from the hub's `related:` field. If **< 5**, surface the hub as a **demotion candidate** — its cluster is below the hub-worthwhile threshold and the hub may be churn rather than signal. Recommend either growing the cluster or merging the hub into a sibling.
+14. **Notes inbox**. Scoped to `<vault_root>/notes/` only. Two checks:
     - **Frontmatter gaps** — flag any `notes/*.md` (excluding `notes/index.md`) missing one of: `type`, `title`, `created`, `updated`, `source_project`, `status`. The `topic` and `tags` fields are optional and never flagged.
     - **Index drift** — flag any file in `notes/` that is missing from `notes/index.md`, and any row in `notes/index.md` whose title text doesn't match any existing note's frontmatter `title:` field. Match against frontmatter `title:`, not filenames — filenames are slugs that may diverge from display titles after CAPTURE rewrites (AC4).
     - **Explicitly skip** orphan checks, dead-link checks, stale-claim checks, and contradictions for `notes/`. These are wiki-canonical concerns and inappropriate for a transient inbox.
@@ -86,6 +89,15 @@ status: developing
 
 ## Backlink Density
 - [[Page Name]]: N inbound, M outbound. Heavily cited, weakly linking. Suggest: add `related:` entries on this page to its top citers, or thread it into a domain hub.
+
+## Hub Promotion Candidates
+- `<tag>`: N leaves share this tag, no `wiki/domains/<tag>/_index.md`. Suggest: `/wiki promote <tag>` to scaffold a hub.
+
+## Hub Stale-Count Drift
+- [[domains/<slug>/_index]]: `page_count: N` in frontmatter, M inbound backlinks (drift: ±X%). Suggest: update `page_count:` or re-curate `related:`.
+
+## Hub Demotion Candidates
+- [[domains/<slug>/_index]]: only N leaves linked. Below threshold (5). Suggest: grow the cluster or merge into a sibling hub.
 
 ## Hot Cache Size
 - hot.md: N words (spec: 500, delta: +N). Status: OK | WARN | FAIL
@@ -189,7 +201,7 @@ views:
 
 ## Canvas Map
 
-Create or update `wiki/meta/overview.canvas` for a visual domain map:
+Create or update `wiki/meta/overview.canvas` for a visual domain map. Use `wiki/index.md` as the central node:
 
 ```json
 {
@@ -197,7 +209,7 @@ Create or update `wiki/meta/overview.canvas` for a visual domain map:
     {
       "id": "1",
       "type": "file",
-      "file": "wiki/overview.md",
+      "file": "wiki/index.md",
       "x": 0, "y": 0,
       "width": 300, "height": 140,
       "color": "1"
@@ -207,7 +219,7 @@ Create or update `wiki/meta/overview.canvas` for a visual domain map:
 }
 ```
 
-Add one node per domain page. Connect domains that have significant cross-references. Colors map to the CSS scheme: 1=blue, 2=purple, 3=yellow, 4=orange, 5=green, 6=red.
+Add one node per domain hub (`wiki/domains/<slug>/_index.md`). Connect hubs that have significant cross-references. Colors map to the CSS scheme: 1=blue, 2=purple, 3=yellow, 4=orange, 5=green, 6=red.
 
 ---
 

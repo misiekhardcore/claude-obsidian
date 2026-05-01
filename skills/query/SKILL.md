@@ -43,14 +43,22 @@ Do not open individual wiki pages in quick mode. Do not call `obsidian backlinks
 
 ## Standard Query Workflow
 
-1. **Read** `wiki/hot.md` first. It may already have the answer or directly relevant context.
-2. **Read** `wiki/index.md` to find the most relevant pages (scan for titles and descriptions).
-3. **Rank candidates by inbound citations.** For the shortlist of candidate pages from step 2 (and any pages reached via depth-1 links), run `obsidian backlinks path=<page> format=json` and use the inbound count as a relevance signal alongside title and `related:` matches. A heavily cited atomic note must surface in the top-N even if its outbound `related:` is sparse — backlinks are the only retrieval signal for canonical pages under the forward-only hub model.
-4. **Read** those pages. Follow wikilinks to depth-2 for key entities. No deeper.
-5. **Step from leaf to hub when needed.** If a candidate page is a leaf and you need its broader topic context, run `obsidian backlinks path=<leaf> format=json` and read the entries whose frontmatter `type: domain` — that file is the leaf's containing hub. Hub membership is forward-only (hubs link to leaves; leaves never declare membership), so backlinks of `type: domain` are the canonical leaf→hub traversal.
-6. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
-7. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
-8. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
+A four-step **hybrid retrieval** flow. Stop at the earliest step that answers the question.
+
+1. **Read** `wiki/hot.md` first. It may already have the answer or directly relevant context. If it answers, stop.
+2. **Tag-match the question against leaves.** Identify the 1–3 strongest tags or keyword stems from the question. Use `obsidian search query=<term>` (or grep over `wiki/`) to collect candidate clusters of leaves that share those tags. This is faster and narrower than reading `index.md` for most topical questions.
+3. **For each cluster, check whether a domain hub exists.** Look for `wiki/domains/<cluster-tag>/_index.md`.
+   - **Hub exists** → read the curated hub. The hub's `related:` list is the curated answer set; follow its wikilinks at depth-1 and pull backlinks (`obsidian backlinks path=<leaf> format=json`) on the leaves it links to so heavily cited canonical pages surface in the top-N. This path is preferred — the hub is human-curated and pre-ranked.
+   - **No hub** → use the grep-derived tag cluster as the answer set, ranked by backlink count (`obsidian backlinks path=<leaf> format=json`; entries field count = inbound citations). A heavily cited atomic note must surface in the top-N even if its outbound `related:` is sparse.
+4. **Fall back to `wiki/index.md`** only when steps 1–3 fail (no hot-cache hit, no tag cluster, no hub). Scan section headers; identify candidate pages; rank by backlinks as in step 3.
+
+After candidates are read:
+
+5. **Step leaf → hub when broader topic context is needed.** If a candidate page is a leaf and the answer needs the wider topic, run `obsidian backlinks path=<leaf> format=json` and read the entries whose frontmatter `type: domain`. That file is the leaf's containing hub. Hub membership is forward-only (hubs link to leaves; leaves never declare membership), so backlinks of `type: domain` are the canonical leaf→hub traversal. Below the hub threshold no hub exists — that is expected, not a gap.
+6. **Read** the candidate pages. Follow wikilinks to depth-2 for key entities. No deeper.
+7. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
+8. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
+9. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
 
 ---
 
@@ -59,12 +67,13 @@ Do not open individual wiki pages in quick mode. Do not call `obsidian backlinks
 Use for synthesis questions, comparisons, or "tell me everything about X."
 
 1. Read `wiki/hot.md` and `wiki/index.md`.
-2. Identify all relevant sections (concepts, entities, sources, comparisons).
-3. **Pull backlinks for every candidate.** Run `obsidian backlinks path=<page> format=json` on each candidate to surface canonical pages with high inbound but sparse outbound `related:`, and to find the `type: domain` hubs that contain each leaf. Read the hubs to recover topic-level structure the leaves themselves don't declare.
-4. Read every relevant page. No skipping.
-5. If wiki coverage is thin, offer to supplement with web search.
-6. Synthesize a comprehensive answer with full citations.
-7. Always file the result back as a wiki page. Deep answers are too valuable to lose.
+2. **Read every relevant domain hub.** List `wiki/domains/*/​_index.md`; read each hub whose tag intersects the question. Hubs are the cheapest path to a curated, pre-ranked answer set.
+3. Identify all relevant leaves across `concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/` — both the leaves linked from the hubs and any extra leaves the hubs missed (use `obsidian search` for completeness).
+4. **Pull backlinks for every candidate.** Run `obsidian backlinks path=<page> format=json` on each candidate to surface canonical pages with high inbound but sparse outbound `related:`, and to find the `type: domain` hubs that contain each leaf. Read any hubs not already covered in step 2.
+5. Read every relevant page. No skipping.
+6. If wiki coverage is thin, offer to supplement with web search.
+7. Synthesize a comprehensive answer with full citations.
+8. Always file the result back as a wiki page. Deep answers are too valuable to lose.
 
 ---
 
@@ -110,29 +119,44 @@ Scan the section headers first to determine which sections to read.
 
 ---
 
-## Domain Sub-Index Format
+## Domain Hub Format
 
-Each domain folder has a `_index.md` for focused lookups:
+Domain hubs live at `wiki/domains/<slug>/_index.md`. Each hub is the curated entry point for one cluster:
 
 ```markdown
 ---
-type: meta
-title: "Entities Index"
+type: domain
+title: "Knowledge Management"
+owns_folder: false
+subdomain_of: ""
+page_count: 12
+created: YYYY-MM-DD
 updated: YYYY-MM-DD
+tags: [domain, knowledge-management]
+status: developing
+confidence: EXTRACTED
+evidence: []
+related:
+  - "[[llm-wiki-pattern|LLM Wiki Pattern]]"
+  - "[[hot|Hot Cache]]"
+  - "[[compounding-knowledge|Compounding Knowledge]]"
 ---
-# Entities
 
-## People
-- [[Person Name]]: role, org
+# Knowledge Management
 
-## Organizations
-- [[Org Name]]: what they do
+One-paragraph hub description.
 
-## Products
-- [[Product Name]]: category
+## Core concepts
+- [[llm-wiki-pattern|LLM Wiki Pattern]] — one-line description
+- [[compounding-knowledge|Compounding Knowledge]] — one-line description
+
+## Sources
+- [[llm-wiki-karpathy-gist|Karpathy's LLM Wiki Gist]] — origin source
 ```
 
-Use sub-indexes when the question is scoped to one domain. Avoid reading the full master index for narrow queries.
+Reach a hub via step 3 of the standard flow (`wiki/domains/<cluster-tag>/_index.md`) or via the leaf→hub backlink traversal in step 5.
+
+Per-folder `<folder>/_index.md` files are not used. Folders like `concepts/`, `entities/`, `sources/`, `solutions/` are flat directories; cross-folder navigation goes through hubs.
 
 ---
 
