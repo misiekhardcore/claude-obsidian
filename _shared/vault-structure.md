@@ -16,7 +16,7 @@ Read this file when a skill needs to understand vault layout or interpret page m
 | `wiki/solutions/` | `solution` | Concrete recipes: how to accomplish a specific task end-to-end | Verb phrase, e.g. `register-vault-with-cli` |
 | `wiki/comparisons/` | `comparison` | Side-by-side analysis of 2+ alternatives | `<A>-vs-<B>` or `comparing-<topic>` |
 | `wiki/questions/` | `question` | Open questions; closed questions link to the answer | Question as written, e.g. `why-tokens-compound` |
-| `wiki/domains/` | `domain` | Universal hub root for topic and project hubs; each hub is `wiki/domains/<slug>/_index.md` | kebab-case slug, e.g. `machine-learning`, `sophia` |
+| `wiki/domains/` | `domain` | Universal hub root for domain hubs; each hub is `wiki/domains/<slug>/_index.md` | kebab-case slug, e.g. `machine-learning`, `sophia` |
 | `wiki/meta/` | `meta` | Index files, log, hot cache, dashboards — structural pages | Short functional names: `index`, `log`, `hot` |
 
 **Examples:**

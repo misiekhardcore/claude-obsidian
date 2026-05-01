@@ -182,7 +182,6 @@ Steps:
    ---
    type: domain
    title: "<Title Case of tag>"
-   scope: topic                # set to project if the user said it is a project hub
    owns_folder: false
    subdomain_of: ""
    page_count: <N>             # length of the related list below

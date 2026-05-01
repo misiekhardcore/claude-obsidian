@@ -121,13 +121,12 @@ Scan the section headers first to determine which sections to read.
 
 ## Domain Hub Format
 
-Topic and project hubs live at `wiki/domains/<slug>/_index.md`. Each hub is the curated entry point for one cluster:
+Domain hubs live at `wiki/domains/<slug>/_index.md`. Each hub is the curated entry point for one cluster:
 
 ```markdown
 ---
 type: domain
 title: "Knowledge Management"
-scope: topic              # topic | project
 owns_folder: false
 subdomain_of: ""
 page_count: 12

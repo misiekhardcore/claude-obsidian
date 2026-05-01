@@ -139,11 +139,10 @@ Domain pages are the **hub layer** for cross-folder topic and project clusters. 
 ```yaml
 subdomain_of: ""        # leave empty for top-level domains
 page_count: 0
-scope: topic            # topic | project — `topic` covers a subject area; `project` covers a single repo or initiative
 owns_folder: false      # true | false — `true` only when the hub also owns the directory of leaves under it (rare)
 ```
 
-`scope:` defaults to `topic`. `owns_folder:` defaults to `false` — most hubs curate leaves that live elsewhere in the vault (`concepts/`, `entities/`, `solutions/`, `sources/`).
+`owns_folder:` defaults to `false` — most hubs curate leaves that live elsewhere in the vault (`concepts/`, `entities/`, `solutions/`, `sources/`).
 
 ---
 
