@@ -37,7 +37,7 @@ Use when the answer is likely in the hot cache or index summary.
 3. If found in index summary, respond and do not open any pages.
 4. If not found, say "Not in quick cache. Run as standard query?"
 
-Do not open individual wiki pages in quick mode.
+Do not open individual wiki pages in quick mode. Do not call `obsidian backlinks` in quick mode — backlink-aware ranking belongs to standard and deep modes; quick mode preserves a ~1.5K token budget.
 
 ---
 
@@ -45,10 +45,12 @@ Do not open individual wiki pages in quick mode.
 
 1. **Read** `wiki/hot.md` first. It may already have the answer or directly relevant context.
 2. **Read** `wiki/index.md` to find the most relevant pages (scan for titles and descriptions).
-3. **Read** those pages. Follow wikilinks to depth-2 for key entities. No deeper.
-4. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
-5. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
-6. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
+3. **Rank candidates by inbound citations.** For the shortlist of candidate pages from step 2 (and any pages reached via depth-1 links), run `obsidian backlinks path=<page> format=json` and use the inbound count as a relevance signal alongside title and `related:` matches. A heavily cited atomic note must surface in the top-N even if its outbound `related:` is sparse — backlinks are the only retrieval signal for canonical pages under the forward-only hub model.
+4. **Read** those pages. Follow wikilinks to depth-2 for key entities. No deeper.
+5. **Step from leaf to hub when needed.** If a candidate page is a leaf and you need its broader topic context, run `obsidian backlinks path=<leaf> format=json` and read the entries whose frontmatter `type: domain` — that file is the leaf's containing hub. Hub membership is forward-only (hubs link to leaves; leaves never declare membership), so backlinks of `type: domain` are the canonical leaf→hub traversal.
+6. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
+7. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
+8. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
 
 ---
 
@@ -58,10 +60,11 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
 
 1. Read `wiki/hot.md` and `wiki/index.md`.
 2. Identify all relevant sections (concepts, entities, sources, comparisons).
-3. Read every relevant page. No skipping.
-4. If wiki coverage is thin, offer to supplement with web search.
-5. Synthesize a comprehensive answer with full citations.
-6. Always file the result back as a wiki page. Deep answers are too valuable to lose.
+3. **Pull backlinks for every candidate.** Run `obsidian backlinks path=<page> format=json` on each candidate to surface canonical pages with high inbound but sparse outbound `related:`, and to find the `type: domain` hubs that contain each leaf. Read the hubs to recover topic-level structure the leaves themselves don't declare.
+4. Read every relevant page. No skipping.
+5. If wiki coverage is thin, offer to supplement with web search.
+6. Synthesize a comprehensive answer with full citations.
+7. Always file the result back as a wiki page. Deep answers are too valuable to lose.
 
 ---
 
