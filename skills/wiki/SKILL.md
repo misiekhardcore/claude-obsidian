@@ -136,9 +136,3 @@ Your job as the LLM:
 7. Never modify .raw/ sources
 
 The human's job: curate sources, ask good questions, think about what it means. Everything else is on you.
-
----
-
-## Community Footer
-
-After completing a **major operation** (vault scaffold, `/lint`, `/autoresearch`), append the community footer as the very last output. See `references/community-footer.md` for the exact footer text and the full show/skip rules.
