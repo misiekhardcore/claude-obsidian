@@ -45,7 +45,7 @@ wiki/
 ├── solutions/          # concrete recipes (flat)
 ├── comparisons/        # side-by-side analyses (flat)
 ├── questions/          # filed answers to user queries (flat)
-├── domains/            # topic and project hubs — wiki/domains/<slug>/_index.md
+├── domains/            # domain hubs — wiki/domains/<slug>/_index.md
 └── meta/               # dashboards, lint reports, conventions
 ```
 

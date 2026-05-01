@@ -24,7 +24,7 @@ Read this file when a skill needs to understand vault layout or interpret page m
 - `wiki/entities/Andrej Karpathy.md` — a person (entity)
 - `wiki/sources/llm-wiki-karpathy-gist.md` — the ingest record for a specific source
 - `wiki/solutions/register-vault-with-cli.md` — step-by-step recipe (solution)
-- `wiki/domains/knowledge-management/_index.md` — a topic hub curating concepts/entities/sources across folders
+- `wiki/domains/knowledge-management/_index.md` — a domain hub curating concepts/entities/sources across folders
 
 > Per-folder `<folder>/_index.md` files are **not** part of this layout. Curation lives only in `wiki/domains/<slug>/_index.md`. Folders like `concepts/`, `entities/`, `solutions/`, `sources/` are flat directories of leaves; navigation crosses them via domain hubs and backlinks.
 

@@ -134,7 +134,7 @@ answer_quality: solid   # draft | solid | definitive
 
 ### domain
 
-Domain pages are the **hub layer** for cross-folder topic and project clusters. They live under `wiki/domains/<slug>/_index.md` and curate leaves via forward-only wikilinks. Leaves do not declare hub membership; the agent traverses leaf→hub via backlinks of `type: domain`.
+Domain pages are the **hub layer** for cross-folder clusters. They live under `wiki/domains/<slug>/_index.md` and curate leaves via forward-only wikilinks. Leaves do not declare hub membership; the agent traverses leaf→hub via backlinks of `type: domain`.
 
 ```yaml
 subdomain_of: ""        # leave empty for top-level domains
