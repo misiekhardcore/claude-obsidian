@@ -20,6 +20,7 @@ Use the native `obsidian` CLI verbs for efficient data gathering:
 - Orphan pages: `obsidian orphans` (returns one path per line)
 - Dead links: `obsidian deadends` (returns one path per line)
 - Unresolved links: `obsidian unresolved format=json` (returns `[{"link": "..."}]`)
+- Inbound links per page: `obsidian backlinks path=<page> format=json` (returns `[{"file": "<path>"}]`; count entries for the inbound-link count)
 
 Work through these in order:
 
@@ -35,7 +36,8 @@ Work through these in order:
    - **WARN** if word count > 500 (spec limit per `_shared/hot-cache-protocol.md`).
    - **FAIL** if word count > 750 (50 % buffer exceeded).
    - Remediation: move entries older than 2 weeks to `wiki/log.md`; trim `## Last Updated` to the 3–5 most recent items.
-10. **Notes inbox**. Scoped to `<vault_root>/notes/` only. Two checks:
+10. **Backlink density**. For every page under `wiki/` (skip `wiki/meta/` and `notes/`), compute the inbound count via `obsidian backlinks path=<page>` and the outbound count from the page's frontmatter `related:` length plus inline wikilinks. Flag pages where `inbound ≥ 3` **and** `outbound ≤ 1` — heavily cited but weakly linking. These pages are retrieval-late under the forward-only `related:` model, so surfacing them prompts targeted cross-linking. Compute on demand; no backlink index is persisted.
+11. **Notes inbox**. Scoped to `<vault_root>/notes/` only. Two checks:
     - **Frontmatter gaps** — flag any `notes/*.md` (excluding `notes/index.md`) missing one of: `type`, `title`, `created`, `updated`, `source_project`, `status`. The `topic` and `tags` fields are optional and never flagged.
     - **Index drift** — flag any file in `notes/` that is missing from `notes/index.md`, and any row in `notes/index.md` whose title text doesn't match any existing note's frontmatter `title:` field. Match against frontmatter `title:`, not filenames — filenames are slugs that may diverge from display titles after CAPTURE rewrites (AC4).
     - **Explicitly skip** orphan checks, dead-link checks, stale-claim checks, and contradictions for `notes/`. These are wiki-canonical concerns and inappropriate for a transient inbox.
@@ -81,6 +83,9 @@ status: developing
 
 ## Cross-Reference Gaps
 - [[Entity Name]] mentioned in [[Page A]] without a wikilink.
+
+## Backlink Density
+- [[Page Name]]: N inbound, M outbound. Heavily cited, weakly linking. Suggest: add `related:` entries on this page to its top citers, or thread it into a domain hub.
 
 ## Hot Cache Size
 - hot.md: N words (spec: 500, delta: +N). Status: OK | WARN | FAIL
