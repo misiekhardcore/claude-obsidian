@@ -2,6 +2,79 @@
 
 Obsidian wiki plugin for Claude Code — personal knowledge vault with LLM-assisted ingestion, research, and retrieval.
 
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'background':'#000','primaryColor':'#ffffff','primaryTextColor':'#000000','primaryBorderColor':'#000000','lineColor':'#000000','textColor':'#000000','titleColor':'#000000','clusterBkg':'#f3f4f6','clusterBorder':'#000000','edgeLabelBackground':'#ffffff'}}}%%
+flowchart TB
+    subgraph Canvas["Plugin flow"]
+        direction TB
+
+        subgraph Capture["Capture — surfaces & inboxes"]
+            direction LR
+            C_Note["/note · /dump"]
+            C_Daily["/daily"]
+            C_Brain["/braindump"]
+            C_Drop[".raw/ drop · URL · image"]
+        end
+
+        subgraph Process["Process — turn raw into wiki"]
+            direction LR
+            P_Ingest["/ingest"]
+            P_NoteProc["/note process"]
+            P_DailyClose["/daily-close"]
+            P_Save["/save"]
+            P_Auto["/autoresearch"]
+        end
+
+        subgraph Wiki["wiki/ — the compounding store"]
+            direction LR
+            W_Hot[("hot.md")]
+            W_Index[("index.md")]
+            W_Pages["concepts/ · entities/ · sources/ · domains/"]
+        end
+
+        subgraph Retrieve["Retrieve — query the vault"]
+            direction LR
+            R_Query["query · what do you know about X?"]
+            R_Hot["SessionStart hot inject"]
+        end
+
+        Capture --> Process --> Wiki
+        P_Auto --> Wiki
+        Wiki --> Retrieve
+        W_Hot -. session boot .-> R_Hot
+
+        subgraph Maintain["Maintenance"]
+            direction LR
+            M_Lint["wiki-lint"]
+            M_Canvas["/canvas"]
+        end
+        Wiki -. weekly · cron .-> M_Lint
+        M_Lint -. fixes .-> Wiki
+
+        subgraph Hooks["Passive hooks"]
+            direction LR
+            H_Commit["auto-commit"]
+            H_Reflect["SessionEnd reflection"]
+        end
+        Process -. on write .-> H_Commit
+        Retrieve -. on stop .-> H_Reflect
+        H_Reflect --> C_Daily
+    end
+
+    classDef canvas fill:#ffffff,stroke:#ffffff,color:#000000
+    classDef orch fill:#dddddd,stroke:#000000,stroke-width:2px,color:#000000
+    classDef spec fill:#eeeeee,stroke:#000000,stroke-width:2px,color:#000000
+    classDef store fill:#a5b4fc,stroke:#000000,stroke-width:2px,color:#000000
+    classDef passive fill:#f9a8d4,stroke:#000000,stroke-width:2px,stroke-dasharray:4 2,color:#000000
+    class Canvas canvas
+    class Capture,Process,Retrieve,Maintain orch
+    class C_Note,C_Daily,C_Brain,C_Drop,P_Ingest,P_NoteProc,P_DailyClose,P_Save,P_Auto,R_Query,R_Hot,M_Lint,M_Canvas spec
+    class W_Hot,W_Index,W_Pages store
+    class Hooks,H_Commit,H_Reflect passive
+```
+
+**Legend**: phase orchestrators (medium gray subgraphs) wrap specialist skills (light gray). The wiki itself (indigo) is the compounding store every phase reads from or writes to. Passive hooks (dashed pink) run silently on session events.
+
 ## Install
 
 **Prerequisites:**
