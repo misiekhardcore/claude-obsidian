@@ -251,10 +251,10 @@ If the lint report is advisory only (no auto-fixes applied), skip the hot.md upd
 
 ## Report Rotation
 
-After writing the new report, prune older ones so `wiki/meta/` keeps only the most recent **3** lint reports. Older reports are advisory snapshots — the dashboard already carries the latest summary, and the new report subsumes their findings, so they only clutter `meta/` and inflate git diffs.
+After writing the new report, prune older ones:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"
 ```
 
-The script keeps the top 3 by ISO date by default; pass a different positive integer to override (e.g. `prune-lint-reports.sh 5`). If fewer than the keep-count exist, nothing is pruned.
+See the script header for keep-count, override arg, and rationale.
