@@ -55,7 +55,15 @@ Use this when `/lint` reports a **promotion candidate** (a tag-cluster of ≥10 
    - ...
    ```
    Empty sections (no leaves of that type) can be omitted. The one-line description should be the leaf's own description if its frontmatter has one, otherwise leave it as `<TODO: describe>` for the human curator.
-7. **Update `wiki/index.md`.** Prepend an entry under the `## Domains` section.
+7. **Update `wiki/index.md`.** Splice an entry under the `## Domains` section via `scripts/index-section-insert.sh` (same helper as `/save` step 7).
+
+   **Entry format:** `- [[domains/<tag>/_index|<Title Case>]] — <one-line description>`
+
+   ```bash
+   new_entry="- [[domains/$tag/_index|$title]] — $stub_one_line"
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-section-insert.sh" \
+     wiki/index.md "## Domains" "$new_entry"
+   ```
 8. **Update `wiki/hot.md`.** Add the new hub to the `## Recent Changes` list per the hot-cache protocol.
 9. **Update `wiki/log.md`.** Prepend a `## [YYYY-MM-DD] promote | <tag>` entry noting the new hub and the cluster size.
 10. **Confirm.** "Scaffolded [[domains/<tag>/_index]] with N pre-populated leaves. Open it in Obsidian to curate descriptions and section ordering."

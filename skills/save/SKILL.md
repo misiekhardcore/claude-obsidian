@@ -54,11 +54,27 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
      content="<frontmatter + body, with \n for newlines>"
    ```
 6. **Collect links**: identify any wiki pages mentioned in the conversation. Include them in `related` in the frontmatter you pass via `content=`.
-7. **Update** `wiki/index.md`. Prepend the new entry under the relevant section:
+7. **Update** `wiki/index.md`. Use a read-splice-overwrite pattern to insert the entry under the correct section heading.
+
+   **Type → section** (deterministic; do not choose freehand):
+
+   | Note type | Target section |
+   |-----------|----------------|
+   | `concept` | `## Concepts` |
+   | `source` | `## Sources` |
+   | `decision` | `## Plans & Decisions` |
+   | `synthesis` | `## Questions` |
+   | `session` | *(skip — not indexed; chronology lives in `wiki/log.md` and `daily/`)* |
+
+   **Entry format:** `- [[<slug>|<Display Name>]] — <one-line description>`
+   Omit `|<Display Name>` when the display name matches the slug exactly (after converting hyphens/underscores to spaces and title-casing).
+
+   **Pattern:** delegate the read-splice-overwrite to `scripts/index-section-insert.sh`. It reads via `obsidian read`, splices the entry on the line immediately after the matching heading, and writes back via `obsidian create overwrite=true`. If the heading is absent, the script appends `<heading>\n<entry>` at the end of the file.
    ```bash
-   obsidian prepend \
-     file=wiki/index.md \
-     content="- [[<slug>]]: <one-line description>\n"
+   # section is determined from the type table above
+   new_entry="- [[$slug|$display_name]] — $description"
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-section-insert.sh" \
+     wiki/index.md "$section" "$new_entry"
    ```
 8. **Prepend** the latest entry to `wiki/log.md` (new entry goes at the TOP):
    ```bash
