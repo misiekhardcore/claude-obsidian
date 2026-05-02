@@ -246,3 +246,21 @@ If the lint run applied any auto-fixes that modified wiki pages (new stubs, adde
 For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 
 If the lint report is advisory only (no auto-fixes applied), skip the hot.md update — reports live at `wiki/meta/lint-report-*.md` and do not count as wiki content changes.
+
+---
+
+## Report Rotation
+
+After writing the new report, prune older ones so `wiki/meta/` keeps only the most recent **3** lint reports. Older reports are advisory snapshots — the dashboard already carries the latest summary, and the new report subsumes their findings, so they only clutter `meta/` and inflate git diffs.
+
+```bash
+obsidian files dir=wiki/meta format=json \
+  | jq -r '.[] | select(.path | test("^wiki/meta/lint-report-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md$")) | .path' \
+  | sort -r \
+  | tail -n +4 \
+  | while read -r stale; do
+      obsidian delete path="$stale"
+    done
+```
+
+ISO-8601 dates sort lexically, so `sort -r` puts the newest first; `tail -n +4` skips the top 3 and emits the rest for deletion. If fewer than 3 reports exist, nothing is pruned.
