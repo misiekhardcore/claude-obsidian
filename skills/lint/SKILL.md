@@ -254,13 +254,7 @@ If the lint report is advisory only (no auto-fixes applied), skip the hot.md upd
 After writing the new report, prune older ones so `wiki/meta/` keeps only the most recent **3** lint reports. Older reports are advisory snapshots — the dashboard already carries the latest summary, and the new report subsumes their findings, so they only clutter `meta/` and inflate git diffs.
 
 ```bash
-obsidian files dir=wiki/meta format=json \
-  | jq -r '.[] | select(.path | test("^wiki/meta/lint-report-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md$")) | .path' \
-  | sort -r \
-  | tail -n +4 \
-  | while read -r stale; do
-      obsidian delete path="$stale"
-    done
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"
 ```
 
-ISO-8601 dates sort lexically, so `sort -r` puts the newest first; `tail -n +4` skips the top 3 and emits the rest for deletion. If fewer than 3 reports exist, nothing is pruned.
+The script keeps the top 3 by ISO date by default; pass a different positive integer to override (e.g. `prune-lint-reports.sh 5`). If fewer than the keep-count exist, nothing is pruned.
