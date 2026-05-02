@@ -44,6 +44,25 @@ Work through these in order:
     - **Frontmatter gaps** — flag any `notes/*.md` (excluding `notes/index.md`) missing one of: `type`, `title`, `created`, `updated`, `source_project`, `status`. The `topic` and `tags` fields are optional and never flagged.
     - **Index drift** — flag any file in `notes/` that is missing from `notes/index.md`, and any row in `notes/index.md` whose title text doesn't match any existing note's frontmatter `title:` field. Match against frontmatter `title:`, not filenames — filenames are slugs that may diverge from display titles after CAPTURE rewrites (AC4).
     - **Explicitly skip** orphan checks, dead-link checks, stale-claim checks, and contradictions for `notes/`. These are wiki-canonical concerns and inappropriate for a transient inbox.
+15. **Misplaced index entries**. For every wikilink in `wiki/index.md`, verify the entry sits under the section matching its target's `type:` frontmatter. Read each linked target via `obsidian read path=<target>` to extract its `type:`, then determine which `## <Section>` heading the entry currently sits under (the nearest preceding H2 in `wiki/index.md`).
+
+    Map `type:` → expected section using this fixed table:
+
+    | `type:` | Expected section |
+    |---|---|
+    | concept | `## Concepts` |
+    | source | `## Sources` |
+    | synthesis | `## Plans & Decisions` (or `## Synthesis` if separate) |
+    | decision | `## Plans & Decisions` |
+    | meta | (no section — sits in the Navigation row, not in the body) |
+    | domain | `## Domains` |
+
+    Types not listed above are skipped (no flag) — extend the table when a new type acquires a canonical section.
+
+    - **Strays** — entries with no preceding H2 (above the first heading) flag as `entry above all sections, expected under <Section>`.
+    - **Misplacements** — entries under a non-matching section flag as `entry under <Current> but type=<X> expects <Expected>`.
+
+    Role: **safety net**, not the primary placement mechanism. `/save` writes new entries directly under the correct section (see #84), so a healthy vault reports zero findings here. Findings indicate drift — manual edits, pre-fix history, or an agent that picked the wrong section despite the corrected `/save` snippet. Auto-fix policy is **ask-first** (see Before Auto-Fixing).
 
 ---
 
@@ -113,6 +132,10 @@ Scope: `notes/` only. Frontmatter gaps and index drift; no orphan/dead-link/stal
 ### Index drift
 - File missing from index: `notes/<filename>.md` (no row in `notes/index.md`)
 - Index row missing file: `notes/index.md` references "<title>" but no file resolves to it
+
+## Misplaced Index Entries
+- `[[<slug>]]`: under `<Current>`, expected `<Expected>` (type=<x>). Suggest: move under `<Expected>`.
+- `[[<slug>]]`: above all sections (stray). Suggest: move under `<Expected>`.
 ```
 
 ---
@@ -236,6 +259,7 @@ Needs review before fixing:
 - Deleting orphan pages (they might be intentionally isolated)
 - Resolving contradictions (requires human judgment)
 - Merging duplicate pages
+- Moving misplaced index entries (check #15). Rationale: low expected volume in a healthy vault makes batch auto-move offer little value over per-entry confirmation, and a misclassification (e.g., a concept intentionally filed under a different section) is harder to undo than to confirm.
 
 ---
 
