@@ -246,3 +246,15 @@ If the lint run applied any auto-fixes that modified wiki pages (new stubs, adde
 For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 
 If the lint report is advisory only (no auto-fixes applied), skip the hot.md update — reports live at `wiki/meta/lint-report-*.md` and do not count as wiki content changes.
+
+---
+
+## Report Rotation
+
+After writing the new report, prune older ones:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"
+```
+
+See the script header for keep-count, override arg, and rationale.

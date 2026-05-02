@@ -75,6 +75,15 @@ Locked by the empirical spike. Skills must not override these without a document
 
 **Multiline `content=`:** `\n` and `\t` escapes in `content=` values round-trip correctly (verified by spike `ingest-create-multiline`). Use `\n` for newlines in `create`, `append`, `prepend`.
 
+**`content=` escape asymmetry (verified empirically, 2026-05-02):** The parser recognizes `\n` → newline and `\t` → tab, but does **not** recognize `\\` → literal backslash. As a result, content that must preserve literal backslash sequences (e.g. canvas JSON with `\n` in text fields, Markdown code blocks with shell escape sequences) cannot round-trip through `content=` — every `\n` becomes a real newline regardless of preceding backslashes. For these files, use the `eval` escape hatch instead:
+
+```bash
+# Escape hatch: bypass content= for files with literal backslash sequences
+obsidian eval code="await app.vault.adapter.write('path/to/file', '<full content>');"
+# Requires: content embedded in JS string literal (double-quote escaping applies)
+# Why eval and not create: content= asymmetric escape parser corrupts \n sequences
+```
+
 ---
 
 ## 4. Escape-hatch policy

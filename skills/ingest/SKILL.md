@@ -65,7 +65,7 @@ Steps:
 
 1. **Fetch** the page using WebFetch.
 2. **Clean** (optional): if `defuddle` is available (`which defuddle 2>/dev/null`), run `defuddle [url]` to strip ads, nav, and clutter. Typically saves 40-60% tokens. Fall back to raw WebFetch output if not installed.
-3. **Derive slug** from the URL path (last segment, lowercased, spaces→hyphens, strip query strings).
+3. **Derive slug** by passing the URL path's last segment (with the query string stripped) through `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<url-last-segment>"`. The script handles lowercasing, separator collapsing, and trailing `.md` normalization — do not slugify by hand.
 4. **Save** to `.raw/articles/[slug]-[YYYY-MM-DD].md` with a frontmatter header:
    ```markdown
    ---
@@ -85,7 +85,7 @@ Steps:
 
 1. **Read** the image file using the Read tool. Claude can process images natively.
 2. **Describe** the image contents: extract all text (OCR), identify key concepts, entities, diagrams, and data visible in the image.
-3. **Save** the description to `.raw/images/[slug]-[YYYY-MM-DD].md`:
+3. **Derive slug** from the image filename (basename without extension) via `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<basename>"`. **Save** the description to `.raw/images/[slug]-[YYYY-MM-DD].md`:
    ```markdown
    ---
    source_type: image
