@@ -65,7 +65,7 @@ Steps:
 
 1. **Fetch** the page using WebFetch.
 2. **Clean** (optional): if `defuddle` is available (`which defuddle 2>/dev/null`), run `defuddle [url]` to strip ads, nav, and clutter. Typically saves 40-60% tokens. Fall back to raw WebFetch output if not installed.
-3. **Derive slug** by passing the URL path's last segment (with the query string stripped) through `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<title>"`. The script handles lowercasing, separator collapsing, and trailing `.md` normalization — do not slugify by hand.
+3. **Derive slug** by passing the URL path's last segment (with the query string stripped) through `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<url-last-segment>"`. The script handles lowercasing, separator collapsing, and trailing `.md` normalization — do not slugify by hand.
 4. **Save** to `.raw/articles/[slug]-[YYYY-MM-DD].md` with a frontmatter header:
    ```markdown
    ---
