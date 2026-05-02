@@ -92,6 +92,11 @@ assert_eq "foo-bar-baz" "$out" "collapse: runs of non-alphanumerics → single -
 out=$(bash "$SLUG" "Hello World")
 assert_eq "hello-world" "$out" "lowercase: mixed case → lowercase"
 
+# Issue #77 — trailing ".md" in title must normalize to "-md" so callers
+# appending ".md" to assemble the filename can't produce a ".md.md" double-suffix.
+out=$(bash "$SLUG" "humanlayer writing a goodclaude.md")
+assert_eq "humanlayer-writing-a-goodclaude-md" "$out" "issue#77: trailing .md in title normalizes to -md"
+
 # Argument validation: zero args → exit 2.
 out=$(bash "$SLUG" 2>/dev/null); rc=$?
 assert_exit 2 "$rc" "no args → exit 2"

@@ -46,10 +46,11 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
 2. **Ask** (if not already named): "What should I call this note?" Keep the name short and descriptive.
 3. **Determine** note type using the table above.
 4. **Extract** all relevant content from the conversation. Rewrite it in declarative present tense (not "the user asked" but the actual content itself).
-5. **Create** the note:
+5. **Create** the note. Generate the filename slug via `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<title>"` and use the result as `<slug>` in the path — do not hand-craft the slug, the script normalizes Unicode, trailing `.md`, and runs of separators:
    ```bash
+   slug=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh" "<title>")
    obsidian create \
-     path=wiki/<folder>/<slug>.md \
+     path=wiki/<folder>/$slug.md \
      content="<frontmatter + body, with \n for newlines>"
    ```
 6. **Collect links**: identify any wiki pages mentioned in the conversation. Include them in `related` in the frontmatter you pass via `content=`.

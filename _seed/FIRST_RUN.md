@@ -69,6 +69,8 @@ In Claude Code, type `/wiki` to see all available wiki operations.
 /wiki scaffold               — customize the vault structure for your domain
 ```
 
+For a guided walkthrough — drop → ingest → query — open `wiki/getting-started.md`.
+
 ---
 
 ## 6. Delete the Example Pages (when ready)
