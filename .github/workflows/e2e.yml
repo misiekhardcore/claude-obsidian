@@ -1,0 +1,45 @@
+name: E2E Test Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    name: Build image + run CI smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build E2E image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: tests/e2e/Dockerfile
+          tags: claude-obsidian-e2e:latest
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run CI smoke
+        timeout-minutes: 8
+        run: |
+          # --security-opt apparmor=unconfined: GitHub's ubuntu-24.04 runners
+          # apply the docker-default AppArmor profile, which blocks the
+          # user-namespace syscalls Chromium uses during Electron init even
+          # with --no-sandbox. Without this flag, Obsidian boots far enough
+          # to log "Loaded main app package" and then SIGTRAPs. Docker Desktop
+          # (local dev) ships no host AppArmor so the issue doesn't reproduce
+          # there.
+          docker run --rm \
+            --security-opt apparmor=unconfined \
+            -e ENTRYPOINT_TYPE=ci \
+            -v "${GITHUB_WORKSPACE}:/opt/plugin-src:ro" \
+            claude-obsidian-e2e:latest
