@@ -119,7 +119,27 @@ The following paths bypass the CLI intentionally. Each bypass is load-bearing; d
 
 ---
 
-## 7. Re-spiking after a CLI version bump
+## 7. Canvas file handling
+
+Canvas files (`.canvas`) are first-class vault documents, but the Obsidian CLI has no canvas-specific verbs. Skills that need to work with canvases use a combination of standard verbs and direct filesystem reads.
+
+| Operation | Approach |
+|-----------|----------|
+| List canvas files | `obsidian files dir=wiki/canvases format=json` — returns `[{"path": "wiki/canvases/foo.canvas", ...}]` |
+| Read canvas content | Direct filesystem read (documented bypass — canvas JSON is not Markdown; `obsidian read` returns raw JSON but the `content=` escape asymmetry in §3 does not affect reads) |
+| Extract wikilinks | Parse `.nodes[]?.text` JSON fields for `[[...]]` patterns. `obsidian unresolved` does **not** cover canvas wikilinks — a separate pass using the filesystem resolver pool is required. |
+| Verify canvas dead links | Build a resolver pool from `find $VAULT -name "*.md" -o -name "*.canvas" ...` and test each extracted link against it. Reference implementation: `scripts/lint-scan.sh`. |
+| Write canvas files | Direct filesystem write (documented bypass — canvas JSON `text` fields contain literal `\n` sequences that `content=` would corrupt per §3 escape asymmetry) |
+| Backlinks to a canvas | `obsidian backlinks path=wiki/canvases/foo.canvas format=json` — works identically to `.md` files |
+
+**`obsidian files` verb** (not in the §3 table; no locked output format):
+- `obsidian files dir=<vault-relative-dir> format=json` → `[{"path": "<vault-relative-path>", ...}]`
+- Works for any directory: `wiki/canvases/`, `wiki/meta/`, `notes/`, etc.
+- Extension filtering is not supported by the verb — filter client-side with `jq select(.path | endswith(".canvas"))`
+
+---
+
+## 8. Re-spiking after a CLI version bump
 
 After any Obsidian minor-version upgrade, re-run `scripts/cli-spike.sh` and diff `tests/spike-results/` against the committed baseline. Update this file if:
 

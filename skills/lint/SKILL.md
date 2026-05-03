@@ -14,18 +14,70 @@ Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. 
 
 ---
 
+## Scan Scope
+
+The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs on an unchanged vault produce byte-identical JSON (excluding `scan_date`).
+
+**Folders scanned:**
+- `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/domains/`, `wiki/comparisons/`, `wiki/questions/`, `wiki/solutions/`
+- `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`
+- `wiki/canvases/*.canvas` — first-class; treated identically to `.md` in all 16 checks
+
+**Folders excluded (with rationale):**
+- `wiki/meta/` — administrative bookkeeping (lint reports, dashboards). Findings pointing into `wiki/meta/` from `wiki/index.md` are still validated by check #15.
+- `wiki/trails/` — frozen run-snapshots; surfaced for visibility, never counted toward totals, never auto-fixed.
+- `notes/` — transient inbox; only checks #14 (frontmatter gaps) and index drift apply.
+- `_archive/`, `_templates/`, `.raw/` — non-wiki storage; never scanned.
+
+**File extensions scanned for wikilinks (sources):** `.md`, `.canvas`
+
+**File extensions valid as wikilink targets (resolver pool):** `.md`, `.canvas`, `.base`, `.png`, `.jpg`, `.jpeg`, `.svg`, `.pdf`
+
+**Ordering guarantee:** `lint-scan.sh` sorts all enumerations before writing JSON.
+
+---
+
+## Repeatability Check
+
+Run this recipe after any change to the scan script or lint agent to verify determinism:
+
+```bash
+# Run twice on an unchanged vault
+CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" \
+  bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-verify-consistency.sh"
+```
+
+The script calls `lint-scan.sh` twice and compares SHA-256 hashes of the JSON output (excluding `scan_date`). Hashes must match; divergence indicates non-determinism.
+
+Manual verification:
+```bash
+CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
+cp "${VAULT}/wiki/meta/lint-data-$(date +%F).json" /tmp/lint-data-1.json
+
+CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
+cp "${VAULT}/wiki/meta/lint-data-$(date +%F).json" /tmp/lint-data-2.json
+
+# Hashes must match (excluding scan_date)
+jq -S 'del(.scan_date)' /tmp/lint-data-1.json | sha256sum
+jq -S 'del(.scan_date)' /tmp/lint-data-2.json | sha256sum
+```
+
+---
+
 ## Lint Checks
 
-Use the native `obsidian` CLI verbs for efficient data gathering:
-- Orphan pages: `obsidian orphans` (returns one path per line)
-- Dead links: `obsidian deadends` (returns one path per line)
+The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
+
+When invoking CLI verbs directly (checks #3–#9, #11–#16):
+- Inbound links per page: `obsidian backlinks path=<page> format=json` (returns `[{"file": "<path>"}]`; count entries for the inbound-link count) — only needed if the JSON backlinks map is not available.
 - Unresolved links: `obsidian unresolved format=json` (returns `[{"link": "..."}]`)
-- Inbound links per page: `obsidian backlinks path=<page> format=json` (returns `[{"file": "<path>"}]`; count entries for the inbound-link count)
 
 Work through these in order:
 
-1. **Orphan pages**. Use `obsidian orphans` to enumerate. Wiki pages with no inbound wikilinks. They exist but nothing points to them. **Exclude `wiki/trails/*.md`** from this check — trails are designed-orphan: the synthesis page does not link back to them (forward-only model), so every trail would be flagged as orphan in perpetuity.
-2. **Dead links**. Use `obsidian deadends` to enumerate. Wikilinks that reference a page that does not exist. Findings inside `wiki/trails/*.md` are surfaced for visibility but **never auto-fixed** — trails are run-snapshots frozen at write time; the user repairs manually or accepts the drift (same policy as check #16).
+1. **Orphan pages**. Source: `orphans` array in `lint-data-YYYY-MM-DD.json`. Wiki pages (`.md` and `.canvas`) with no inbound wikilinks. They exist but nothing points to them. `wiki/trails/*.md` and `notes/` are already excluded from the JSON output — trails are designed-orphan (forward-only model), so they would be flagged in perpetuity.
+2. **Dead links**. Source: `dead_links` array in `lint-data-YYYY-MM-DD.json`. Each entry is `{source_page, link_text}` — a wikilink in `source_page` that does not resolve to any existing page. Canvas dead links are merged into the same array; no separate handling. Findings inside `wiki/trails/*.md` are surfaced for visibility but **never auto-fixed** — trails are run-snapshots frozen at write time; the user repairs manually or accepts the drift (same policy as check #16).
+
+    **Anti-pattern note:** URL-as-wikilink occurrences (e.g. `[[https://...]]`) are in the `anti_patterns` array of the JSON. Report these in a dedicated **Anti-patterns** section; do **not** count them toward the dead-link total.
 3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated.
 4. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
 5. **Missing cross-references**. Entities mentioned in a page but not linked.
@@ -36,7 +88,7 @@ Work through these in order:
    - **WARN** if word count > 500 (spec limit per `_shared/hot-cache-protocol.md`).
    - **FAIL** if word count > 750 (50 % buffer exceeded).
    - Remediation: move entries older than 2 weeks to `wiki/log.md`; trim `## Last Updated` to the 3–5 most recent items.
-10. **Backlink density**. For every page under `wiki/` (skip `wiki/meta/` and `notes/`), compute the inbound count via `obsidian backlinks path=<page>` and the outbound count from the page's frontmatter `related:` length plus inline wikilinks. Flag pages where `inbound ≥ 3` **and** `outbound ≤ 1` — heavily cited but weakly linking. These pages are retrieval-late under the forward-only `related:` model, so surfacing them prompts targeted cross-linking. Compute on demand; no backlink index is persisted.
+10. **Backlink density**. Source: `backlinks` map in `lint-data-YYYY-MM-DD.json` (pre-computed by `lint-scan.sh`; do **not** call `obsidian backlinks` per page). For every in-scope page (`.md` and `.canvas`, per the scope definition above), use the precomputed inbound count and compare against the outbound count from the page's frontmatter `related:` length plus inline wikilinks. Flag pages where `inbound ≥ 3` **and** `outbound ≤ 1` — heavily cited but weakly linking. These pages are retrieval-late under the forward-only `related:` model, so surfacing them prompts targeted cross-linking.
 11. **Hub promotion candidates**. Group all leaves under `wiki/concepts/`, `wiki/entities/`, `wiki/solutions/`, `wiki/sources/` by their primary tag (the first non-type tag in `tags:`). For each tag-cluster of **≥ 10 leaves**, check whether `wiki/domains/<cluster-tag>/_index.md` exists. If it does not, surface the cluster as a **promotion candidate** — recommend running `/wiki promote <tag>` to scaffold a domain hub. Threshold rationale: clusters below ~10 leaves are noisy; LYT MOC heuristics put the mental-squeeze trigger around this size.
 12. **Hub stale-count drift**. For every `wiki/domains/<slug>/_index.md`, compare the hub's frontmatter `page_count:` to the actual inbound count returned by `obsidian backlinks path=wiki/domains/<slug>/_index.md format=json`. Flag drift **> 20 %** (in either direction). Suggest resync — either update `page_count:` to the live count or re-curate the `related:` list to match reality.
 13. **Hub demotion candidates**. For every `wiki/domains/<slug>/_index.md`, count the leaves linked from the hub's `related:` field. If **< 5**, surface the hub as a **demotion candidate** — its cluster is below the hub-worthwhile threshold and the hub may be churn rather than signal. Recommend either growing the cluster or merging the hub into a sibling.
@@ -154,6 +206,13 @@ Scope: `wiki/trails/*.md`. Run-record snapshots; never auto-fixed.
 - `[[Trail: Topic (YYYY-MM-DD)]]`: synthesis link `[[Research: Topic]]` does not resolve.
 - `[[Trail: Topic (YYYY-MM-DD)]]`: body is not an ordered list (found: <prose paragraph | nested list | multiple top-level lists | no list>).
 - `[[Trail: Topic (YYYY-MM-DD)]]`: step N has <no wikilink | multiple wikilinks | no annotation | URL in annotation | extra wikilink in annotation>.
+
+## Anti-patterns
+
+Source: `anti_patterns` array from `wiki/meta/lint-data-YYYY-MM-DD.json`.
+Not counted toward dead-link total. Each entry is `[[https://...]]` used as a wikilink.
+
+- `[[Source Page]]`: URL-as-wikilink `[[https://example.com]]`. Suggest: convert to a plain `[text](url)` Markdown link.
 ```
 
 ---
@@ -296,10 +355,10 @@ If the lint report is advisory only (no auto-fixes applied), skip the hot.md upd
 
 ## Report Rotation
 
-After writing the new report, prune older ones:
+After writing the new report, prune older lint artifacts (both `.md` reports and `.json` data files):
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"
 ```
 
-See the script header for keep-count, override arg, and rationale.
+The script keeps the most recent 3 of each artifact type by default. Pass a count to override (`prune-lint-reports.sh 5`). See the script header for rationale.

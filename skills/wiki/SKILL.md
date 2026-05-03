@@ -28,6 +28,8 @@ Two top-level peers of `wiki/`:
 - `notes/` — verbatim quick-capture inbox owned by the `notes` skill.
 - `daily/` — append-only daily log owned by the `daily` skill.
 
+**Canvas files** (`wiki/canvases/*.canvas`) are first-class wiki documents. They are indexed in `wiki/index.md`, counted toward page totals in lint, scanned for dead wikilinks, and included in backlink calculations. When any skill enumerates wiki pages, `.canvas` files in `wiki/canvases/` are valid pages alongside `.md` files in the concept/entity/source directories. The `canvas` skill owns creation and editing of these files.
+
 Dot-prefixed folders (`.raw/`) are hidden in Obsidian's file explorer and graph view. Use this for source documents.
 
 ---

@@ -119,6 +119,7 @@ Steps:
 3. **Create** source summary in `wiki/sources/`. Use the source frontmatter schema from `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 4. **Create or update** entity pages for every person, org, product, and repo mentioned. One page per entity.
 5. **Create or update** concept pages for significant ideas and frameworks.
+   When checking for existing pages to link against, include canvas files in `wiki/canvases/` — they are first-class wiki pages. The ingest skill itself creates `.md` pages; canvas creation is done by the `canvas` skill.
 6. **Update** relevant domain hubs at `wiki/domains/<slug>/_index.md` if any new leaves match an existing hub's tag — append the new leaves to the hub's `related:` list and bump the hub's `page_count:`. Do not write a `domain:` field on the leaves.
 7. **Update** `wiki/index.md`. Add entries for all new pages.
 8. **Update** `wiki/hot.md` with this ingest's context.

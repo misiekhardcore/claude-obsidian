@@ -22,42 +22,51 @@ You will be given:
 - The vault path
 - The scope (full wiki, or a specific folder)
 
-## Your Process
+## Step 1 — Run the deterministic scan
 
-1. Read `wiki/index.md` to get the full list of pages.
-2. For each wiki page, check:
-   - Frontmatter has required fields (type, status, created, updated, tags)
-   - All wikilinks in the page resolve to real files
-   - All headings have content underneath them
-   - Page is linked from at least one other page (no orphans)
-3. Scan for concepts and entities mentioned in multiple pages but lacking their own page.
-4. Scan for unlinked mentions (entity names appearing without `[[` brackets).
-5. Check `wiki/index.md` for stale entries pointing to renamed/deleted files.
-6. Identify pages with status `seed` that have not been updated in over 30 days.
+Before doing any enumeration yourself, invoke the scan script to produce a canonical JSON snapshot:
+
+```bash
+CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" \
+  bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
+```
+
+Read the resulting `wiki/meta/lint-data-YYYY-MM-DD.json` (today's date). This file is the authoritative source for:
+
+- **`dead_links`** — `[{source_page, link_text}]` broken wikilinks across `.md` and `.canvas` sources
+- **`orphans`** — pages with no inbound wikilinks (trails and notes already excluded)
+- **`unresolved_targets`** — `[{link}]` all unresolved link texts (for reference)
+- **`backlinks`** — `{page_path: count}` inbound link count per in-scope page
+- **`anti_patterns`** — URL-as-wikilink occurrences (reported separately, not counted as dead links)
+- **`scope`** — the exact folders and extensions that were scanned
+
+Do **not** run `obsidian deadends`, `obsidian orphans`, or per-page `obsidian backlinks` loops yourself — the JSON already contains those results, sorted and deterministic.
+
+## Step 2 — Agent-driven checks
+
+After reading the JSON, perform the checks that require reading page content or exercising judgment. Work through the checks defined in `skills/lint/SKILL.md` in order, using the JSON where it provides data and reading individual pages only for checks that require full content:
+
+- **Check #1 (orphans):** use `orphans` from JSON.
+- **Check #2 (dead links):** use `dead_links` from JSON. Canvas dead links are already merged in.
+- **Check #3 (stale claims):** requires reading pages — do this yourself.
+- **Check #4 (missing pages):** requires reading pages — do this yourself.
+- **Check #5 (missing cross-references):** requires reading pages — do this yourself.
+- **Check #6 (frontmatter gaps):** read each in-scope page; use `scope.scanned_dirs` from JSON for the exact directory list.
+- **Check #7 (empty sections):** requires reading pages.
+- **Check #8 (stale index entries):** use `obsidian read path=wiki/index.md` then validate each link.
+- **Check #9 (hot.md size budget):** `obsidian read path=wiki/hot.md` then count words.
+- **Check #10 (backlink density):** use `backlinks` from JSON. No additional CLI calls needed.
+- **Checks #11–#13 (hub promotion/drift/demotion):** use `backlinks` from JSON for counts.
+- **Check #14 (notes inbox):** scoped to `notes/` — read those files directly.
+- **Check #15 (misplaced index entries):** read `wiki/index.md` and linked pages.
+- **Check #16 (trail integrity):** read `wiki/trails/*.md` files.
+
+For checks requiring page reads, use the `scope.scanned_dirs` list from the JSON to avoid reading outside defined scope. Canvas files in `wiki/canvases/` are first-class pages — include them in all checks where `.md` files are checked.
 
 ## Output
 
-Create a lint report at `wiki/meta/lint-report-YYYY-MM-DD.md`.
+Create a lint report at `wiki/meta/lint-report-YYYY-MM-DD.md` per the format in `skills/lint/SKILL.md`.
 
-Use this structure:
-```
-## Summary
-- Pages scanned: N
-- Issues found: N (N critical, N warnings, N suggestions)
-
-## Critical (must fix)
-[dead links, missing required frontmatter]
-
-## Warnings (should fix)
-[orphan pages, stale claims, large pages over 300 lines]
-
-## Suggestions (worth considering)
-[missing pages for frequently mentioned concepts, cross-reference gaps]
-```
-
-List each issue with:
-1. The affected page (wikilink)
-2. The specific problem
-3. A suggested fix
+Include an **Anti-patterns** section for URL-as-wikilink occurrences from `anti_patterns` in the JSON. These are not dead links — report them separately.
 
 Do not auto-fix anything. Report only. The user reviews the report and decides what to fix.
