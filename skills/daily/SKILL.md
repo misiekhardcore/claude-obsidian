@@ -14,9 +14,7 @@ Append a timestamped bullet to `<vault_root>/daily/YYYY-MM-DD.md`. No MATCH/NEW 
 
 ## Vault I/O
 
-This skill creates and updates `<vault_root>/daily/YYYY-MM-DD.md` through exactly **two** wrapper-only `obsidian` CLI verbs — `create-or-append` and `frontmatter-set` (see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3.1, §3.2). The skill never reads the daily file, never reconstructs the body, and never calls `obsidian create overwrite=true` against `daily/*.md` — the rewrite hook rejects that shape (issue #98).
-
-The local `daily/` directory is filesystem state, not a vault page; create it via `mkdir -p` if missing (the CLI does not create parent directories).
+Uses `create-or-append` and `frontmatter-set` (see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3.1, §3.2). The local `daily/` directory is not a vault page; create it via `mkdir -p` if missing.
 
 ---
 
@@ -46,7 +44,7 @@ Steps:
 
 1. **Extract arguments** from the user's message. Everything after the trigger phrase. Scan for image-path tokens (any token that resolves to a path or carries a supported image extension); keep them separate. Join the remaining non-path tokens as the verbatim text segment in original order with single spaces. Do not include image-path tokens in the verbatim text.
 
-2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/daily/references/image-capture.md`. Use those files to determine the image-specific bullet text and attachment handling only. Then continue with steps 3–9 below for the normal daily append flow — resolve `<vault_root>`, compute date/time, ensure daily directory, probe and write the daily file via the CLI, and confirm.
+2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/daily/references/image-capture.md`. Use those files to determine the image-specific bullet text and attachment handling only. Then continue with steps 3–8 below for the normal daily append flow — resolve `<vault_root>`, compute date/time, ensure daily directory, probe and write the daily file via the CLI, and confirm.
 
 3. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort with `No vault configured — run /wiki init first.` if unresolved.
 
@@ -74,9 +72,7 @@ Steps:
      value=YYYY-MM-DD
    ```
 
-8. **Do not** invoke `obsidian read`, `obsidian create overwrite=true`, `Edit`, or `Write` against the daily file. The rewrite hook rejects the `create overwrite=true` shape on `daily/*.md`; the other tool surfaces are not in `allowed-tools` for this skill.
-
-9. **Confirm** with exactly one line:
+8. **Confirm** with exactly one line:
     ```
     Logged to daily/YYYY-MM-DD.md
     ```
