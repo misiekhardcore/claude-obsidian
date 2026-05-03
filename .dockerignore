@@ -1,0 +1,25 @@
+# Dockerfile (tests/e2e/Dockerfile) only COPYs the three e2e helper scripts;
+# everything else is bind-mounted at runtime via /opt/plugin-src. Keep the build
+# context minimal so docker build doesn't ship the whole repo (incl. .git).
+
+.git
+.github
+.gitignore
+
+# Editor / OS noise
+.idea
+.vscode
+.DS_Store
+*.swp
+
+# Test artifacts
+tests/spike-results
+
+# Local Claude state (worklog, hooks output)
+.claude
+
+# Node / build artifacts (defensive — none currently in repo)
+node_modules
+dist
+build
+*.log
