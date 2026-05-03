@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Assert a file has valid YAML frontmatter with name and description keys.
+# Assert a file has a frontmatter block (between --- markers) containing
+# the required key lines. This is a shape-only check (AC16) — it does not
+# validate the YAML body itself; it only verifies the block delimiters and
+# the presence of `name:` / `description:` lines.
 # Usage: bash frontmatter.sh <file>
 # Exits non-zero if any assertion fails. AC5.
 
@@ -30,7 +33,7 @@ fm=$(awk '/^---/{c++; if(c==1){p=1;next}; if(c==2){exit}} p{print}' "$FILE")
 if [ -n "$fm" ]; then
   pass "frontmatter block present"
 else
-  fail "frontmatter block present"
+  fail "frontmatter block missing or empty"
   echo "  pass=$PASS  fail=$FAIL"
   exit 1
 fi
