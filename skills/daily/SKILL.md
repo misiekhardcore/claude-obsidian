@@ -14,7 +14,7 @@ Append a timestamped bullet to `<vault_root>/daily/YYYY-MM-DD.md`. No MATCH/NEW 
 
 ## Vault I/O
 
-This skill creates and updates `<vault_root>/daily/YYYY-MM-DD.md`. All vault writes go through the `obsidian` CLI (`create`, `read`, `append`, `create overwrite=true` for atomic frontmatter rewrites). See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, multiline `content=` escapes, and the `overwrite` flag.
+This skill creates and updates `<vault_root>/daily/YYYY-MM-DD.md` through exactly **two** wrapper-only `obsidian` CLI verbs — `create-or-append` and `frontmatter-set` (see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3.1, §3.2). The skill never reads the daily file, never reconstructs the body, and never calls `obsidian create overwrite=true` against `daily/*.md` — the rewrite hook rejects that shape (issue #98).
 
 The local `daily/` directory is filesystem state, not a vault page; create it via `mkdir -p` if missing (the CLI does not create parent directories).
 
@@ -54,26 +54,27 @@ Steps:
 
 5. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently with `mkdir -p`. (Local directory creation, not a vault page op.)
 
-6. **Probe the file:** call `obsidian read path=daily/YYYY-MM-DD.md`. Treat exit 1 with `Error: File "..." not found.` as the file-missing branch.
-
-7. **File-missing branch:** create the file with frontmatter from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) plus an empty `## Captures` section, plus the new bullet, in one atomic write:
+6. **Append the bullet (atomic, branch-free):** issue exactly one `obsidian create-or-append` call. The wrapper handles both the file-missing and file-exists branches internally — the model never reads, parses, or reconstructs the file body.
 
    ```bash
-   obsidian create \
-     path=daily/YYYY-MM-DD.md \
-     content="---\ntype: daily\ndate: YYYY-MM-DD\ncreated: YYYY-MM-DD\nupdated: YYYY-MM-DD\n---\n\n## Captures\n- HH:MM <verbatim text>\n"
+   obsidian create-or-append \
+     file=daily/YYYY-MM-DD.md \
+     template="---\ntype: daily\ndate: YYYY-MM-DD\ncreated: YYYY-MM-DD\nupdated: YYYY-MM-DD\n---\n\n## Captures\n" \
+     content="- HH:MM <verbatim text>"
    ```
 
-8. **File-exists branch:** parse the file content from step 6. If the `## Captures` heading is present, append one bullet under it; if it is missing, append the heading and the bullet at EOF. Bump `updated:` in the frontmatter to today. Then write the full updated content back atomically:
+   The `template` argument is used only when the file is missing; when the file exists, the wrapper appends `content` and ignores `template`. See [§2 frontmatter schema](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) for the daily template shape.
+
+7. **Bump `updated:` (idempotent):** issue one `obsidian frontmatter-set` call. The wrapper rewrites only the YAML scalar; the body — including the bullet just appended — passes through verbatim.
 
    ```bash
-   obsidian create \
+   obsidian frontmatter-set \
      path=daily/YYYY-MM-DD.md \
-     overwrite=true \
-     content="<full updated file content with \n escapes>"
+     key=updated \
+     value=YYYY-MM-DD
    ```
 
-   The `overwrite` flag replaces the file in one operation; no temp-file dance is required at the skill layer (Obsidian's index stays consistent through the wrapper).
+8. **Do not** invoke `obsidian read`, `obsidian create overwrite=true`, `Edit`, or `Write` against the daily file. The rewrite hook rejects the `create overwrite=true` shape on `daily/*.md`; the other tool surfaces are not in `allowed-tools` for this skill.
 
 9. **Confirm** with exactly one line:
     ```
