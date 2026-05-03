@@ -55,10 +55,11 @@ A four-step **hybrid retrieval** flow. Stop at the earliest step that answers th
 After candidates are read:
 
 5. **Step leaf → hub when broader topic context is needed.** If a candidate page is a leaf and the answer needs the wider topic, run `obsidian backlinks path=<leaf> format=json` and read the entries whose frontmatter `type: domain`. That file is the leaf's containing hub. Hub membership is forward-only (hubs link to leaves; leaves never declare membership), so backlinks of `type: domain` are the canonical leaf→hub traversal. Below the hub threshold no hub exists — that is expected, not a gap.
-6. **Read** the candidate pages. Follow wikilinks to depth-2 for key entities. No deeper.
-7. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
-8. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
-9. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
+6. **Step synthesis → trail when reading order matters.** If a candidate page has `type: synthesis` (a `Research: [Topic]` page produced by `/autoresearch`), check for a trail: run `obsidian backlinks path=<synthesis> format=json` and filter the entries to those whose frontmatter `type: trail`. The trail is the curated reading order for that research run, with one-line annotations explaining each step's argument role — much cheaper than reconstructing the path from `related:` traversal. See **Trail Discovery** below for the multi-trail rule.
+7. **Read** the candidate pages. Follow wikilinks to depth-2 for key entities. No deeper.
+8. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
+9. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
+10. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
 
 ---
 
@@ -69,7 +70,7 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
 1. Read `wiki/hot.md` and `wiki/index.md`.
 2. **Read every relevant domain hub.** List `wiki/domains/*/​_index.md`; read each hub whose tag intersects the question. Hubs are the cheapest path to a curated, pre-ranked answer set.
 3. Identify all relevant leaves across `concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/` — both the leaves linked from the hubs and any extra leaves the hubs missed (use `obsidian search` for completeness).
-4. **Pull backlinks for every candidate.** Run `obsidian backlinks path=<page> format=json` on each candidate to surface canonical pages with high inbound but sparse outbound `related:`, and to find the `type: domain` hubs that contain each leaf. Read any hubs not already covered in step 2.
+4. **Pull backlinks for every candidate.** Run `obsidian backlinks path=<page> format=json` on each candidate to surface canonical pages with high inbound but sparse outbound `related:`, and to find the `type: domain` hubs and `type: trail` reading orders that backlink each candidate. Read any hubs not already covered in step 2. For trails, follow the multi-trail rule in **Trail Discovery** below.
 5. Read every relevant page. No skipping.
 6. If wiki coverage is thin, offer to supplement with web search.
 7. Synthesize a comprehensive answer with full citations.
@@ -157,6 +158,30 @@ One-paragraph hub description.
 Reach a hub via step 3 of the standard flow (`wiki/domains/<cluster-tag>/_index.md`) or via the leaf→hub backlink traversal in step 5.
 
 Per-folder `<folder>/_index.md` files are not used. Folders like `concepts/`, `entities/`, `sources/`, `solutions/` are flat directories; cross-folder navigation goes through hubs.
+
+---
+
+## Trail Discovery
+
+Trails are run-records emitted by `/autoresearch`. They live under `wiki/trails/Trail: [Topic] (YYYY-MM-DD).md` and answer "in what order, and why each next?" — complementary to hubs ("what notes are about X?"). When the question is about a topic that has been research-ran, the trail is usually the cheapest route to the right reading order.
+
+**Discovery procedure** (synthesis → trail):
+
+1. When a candidate page has `type: synthesis` (e.g. `Research: [Topic]`), run:
+   ```bash
+   obsidian backlinks path=<synthesis-path> format=json
+   ```
+2. Filter the returned entries to those whose frontmatter `type: trail`. (Read the candidate's frontmatter via `obsidian read path=<entry>` if the JSON does not already include it.) These are the trails covering that research run.
+3. **Multi-trail rule.** If more than one trail backlinks the synthesis (multiple runs on the same topic), pick the **most recent** by the `YYYY-MM-DD` date suffix on the filename — the date suffix is canonical, not the `research_run:` field, because filename ordering is what the index/log entries point at. Read only that trail. After answering, append exactly:
+   ```
+   *N earlier trail(s) exist on this topic — say 'compare trails' to read all.*
+   ```
+   where N is the count of older trails. Skip the line entirely when only one trail exists.
+4. **`compare trails` follow-up.** If the user replies with "compare trails" (or equivalent), read all trails for the topic, oldest first, and synthesize an evolution view — what changed between runs, what stayed, what dropped out.
+
+**Trail vs. hub** — both are reachable via backlinks, but they answer different questions and the discovery filter (`type: trail` vs. `type: domain`) is the disambiguator. A page can have both kinds of backlinks; read the trail when the user is re-entering a research topic, the hub when the user is exploring a domain.
+
+**Fallback.** If no trail exists for a synthesis page, fall back to the existing backlink/hub traversal in steps 5–6 of the standard flow. No trail is not a gap — older research runs predate this feature, and a thin run may have produced no trail at all.
 
 ---
 

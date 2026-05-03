@@ -64,6 +64,15 @@ Work through these in order:
 
     Role: **safety net**, not the primary placement mechanism. `/save` writes new entries directly under the correct section (see #84), so a healthy vault reports zero findings here. Findings indicate drift — manual edits, pre-fix history, or an agent that picked the wrong section despite the corrected `/save` snippet. Auto-fix policy is **ask-first** (see Before Auto-Fixing).
 
+16. **Trail integrity**. Scoped to `wiki/trails/*.md`. Trails are run-records emitted by `/autoresearch` and frozen at write time, so integrity checks run against a fixed shape. For each trail page:
+    - **Required trail-specific frontmatter** — flag missing `type:` (must equal `trail`), `topic:`, `research_run:`, or `synthesis:`. The universal fields (`title`, `created`, `updated`, `tags`, `status`, `confidence`, `evidence`) are check #6's responsibility — do not duplicate.
+    - **Synthesis link resolves** — read the `synthesis:` value, strip the `[[…]]` wrap, and verify a page exists at that target via `obsidian read path=<target>` (or `obsidian unresolved` membership). Flag `synthesis: [[Research: X]] does not resolve` when missing.
+    - **Body is an ordered list** — the trail body (everything below the first H1, excluding a single optional intro paragraph) must be exactly one ordered Markdown list (`1. …`, `2. …`, …). Flag `body is not an ordered list` for trails whose body has no ordered list, multiple top-level lists, prose paragraphs interleaved with list items, or nested lists.
+    - **Every list item contains a wikilink and an annotation** — for each ordered-list item, flag the item if it has zero `[[wikilink]]`s, more than one `[[wikilink]]`, or no annotation text after stripping the wikilink (the residue must contain at least one non-whitespace, non-punctuation character).
+    - **No minimum link count.** A one-step trail is valid output and must not be flagged.
+
+    Auto-fix policy: **never auto-fix**. Trails are run-snapshots; rewriting them post-emission destroys the run-record property. Findings here are advisory — the user repairs the trail manually or accepts the drift.
+
 ---
 
 ## Lint Report Format
@@ -136,6 +145,15 @@ Scope: `notes/` only. Frontmatter gaps and index drift; no orphan/dead-link/stal
 ## Misplaced Index Entries
 - `[[<slug>]]`: under `<Current>`, expected `<Expected>` (type=<x>). Suggest: move under `<Expected>`.
 - `[[<slug>]]`: above all sections (stray). Suggest: move under `<Expected>`.
+
+## Trail Integrity
+
+Scope: `wiki/trails/*.md`. Run-record snapshots; never auto-fixed.
+
+- `[[Trail: Topic (YYYY-MM-DD)]]`: missing trail frontmatter: <field>, <field>
+- `[[Trail: Topic (YYYY-MM-DD)]]`: synthesis link `[[Research: Topic]]` does not resolve.
+- `[[Trail: Topic (YYYY-MM-DD)]]`: body is not an ordered list (found: <prose paragraph | nested list | multiple top-level lists | no list>).
+- `[[Trail: Topic (YYYY-MM-DD)]]`: step N has <no wikilink | multiple wikilinks | no annotation>.
 ```
 
 ---
@@ -260,6 +278,9 @@ Needs review before fixing:
 - Resolving contradictions (requires human judgment)
 - Merging duplicate pages
 - Moving misplaced index entries (check #15). Rationale: low expected volume in a healthy vault makes batch auto-move offer little value over per-entry confirmation, and a misclassification (e.g., a concept intentionally filed under a different section) is harder to undo than to confirm.
+
+Never auto-fix:
+- Trail integrity findings (check #16). Trails are frozen-at-write-time run-snapshots; rewriting them post-emission destroys the run-record property. Surface the finding and let the user repair manually or accept the drift.
 
 ---
 
