@@ -153,6 +153,66 @@ if [ -n "$SCRATCH_VAULT_PATH" ] && [ -d "$SCRATCH_VAULT_PATH/$SCRATCH" ]; then
 fi
 
 echo ""
+echo "=== wrapper-only verbs — create-or-append, frontmatter-set ==="
+
+# Per-process scratch keeps parallel runs (and re-runs) from colliding;
+# `obsidian create` creates intermediate directories on first write.
+VERB_SCRATCH="_cli-smoke-verbs-$$"
+verb_path="$VERB_SCRATCH/coa.md"
+template='---\ntype: daily\ndate: 2026-05-03\ncreated: 2026-05-03\nupdated: 2026-05-03\n---\n\n## Captures\n'
+
+# 1. create-or-append, file missing → create+append branch.
+out=$("$WRAPPER" create-or-append "file=$verb_path" "template=$template" "content=- 09:00 first"); rc=$?
+assert_exit 0 "$rc" "create-or-append (missing) exit"
+case "$out" in "Created and appended:"*) pass "create-or-append (missing) output shape" ;;
+               *)                          fail "create-or-append (missing) — got: $out" ;; esac
+
+# 2. create-or-append, file exists → append-only branch.
+out=$("$WRAPPER" create-or-append "file=$verb_path" "template=$template" "content=- 09:01 second"); rc=$?
+assert_exit 0 "$rc" "create-or-append (exists) exit"
+case "$out" in "Appended to:"*) pass "create-or-append (exists) output shape" ;;
+               *)               fail "create-or-append (exists) — got: $out" ;; esac
+
+# 3. Both bullets must survive the second call (the #98 regression check).
+body=$("$WRAPPER" read "path=$verb_path" 2>/dev/null)
+assert_contains "$body" "- 09:00 first"  "create-or-append — first bullet preserved"
+assert_contains "$body" "- 09:01 second" "create-or-append — second bullet appended"
+assert_contains "$body" "## Captures"    "create-or-append — heading preserved"
+
+# 4. frontmatter-set replace existing key.
+out=$("$WRAPPER" frontmatter-set "path=$verb_path" key=updated value=2026-05-04); rc=$?
+assert_exit 0 "$rc" "frontmatter-set replace exit"
+case "$out" in "Set frontmatter:"*) pass "frontmatter-set replace output" ;;
+               *)                   fail "frontmatter-set replace — got: $out" ;; esac
+body=$("$WRAPPER" read "path=$verb_path" 2>/dev/null)
+assert_contains "$body" "updated: 2026-05-04" "frontmatter-set — value rewritten"
+assert_contains "$body" "- 09:00 first"        "frontmatter-set — body bullet preserved (1)"
+assert_contains "$body" "- 09:01 second"       "frontmatter-set — body bullet preserved (2)"
+
+# 5. frontmatter-set insert-if-missing.
+out=$("$WRAPPER" frontmatter-set "path=$verb_path" key=tags value=daily); rc=$?
+assert_exit 0 "$rc" "frontmatter-set insert exit"
+body=$("$WRAPPER" read "path=$verb_path" 2>/dev/null)
+assert_contains "$body" "tags: daily" "frontmatter-set — key inserted"
+# Must land *inside* the frontmatter block, before the closing ---.
+fm_block=$(printf '%s\n' "$body" | awk 'NR==1 && $0=="---"{p=1; next} p && $0=="---"{exit} p{print}')
+case "$fm_block" in *"tags: daily"*) pass "frontmatter-set — key inserted inside frontmatter block" ;;
+                    *)               fail "frontmatter-set — key landed outside frontmatter block" ;; esac
+
+# 6. frontmatter-set on a file with no frontmatter → exit 1.
+nofm_path="$VERB_SCRATCH/no-frontmatter-$$.md"
+"$WRAPPER" create "path=$nofm_path" content="just a body line" overwrite >/dev/null 2>&1
+out=$("$WRAPPER" frontmatter-set "path=$nofm_path" key=updated value=2026-05-04 2>&1); rc=$?
+assert_exit 1 "$rc" "frontmatter-set malformed (no frontmatter) exit"
+case "$out" in *"no frontmatter block"*) pass "frontmatter-set malformed — error message" ;;
+               *)                         fail "frontmatter-set malformed — expected 'no frontmatter block'; got: $out" ;; esac
+
+# Cleanup verb scratch
+if [ -n "$SCRATCH_VAULT_PATH" ] && [ -d "$SCRATCH_VAULT_PATH/$VERB_SCRATCH" ]; then
+  rm -rf "$SCRATCH_VAULT_PATH/$VERB_SCRATCH"
+fi
+
+echo ""
 echo "=== rewrite-hook — PreToolUse Bash auto-rewrite ==="
 
 REWRITE_HOOK="$PLUGIN_ROOT/hooks/obsidian-cli-rewrite.sh"
@@ -219,6 +279,55 @@ if [ -n "$rewritten" ] \
   pass "multi-line rewrite preserves continuation lines"
 else
   fail "expected multi-line rewrite to keep path/content args; got: $(printf '%s' "$rewritten" | head -c 200)"
+fi
+
+echo ""
+echo "=== rewrite-hook — daily/*.md antipattern guard (#98) ==="
+
+# 1. `obsidian create overwrite=true path=daily/...` must be rejected.
+out=$(run_hook 'obsidian create path=daily/2026-05-03.md overwrite=true content="full file body"')
+if echo "$out" | jq -e '.hookSpecificOutput.permissionDecision == "deny"' >/dev/null 2>&1; then
+  pass "daily/*.md overwrite=true — denied"
+else
+  fail "daily/*.md overwrite=true — expected deny; got: $(echo "$out" | jq -c '.hookSpecificOutput // "<none>"')"
+fi
+
+# 2. `obsidian create overwrite path=daily/...` (flag form) must be rejected.
+out=$(run_hook 'obsidian create path=daily/2026-05-03.md content="x" overwrite')
+if echo "$out" | jq -e '.hookSpecificOutput.permissionDecision == "deny"' >/dev/null 2>&1; then
+  pass "daily/*.md bare overwrite — denied"
+else
+  fail "daily/*.md bare overwrite — expected deny; got: $(echo "$out" | jq -c '.hookSpecificOutput // "<none>"')"
+fi
+
+# 3. `obsidian create path=daily/...` WITHOUT overwrite must NOT be denied
+#    (legitimate first-time create through the rewrite path).
+out=$(run_hook 'obsidian create path=daily/2026-05-03.md content="fresh"')
+decision=$(echo "$out" | jq -r '.hookSpecificOutput.permissionDecision // empty' 2>/dev/null)
+if [ "$decision" != "deny" ]; then
+  pass "daily/*.md create (no overwrite) — not denied"
+else
+  fail "daily/*.md create (no overwrite) — unexpectedly denied"
+fi
+
+# 4. `obsidian create overwrite=true path=wiki/...` must NOT be denied
+#    (legitimate full-rewrite outside daily/).
+out=$(run_hook 'obsidian create path=wiki/index.md overwrite=true content="x"')
+decision=$(echo "$out" | jq -r '.hookSpecificOutput.permissionDecision // empty' 2>/dev/null)
+if [ "$decision" != "deny" ]; then
+  pass "wiki/*.md overwrite=true — not denied (legit full-rewrite)"
+else
+  fail "wiki/*.md overwrite=true — unexpectedly denied"
+fi
+
+# 5. `obsidian create-or-append file=daily/...` must NOT be denied (the verb
+#    that replaces the antipattern).
+out=$(run_hook 'obsidian create-or-append file=daily/2026-05-03.md template="..." content="- 09:00 x"')
+decision=$(echo "$out" | jq -r '.hookSpecificOutput.permissionDecision // empty' 2>/dev/null)
+if [ "$decision" != "deny" ]; then
+  pass "daily/*.md create-or-append — not denied"
+else
+  fail "daily/*.md create-or-append — unexpectedly denied"
 fi
 
 echo ""

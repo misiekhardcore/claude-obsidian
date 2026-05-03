@@ -1,4 +1,12 @@
-.PHONY: e2e e2e-build e2e-clean e2e-preflight
+.PHONY: test e2e e2e-build e2e-clean e2e-preflight
+
+# Deterministic test tier — wrapper smoke + AC1 regression for #98. Both
+# scripts skip with exit 0 when Obsidian is not running, so this target is
+# safe to run in any environment.
+test:
+	bash tests/cli-smoke.sh
+	bash tests/regression/daily-append.sh
+
 
 # AC12: preflight runs before docker build; fails fast (exit 2) if credentials
 # are missing or malformed, before any image build or container work begins.
