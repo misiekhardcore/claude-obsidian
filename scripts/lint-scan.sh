@@ -135,6 +135,8 @@ done
 
 # Build resolver pool from filesystem (basenames without extension).
 # Used only for canvas link verification; .md dead-link checking uses obsidian unresolved.
+# Pool includes .base as a valid target type (Obsidian Bases files are linkable) but .base
+# files are not scanned for outbound wikilinks — they are data tables, not narrative pages.
 declare -A resolver_pool
 while IFS= read -r f; do
   base=$(basename "$f"); name="${base%.*}"
@@ -174,10 +176,12 @@ if [ -d "${VAULT}/${CANVAS_DIR}" ]; then
         | grep -oP '(?<=\[\[)[^\]]+(?=\]\])' \
         | sort -u
     )
-  done < <(find "${VAULT}/${CANVAS_DIR}" -name '*.canvas' 2>/dev/null | sort)
+  done < <(find "${VAULT}/${CANVAS_DIR}" -name '*.canvas' 2>/dev/null | sort)  # sort: determinism
 fi
 
 # ─── Anti-patterns: URL-as-wikilink in .md pages ─────────────────────────────
+# Anti-patterns are reported per source-page occurrence, not deduplicated across the vault.
+# This matches the dead-links semantics: each broken wikilink is its own finding.
 md_anti_entries=()
 for page in "${md_pages[@]}"; do
   content=$("$CLI" read "path=${page}" 2>/dev/null) || continue
