@@ -114,9 +114,14 @@ RUN mkdir -p "/root/.claude/plugins/cache/${MARKETPLACE_NAME}/${PLUGIN_NAME}" \
 COPY tests/e2e/register-vault.sh \
      tests/e2e/wait-for-obsidian.sh \
      tests/e2e/entrypoint-ci.sh \
+     tests/e2e/entrypoint-local.sh \
+     tests/e2e/test-entrypoint.sh \
      /e2e/
-RUN chmod +x /e2e/*.sh
+COPY tests/e2e/assertions/ /e2e/assertions/
+COPY tests/e2e/fixtures/ /e2e/fixtures/
+RUN chmod +x /e2e/*.sh /e2e/assertions/*.sh
 
-# Shell-form ENTRYPOINT so ${ENTRYPOINT_TYPE} expands at run time. Defaults
-# to `ci`; the local entrypoint is added in the follow-up issue.
+# Shell-form ENTRYPOINT so ${ENTRYPOINT_TYPE} expands at run time.
+# ENTRYPOINT_TYPE=ci → CI fast tier (no auth, no claude calls)
+# ENTRYPOINT_TYPE=local → local full tier (credentials + LLM exercises)
 ENTRYPOINT bash /e2e/entrypoint-${ENTRYPOINT_TYPE:-ci}.sh

@@ -1,0 +1,218 @@
+#!/usr/bin/env bash
+# Local full-tier entrypoint. Exercises the LLM path:
+#   vault registration → /wiki init → ingest → /daily ×3 → /daily-close
+# Shape-only assertions throughout. Sequence per #89 Section C.
+#
+# Requires mounts:
+#   /opt/plugin-src      plugin working tree (read-only)
+#   /credentials.json    ~/.claude/.credentials.json (read-only)
+#
+# AC3: mounts + credentials verified before any docker/LLM work.
+# AC8: all-pass → exit 0, container removed (--rm by caller).
+# AC9: failure → artifacts dumped to stderr → exit non-zero.
+# AC14: 180s timeout per claude -p call.
+
+set -euo pipefail
+
+PLUGIN_SRC="${PLUGIN_SRC:-/opt/plugin-src}"
+CREDENTIALS="${CREDENTIALS:-/credentials.json}"
+VAULT_PATH="${VAULT_PATH:-/tmp/vault}"
+DISPLAY_NUM="${DISPLAY_NUM:-:99}"
+
+# ── State for AC9 artifact capture ───────────────────────────────────────────
+LAST_CMD=""
+CLAUDE_OUTPUT=""
+OBSIDIAN_PID=""
+XVFB_PID=""
+
+dump_artifacts() {
+  echo "" >&2
+  echo "=== E2E failure artifacts ===" >&2
+  echo "Obsidian log (/tmp/obsidian.log — last 50 lines):" >&2
+  tail -50 /tmp/obsidian.log 2>/dev/null | sed 's/^/  /' >&2 || true
+  echo "" >&2
+  if [ -n "$LAST_CMD" ]; then
+    echo "Last claude -p: $LAST_CMD" >&2
+    echo "Output (first 500 chars):" >&2
+    printf '%s' "$CLAUDE_OUTPUT" | head -c 500 | sed 's/^/  /' >&2 || true
+    echo "" >&2
+  fi
+  DAILY_FILE="$VAULT_PATH/daily/$(date +%F).md"
+  if [ -f "$DAILY_FILE" ]; then
+    echo "Daily file ($DAILY_FILE):" >&2
+    sed 's/^/  /' "$DAILY_FILE" >&2 || true
+    echo "" >&2
+  fi
+}
+
+cleanup() {
+  local rc=$?
+  [ $rc -ne 0 ] && dump_artifacts || true
+  [ -n "$OBSIDIAN_PID" ] && kill "$OBSIDIAN_PID" 2>/dev/null || true
+  [ -n "$XVFB_PID" ] && kill "$XVFB_PID" 2>/dev/null || true
+  [ -n "${DBUS_SESSION_BUS_PID:-}" ] && kill "$DBUS_SESSION_BUS_PID" 2>/dev/null || true
+  rm -rf "$VAULT_PATH" 2>/dev/null || true
+  exit $rc
+}
+trap cleanup EXIT INT TERM
+
+# ── Step 1: Verify mounts ─────────────────────────────────────────────────────
+if [ ! -d "$PLUGIN_SRC" ]; then
+  echo "entrypoint-local: plugin source not mounted at $PLUGIN_SRC" >&2
+  exit 2
+fi
+if [ ! -r "$PLUGIN_SRC/bin/setup-vault.sh" ]; then
+  echo "entrypoint-local: $PLUGIN_SRC/bin/setup-vault.sh missing or not readable" >&2
+  exit 2
+fi
+if [ ! -r "$CREDENTIALS" ]; then
+  echo "entrypoint-local: credentials not mounted at $CREDENTIALS" >&2
+  exit 2
+fi
+
+# ── Step 2: Parse API key from credentials ────────────────────────────────────
+API_KEY=$(jq -re '.api_key // empty' "$CREDENTIALS") || {
+  echo "entrypoint-local: api_key not found in $CREDENTIALS" >&2
+  exit 2
+}
+export ANTHROPIC_API_KEY="$API_KEY"
+echo "entrypoint-local: credentials validated"
+
+# ── Step 3: Create vault dir ──────────────────────────────────────────────────
+rm -rf "$VAULT_PATH"
+mkdir -p "$VAULT_PATH"
+echo "entrypoint-local: vault at $VAULT_PATH"
+
+# ── Step 4: Scaffold vault dirs ───────────────────────────────────────────────
+echo "entrypoint-local: scaffolding vault"
+CLAUDE_PLUGIN_ROOT="$PLUGIN_SRC" bash "$PLUGIN_SRC/bin/setup-vault.sh" "$VAULT_PATH"
+
+# Seed wiki/hot.md so the readiness probe (obsidian read path=wiki/hot.md) can
+# succeed before /wiki init runs. hot.md links to index.md for the backlinks
+# probe in cli-smoke.sh (AC3).
+if [ ! -f "$VAULT_PATH/wiki/hot.md" ]; then
+  cat > "$VAULT_PATH/wiki/hot.md" <<'EOF'
+# Hot cache
+
+See [[index]] for the wiki entrypoint.
+EOF
+fi
+[ -f "$VAULT_PATH/wiki/index.md" ] || echo "# Wiki index" > "$VAULT_PATH/wiki/index.md"
+
+# ── Step 5: Register vault ────────────────────────────────────────────────────
+bash /e2e/register-vault.sh "$VAULT_PATH"
+
+# ── Step 6: Boot Xvfb + D-Bus + Obsidian ─────────────────────────────────────
+echo "entrypoint-local: starting Xvfb on $DISPLAY_NUM"
+Xvfb "$DISPLAY_NUM" -screen 0 1920x1080x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &
+XVFB_PID=$!
+export DISPLAY="$DISPLAY_NUM"
+sleep 1
+
+echo "entrypoint-local: starting D-Bus session"
+eval "$(dbus-launch --sh-syntax)"
+export DBUS_SESSION_BUS_ADDRESS DBUS_SESSION_BUS_PID
+
+echo "entrypoint-local: launching Obsidian GUI"
+
+launch_obsidian() {
+  APPDIR=/opt/Obsidian /opt/Obsidian/AppRun \
+      --no-sandbox \
+      --disable-gpu \
+      --disable-dev-shm-usage \
+      >>/tmp/obsidian.log 2>&1 &
+  OBSIDIAN_PID=$!
+}
+
+launch_obsidian
+# Defensive retry: rare Chromium SIGTRAP during first launch after a cold image
+# build. If the process dies in the first 3s, relaunch once before the 60s
+# readiness probe decides the outcome.
+sleep 3
+if ! kill -0 "$OBSIDIAN_PID" 2>/dev/null; then
+  echo "entrypoint-local: Obsidian process died during init; relaunching once"
+  launch_obsidian
+fi
+
+# ── Step 7: Readiness probe (AC13: 60s cap) ───────────────────────────────────
+if ! bash /e2e/wait-for-obsidian.sh; then
+  echo "entrypoint-local: readiness probe failed; tail of Obsidian log:" >&2
+  tail -100 /tmp/obsidian.log >&2 || true
+  exit 1
+fi
+
+# ── Claude -p wrapper with 180s timeout (AC14) ───────────────────────────────
+run_claude() {
+  local cmd="$1"
+  LAST_CMD="$cmd"
+  local tmp; tmp=$(mktemp)
+  local rc=0
+  timeout 180 claude -p "$cmd" 2>&1 | tee "$tmp" || rc=$?
+  CLAUDE_OUTPUT=$(cat "$tmp")
+  rm -f "$tmp"
+  if [ $rc -eq 124 ]; then
+    echo "entrypoint-local: TIMEOUT — claude -p exceeded 180s: $cmd" >&2
+    exit 1
+  fi
+  return $rc
+}
+
+# ── Step 8a: /wiki init → vault-shape assertion (AC4) ────────────────────────
+echo ""
+echo "entrypoint-local: step 8a — /wiki init"
+run_claude "/wiki init"
+bash /e2e/assertions/vault-shape.sh "$VAULT_PATH"
+
+# ── Step 8b: ingest fixture → frontmatter + index-mutated assertions (AC5) ───
+echo ""
+echo "entrypoint-local: step 8b — ingest fixture"
+cp /e2e/fixtures/sample.md "$VAULT_PATH/.raw/sample.md"
+
+SOURCES_BEFORE=$(ls "$VAULT_PATH/wiki/sources/" 2>/dev/null || true)
+INDEX_MTIME_BEFORE=$(stat -c %Y "$VAULT_PATH/wiki/index.md" 2>/dev/null || echo 0)
+
+run_claude "ingest .raw/sample.md"
+
+# Find the new source file created by ingest
+SOURCES_AFTER=$(ls "$VAULT_PATH/wiki/sources/" 2>/dev/null || true)
+NEW_SOURCES=$(comm -13 \
+  <(echo "$SOURCES_BEFORE" | sort) \
+  <(echo "$SOURCES_AFTER" | sort) || true)
+
+if [ -n "$NEW_SOURCES" ]; then
+  SOURCES_FILE="$VAULT_PATH/wiki/sources/$(echo "$NEW_SOURCES" | head -1)"
+  bash /e2e/assertions/frontmatter.sh "$SOURCES_FILE"
+else
+  echo "  [FAIL] no new .md file found in wiki/sources/ after ingest" >&2
+  exit 1
+fi
+
+# Assert wiki/index.md was mutated (mtime changed)
+INDEX_MTIME_AFTER=$(stat -c %Y "$VAULT_PATH/wiki/index.md" 2>/dev/null || echo 0)
+if [ "$INDEX_MTIME_AFTER" -gt "$INDEX_MTIME_BEFORE" ]; then
+  echo "  [ok] wiki/index.md mutated after ingest"
+else
+  echo "  [FAIL] wiki/index.md not mutated after ingest (mtime unchanged)" >&2
+  exit 1
+fi
+
+# ── Steps 8c–8e: /daily ×3 → daily-shape assertion (AC6) ─────────────────────
+echo ""
+echo "entrypoint-local: step 8c — /daily first entry"
+run_claude "/daily E2E harness test entry one"
+echo "entrypoint-local: step 8d — /daily second entry"
+run_claude "/daily E2E harness test entry two"
+echo "entrypoint-local: step 8e — /daily third entry"
+run_claude "/daily E2E harness test entry three"
+bash /e2e/assertions/daily-shape.sh "$VAULT_PATH"
+
+# ── Step 8f: /daily-close → section-header assertion (AC7) ───────────────────
+echo ""
+echo "entrypoint-local: step 8f — /daily-close"
+run_claude "/daily-close"
+DAILY_FILE="$VAULT_PATH/daily/$(date +%F).md"
+bash /e2e/assertions/section-header.sh "$DAILY_FILE" "## Summary"
+
+# ── Step 9: All-pass summary (AC8) ───────────────────────────────────────────
+echo ""
+echo "=== entrypoint-local: all assertions passed — exit 0 ==="
