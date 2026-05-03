@@ -31,7 +31,15 @@ jobs:
       - name: Run CI smoke
         timeout-minutes: 8
         run: |
+          # --security-opt apparmor=unconfined: GitHub's ubuntu-24.04 runners
+          # apply the docker-default AppArmor profile, which blocks the
+          # user-namespace syscalls Chromium uses during Electron init even
+          # with --no-sandbox. Without this flag, Obsidian boots far enough
+          # to log "Loaded main app package" and then SIGTRAPs. Docker Desktop
+          # (local dev) ships no host AppArmor so the issue doesn't reproduce
+          # there.
           docker run --rm \
+            --security-opt apparmor=unconfined \
             -e ENTRYPOINT_TYPE=ci \
             -v "${GITHUB_WORKSPACE}:/opt/plugin-src:ro" \
             claude-obsidian-e2e:latest

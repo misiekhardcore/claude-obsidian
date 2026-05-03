@@ -100,6 +100,17 @@ obsidian read path=wiki/hot.md
 - No GitHub Secrets, no `ANTHROPIC_API_KEY`, no `claude` invocations in the CI tier.
 - `bin/setup-vault.sh` and `tests/cli-smoke.sh` are reused as-is — never modified.
 
+## AppArmor on Linux hosts
+
+CI passes `--security-opt apparmor=unconfined` to `docker run`. GitHub's
+`ubuntu-24.04` runners (and any native Linux Docker on Ubuntu 24.04+) apply
+the `docker-default` AppArmor profile, which blocks the user-namespace
+syscalls Chromium uses during Electron init even with `--no-sandbox`.
+Without the flag, Obsidian crashes with `SIGTRAP` mid-boot. Docker Desktop
+(macOS / Windows / WSL) runs containers in a linuxkit VM with no host
+AppArmor and is unaffected, so locally the flag is optional. Add it when
+reproducing a CI failure on a native Linux Docker host.
+
 ## Not yet implemented (deferred to #91)
 
 - `entrypoint-local.sh` — local full tier with `claude -p` scripting
