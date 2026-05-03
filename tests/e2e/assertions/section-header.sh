@@ -26,8 +26,10 @@ if [ "$FAIL" -gt 0 ]; then
   exit 1
 fi
 
-# Check header exists
-if grep -qF "$HEADER" "$FILE"; then
+# Both checks use the same match rule: exact line match with optional
+# trailing whitespace, so an existence-pass cannot be followed by a
+# body-scan-fail caused by a substring/exact mismatch.
+if awk -v hdr="$HEADER" '{ sub(/[[:space:]]+$/, ""); if ($0 == hdr) { found=1; exit } } END { exit found ? 0 : 1 }' "$FILE"; then
   pass "section header '$HEADER' present"
 else
   fail "section header '$HEADER' missing"
@@ -37,7 +39,7 @@ fi
 
 # Check ≥1 non-blank line follows the header, before the next ## section
 NONBLANK=$(awk -v hdr="$HEADER" \
-  '$0==hdr{p=1;next} p && /^## /{exit} p && NF>0{found=1;exit} END{print found+0}' \
+  '{ line=$0; sub(/[[:space:]]+$/, "", line); if (line==hdr){p=1;next} } p && /^## /{exit} p && NF>0{found=1;exit} END{print found+0}' \
   "$FILE")
 
 if [ "$NONBLANK" -eq 1 ]; then
