@@ -1,0 +1,27 @@
+name: E2E Test Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  e2e:
+    name: Build image + run CI smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build E2E image
+        run: docker build -f tests/e2e/Dockerfile -t claude-obsidian-e2e:latest .
+
+      - name: Run CI smoke
+        timeout-minutes: 8
+        run: |
+          docker run --rm \
+            -e ENTRYPOINT_TYPE=ci \
+            -v "${GITHUB_WORKSPACE}:/opt/plugin-src:ro" \
+            claude-obsidian-e2e:latest
