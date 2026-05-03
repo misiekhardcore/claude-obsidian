@@ -83,7 +83,6 @@ make e2e-preflight && make e2e-build
 docker run --rm \
   --security-opt apparmor=unconfined \
   -e ENTRYPOINT_TYPE=local \
-  -e ANTHROPIC_API_KEY="$(jq -r '.api_key' ~/.claude/.credentials.json)" \
   -v "$(pwd):/opt/plugin-src:ro" \
   -v "$HOME/.claude/.credentials.json:/credentials.json:ro" \
   claude-obsidian-e2e:latest
@@ -156,9 +155,3 @@ Without the flag, Obsidian crashes with `SIGTRAP` mid-boot. Docker Desktop
 (macOS / Windows / WSL) runs containers in a linuxkit VM with no host
 AppArmor and is unaffected, so locally the flag is optional. Add it when
 reproducing a CI failure on a native Linux Docker host.
-
-## Reference
-
-- Umbrella spec: [#89](https://github.com/misiekhardcore/claude-obsidian/issues/89)
-- CI fast tier: [#90](https://github.com/misiekhardcore/claude-obsidian/issues/90)
-- Local full tier: [#91](https://github.com/misiekhardcore/claude-obsidian/issues/91)
