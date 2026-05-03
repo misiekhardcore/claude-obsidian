@@ -42,33 +42,6 @@ The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs
 
 ---
 
-## Repeatability Check
-
-Run this recipe after any change to the scan script or lint agent to verify determinism:
-
-```bash
-# Run twice on an unchanged vault
-CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" \
-  bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-verify-consistency.sh"
-```
-
-The script calls `lint-scan.sh` twice and compares SHA-256 hashes of the JSON output (excluding `scan_date`). Hashes must match; divergence indicates non-determinism.
-
-Manual verification:
-```bash
-CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
-cp "${VAULT}/wiki/meta/lint-data-$(date +%F).json" /tmp/lint-data-1.json
-
-CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
-cp "${VAULT}/wiki/meta/lint-data-$(date +%F).json" /tmp/lint-data-2.json
-
-# Hashes must match (excluding scan_date)
-jq -S 'del(.scan_date)' /tmp/lint-data-1.json | sha256sum
-jq -S 'del(.scan_date)' /tmp/lint-data-2.json | sha256sum
-```
-
----
-
 ## Lint Checks
 
 The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
