@@ -32,6 +32,37 @@ case "$CMD" in
   *obsidian-cli*) exit 0 ;;
 esac
 
+# Antipattern guard (issue #98): block `obsidian create … overwrite=true` calls
+# whose `path=` targets `daily/*.md`. The /daily skill must use the wrapper-only
+# `create-or-append` (atomic append) and `frontmatter-set` (surgical YAML)
+# verbs instead. Read-modify-overwrite of a daily file at the model layer is
+# the root cause of bullet loss in #98 — this guard catches the regression.
+#
+# Path-scoped to `daily/*.md` so legitimate full-rewrite callers
+# (daily-close synthesis, obsidian-bases templates, save promotions) are
+# unaffected. Detection is substring-based on the verbatim command, so it
+# survives multi-line / continuation / heredoc shapes.
+DAILY_VIOLATION=0
+case "$CMD" in
+  *"obsidian"*"create"*)
+    if printf '%s' "$CMD" | grep -qE 'path=("?)daily/[^[:space:]"]*\.md' \
+       && printf '%s' "$CMD" | grep -qE 'overwrite=true|overwrite=1|overwrite([[:space:]]|$)'; then
+      DAILY_VIOLATION=1
+    fi
+    ;;
+esac
+
+if [ "$DAILY_VIOLATION" = 1 ]; then
+  jq -n '{
+    "hookSpecificOutput": {
+      "hookEventName": "PreToolUse",
+      "permissionDecision": "deny",
+      "permissionDecisionReason": "obsidian create overwrite=true on daily/*.md is forbidden (issue #98). Use obsidian create-or-append for appends or obsidian frontmatter-set for updated: bumps. See _shared/cli.md §3.1, §3.2."
+    }
+  }'
+  exit 0
+fi
+
 # Rewrite ONLY the leading `obsidian` token on the first line. Preserves
 # multi-line commands (backslash continuations, here-docs, embedded newlines)
 # verbatim after the first token. Mid-string occurrences of `obsidian` (e.g.

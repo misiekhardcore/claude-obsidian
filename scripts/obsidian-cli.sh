@@ -62,6 +62,29 @@
 #   • cron-time writes when Obsidian is closed — see commands/cron.md
 #   • bin/setup-vault.sh, bin/seed-demo.sh — operate before vault registration
 #
+# ─── Wrapper-only verbs ──────────────────────────────────────────────────────
+# These verbs are not part of the upstream CLI; the wrapper synthesizes them
+# from the underlying primitives. They exist so callers (notably skills/daily)
+# never have to read-modify-overwrite a file at the model layer.
+#
+#   create-or-append  file=<path> template=<full-file-template> content=<bullet>
+#     File missing → write `template` via `obsidian create`, then append
+#     `content`. File exists → append `content` only; `template` is ignored.
+#     `template` is required (no caller needs empty-template create).
+#     Output: `Created and appended: <path>` (file-missing branch) or
+#             `Appended to: <path>` (file-exists branch).
+#     Exit:   0 success, 1 generic error (e.g. underlying create/append failed).
+#
+#   frontmatter-set   path=<path> key=<yaml-key> value=<scalar>
+#     Surgical mutation of a single YAML key in the frontmatter block of an
+#     existing file. Body bytes are preserved verbatim. If `key` is present,
+#     its value is replaced; if absent, `key: value` is inserted at the end of
+#     the frontmatter block (just before the closing `---`).
+#     Multi-line values and quoted strings are out of scope — scalars only.
+#     Output: `Set frontmatter: <path>`.
+#     Exit:   0 success, 1 generic error (file missing, no frontmatter block,
+#             malformed frontmatter — closing `---` not found).
+#
 # ─── Empirical contract ──────────────────────────────────────────────────────
 # Every behavior above is verified by tests/cli-smoke.sh and backed by the
 # captures in tests/spike-results/. After every Obsidian CLI minor-version
@@ -91,6 +114,183 @@ if [ -z "$VERSION_OUT" ]; then
   echo "obsidian-cli: 'obsidian version' returned no output (Obsidian not running?)" >&2
   exit 3
 fi
+
+# 4a. Wrapper-only verbs (create-or-append, frontmatter-set) — see header.
+#     Both call the underlying `obsidian` binary directly with the resolved
+#     vault name; the upstream CLI's stdout-based error reporting is parsed
+#     here without needing to recurse through this wrapper.
+
+# run_obs <args...> — call upstream `obsidian` with the resolved vault name,
+# print stdout verbatim, and return a normalized exit code (0/1/2 — see the
+# header's exit-code table). Used only by the wrapper-only verbs below.
+run_obs() {
+  local tmp first cli_exit
+  tmp="$(mktemp)"
+  obsidian "vault=$VAULT_NAME" "$@" >"$tmp" 2>&2
+  cli_exit=$?
+  cat "$tmp"
+  first="$(head -n 1 "$tmp" 2>/dev/null || true)"
+  rm -f "$tmp"
+  if [ "$cli_exit" -ne 0 ]; then return "$cli_exit"; fi
+  case "$first" in
+    "Vault not found."*) return 2 ;;
+    "Error: "*)          return 1 ;;
+    *)                   return 0 ;;
+  esac
+}
+
+# do_create_or_append — see header for the contract.
+do_create_or_append() {
+  local file="" template="" content=""
+  for arg in "$@"; do
+    case "$arg" in
+      file=*)     file="${arg#file=}" ;;
+      template=*) template="${arg#template=}" ;;
+      content=*)  content="${arg#content=}" ;;
+      *) echo "Error: create-or-append: unknown argument '$arg'" >&2; return 1 ;;
+    esac
+  done
+  if [ -z "$file" ] || [ -z "$template" ] || [ -z "$content" ]; then
+    echo "Error: create-or-append requires file=, template=, and content=" >&2
+    return 1
+  fi
+
+  # File-exists fast path: try `append` directly. The upstream CLI returns
+  # `Error: File "<path>" not found.` on a missing file, otherwise
+  # `Appended to: <path>`. One call covers the common case (file exists);
+  # only the cold-start (file missing) path pays for the extra `create`.
+  # We avoid a separate `read` probe so we don't pull a possibly-large body
+  # into memory just to learn whether the file exists.
+  local append_out append_first append_rc
+  append_out="$(mktemp)"
+  obsidian "vault=$VAULT_NAME" append "file=$file" "content=$content" \
+    >"$append_out" 2>&2
+  append_rc=$?
+  append_first="$(head -n 1 "$append_out" 2>/dev/null || true)"
+  rm -f "$append_out"
+
+  if [ "$append_rc" -eq 0 ]; then
+    case "$append_first" in
+      "Appended to: "*)
+        echo "Appended to: $file"
+        return 0
+        ;;
+      'Error: File "'*)
+        # Fall through to create+append.
+        ;;
+      "Error: "*)
+        echo "$append_first"
+        return 1
+        ;;
+      *)
+        # Treat any other non-error first line as a successful append.
+        echo "Appended to: $file"
+        return 0
+        ;;
+    esac
+  fi
+
+  # File-missing branch: create with template, then append the bullet.
+  if ! run_obs create "path=$file" "content=$template" >/dev/null; then
+    echo "Error: create-or-append: failed to create $file" >&2
+    return 1
+  fi
+  if ! run_obs append "file=$file" "content=$content" >/dev/null; then
+    echo "Error: create-or-append: created $file but append failed" >&2
+    return 1
+  fi
+  echo "Created and appended: $file"
+  return 0
+}
+
+# do_frontmatter_set — see header for the contract.
+do_frontmatter_set() {
+  local path="" key="" value=""
+  for arg in "$@"; do
+    case "$arg" in
+      path=*)  path="${arg#path=}" ;;
+      key=*)   key="${arg#key=}" ;;
+      value=*) value="${arg#value=}" ;;
+      *) echo "Error: frontmatter-set: unknown argument '$arg'" >&2; return 1 ;;
+    esac
+  done
+  if [ -z "$path" ] || [ -z "$key" ] || [ -z "$value" ]; then
+    echo "Error: frontmatter-set requires path=, key=, and value=" >&2
+    return 1
+  fi
+
+  # Read the file. Surface CLI errors (missing file → exit 1).
+  local current read_rc
+  current="$(run_obs read "path=$path")"
+  read_rc=$?
+  if [ "$read_rc" -ne 0 ]; then
+    return "$read_rc"
+  fi
+
+  # Surgical YAML key mutation in awk — body bytes are passed through verbatim.
+  # Frontmatter delimiters: opening `---` must be the first line; closing `---`
+  # is the next line that is exactly `---`. Multi-line values and quoted
+  # strings are out of scope (per /define). Diagnostic codes — not user text —
+  # are emitted on awk's stdout when the input is malformed; the shell
+  # translates them into user-facing messages and discards the partial output.
+  local updated awk_rc
+  updated="$(printf '%s' "$current" | awk -v key="$key" -v value="$value" '
+    BEGIN { state = "pre"; replaced = 0 }
+    NR == 1 {
+      if ($0 == "---") { state = "fm"; print; next }
+      state = "err_no_opening"; exit 2
+    }
+    state == "fm" {
+      if ($0 == "---") {
+        if (!replaced) { print key ": " value }
+        state = "body"; print; next
+      }
+      # Match `key:` at the start of the line; later occurrences are ignored.
+      if (!replaced && index($0, key ":") == 1) {
+        print key ": " value
+        replaced = 1
+        next
+      }
+      print; next
+    }
+    state == "body" { print; next }
+    END {
+      if (state == "pre" || state == "err_no_opening") print "FM_ERR_NO_OPENING"
+      else if (state == "fm") print "FM_ERR_NO_CLOSING"
+    }
+  ')"
+  awk_rc=$?
+
+  case "$updated" in
+    *FM_ERR_NO_OPENING*)
+      echo "Error: frontmatter-set: $path has no frontmatter block" >&2
+      return 1
+      ;;
+    *FM_ERR_NO_CLOSING*)
+      echo "Error: frontmatter-set: $path has malformed frontmatter (no closing ---)" >&2
+      return 1
+      ;;
+  esac
+  if [ "$awk_rc" -ne 0 ]; then
+    echo "Error: frontmatter-set: awk failed parsing $path" >&2
+    return 1
+  fi
+
+  # Write back via `obsidian create overwrite=true`. This wrapper-internal
+  # call does not pass through the rewrite hook (the hook only fires on the
+  # model's Bash tool), so the daily/*.md antipattern guard does not trigger.
+  if ! run_obs create "path=$path" overwrite=true "content=$updated" >/dev/null; then
+    echo "Error: frontmatter-set: write failed for $path" >&2
+    return 1
+  fi
+  echo "Set frontmatter: $path"
+  return 0
+}
+
+case "${1:-}" in
+  create-or-append) shift; do_create_or_append "$@"; exit $? ;;
+  frontmatter-set)  shift; do_frontmatter_set "$@";  exit $? ;;
+esac
 
 # 4. Run the verb. Capture stdout so we can inspect it for error markers.
 #    The CLI itself always exits 0, so its real exit is uninformative — we
