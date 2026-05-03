@@ -4,8 +4,13 @@
 # Shape-only assertions throughout. Sequence per #89 Section C.
 #
 # Requires mounts:
-#   /opt/plugin-src      plugin working tree (read-only)
-#   /credentials.json    ~/.claude/.credentials.json (read-only)
+#   /opt/plugin-src                       plugin working tree (read-only)
+#   /root/.claude/.credentials.json       ~/.claude/.credentials.json (read-only)
+#
+# Credentials are mounted at the path the `claude` CLI consults natively
+# (HOME=/root inside the container), so OAuth or API-key auth is picked up
+# without an env-var hop. The entrypoint verifies the file is readable and
+# carries one of the two accepted shapes; it never extracts the secret.
 #
 # AC3: mounts + credentials verified before any docker/LLM work.
 # AC8: all-pass → exit 0, container removed (--rm by caller).
@@ -15,7 +20,7 @@
 set -euo pipefail
 
 PLUGIN_SRC="${PLUGIN_SRC:-/opt/plugin-src}"
-CREDENTIALS="${CREDENTIALS:-/credentials.json}"
+CREDENTIALS="${CREDENTIALS:-/root/.claude/.credentials.json}"
 VAULT_PATH="${VAULT_PATH:-/tmp/vault}"
 DISPLAY_NUM="${DISPLAY_NUM:-:99}"
 
@@ -79,12 +84,17 @@ if [ ! -r "$CREDENTIALS" ]; then
   exit 2
 fi
 
-# ── Step 2: Parse API key from credentials ────────────────────────────────────
-API_KEY=$(jq -re '.api_key | select(type == "string" and length > 0)' "$CREDENTIALS") || {
-  echo "entrypoint-local: api_key missing, empty, or not a string in $CREDENTIALS" >&2
+# ── Step 2: Validate credentials shape ───────────────────────────────────────
+# Accept either an OAuth login (`claudeAiOauth.accessToken`) or a legacy API
+# key (`api_key`). The `claude` CLI reads the file directly at this path —
+# we only assert one of the two fields is a non-empty string before
+# exercising the LLM, so misconfigured credentials fail here instead of
+# producing an opaque 401 mid-run.
+if ! jq -e '(.claudeAiOauth.accessToken // .api_key) | type == "string" and length > 0' \
+      "$CREDENTIALS" >/dev/null 2>&1; then
+  echo "entrypoint-local: $CREDENTIALS has neither a non-empty claudeAiOauth.accessToken nor a non-empty api_key" >&2
   exit 2
-}
-export ANTHROPIC_API_KEY="$API_KEY"
+fi
 echo "entrypoint-local: credentials validated"
 
 # ── Step 3: Create vault dir ──────────────────────────────────────────────────

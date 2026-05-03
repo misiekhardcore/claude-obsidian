@@ -84,12 +84,13 @@ docker run --rm \
   --security-opt apparmor=unconfined \
   -e ENTRYPOINT_TYPE=local \
   -v "$(pwd):/opt/plugin-src:ro" \
-  -v "$HOME/.claude/.credentials.json:/credentials.json:ro" \
+  -v "$HOME/.claude/.credentials.json:/root/.claude/.credentials.json:ro" \
   claude-obsidian-e2e:latest
 ```
 
-`make e2e-preflight` fails fast (exit 2) before any build if credentials are
-missing or missing an `api_key` field (AC12).
+`make e2e-preflight` fails fast (exit 2) before any build if `~/.claude/.credentials.json`
+is missing or carries neither a non-empty `claudeAiOauth.accessToken`
+(OAuth login from `claude login`) nor a non-empty `api_key` (AC12).
 
 Expected exit 0 sequence:
 
@@ -134,8 +135,7 @@ obsidian read path=wiki/hot.md
 | `VAULT_PATH` | `/tmp/vault` | Where the test vault is scaffolded |
 | `DISPLAY_NUM` | `:99` | Xvfb display number |
 | `WAIT_FOR_OBSIDIAN_TIMEOUT` | `60` | Readiness probe deadline (seconds) |
-| `ANTHROPIC_API_KEY` | — | API key for `claude -p` calls (local tier only) |
-| `CREDENTIALS` | `/credentials.json` | Path to credentials inside container (local tier) |
+| `CREDENTIALS` | `/root/.claude/.credentials.json` | Path the entrypoint validates; the `claude` CLI reads it from the same location (local tier) |
 
 ## Constraints
 
