@@ -18,8 +18,8 @@ if [ ! -d "$PLUGIN_SRC" ]; then
   echo "entrypoint-ci: plugin source not mounted at $PLUGIN_SRC" >&2
   exit 2
 fi
-if [ ! -x "$PLUGIN_SRC/bin/setup-vault.sh" ]; then
-  echo "entrypoint-ci: $PLUGIN_SRC/bin/setup-vault.sh missing or not executable" >&2
+if [ ! -r "$PLUGIN_SRC/bin/setup-vault.sh" ]; then
+  echo "entrypoint-ci: $PLUGIN_SRC/bin/setup-vault.sh missing or not readable" >&2
   exit 2
 fi
 
