@@ -145,7 +145,7 @@ synthesis: "[[Research: Topic]]"        # wikilink to the synthesis page from th
 Notes:
 - `confidence:` for trail pages is `EXTRACTED` — the trail records what the run produced, not an inference.
 - `evidence:` is the list of atomic notes the trail steps through (the same wikilinks that appear in the body, in order).
-- Trails are run-scoped and not edited after emission. Lint check #16 validates trail integrity; trails are exempt from the orphan/dead-link auto-fix path because backlinks naturally route through the synthesis page.
+- Trails are run-scoped and not edited after emission. Lint check #16 validates trail integrity. Per `skills/lint/SKILL.md`, trails are excluded from the orphan check (designed-orphan: the synthesis page does not link back to the trail under the forward-only model) and trail dead-link findings are surfaced but never auto-fixed (run-snapshot frozen at write time).
 
 ### domain
 

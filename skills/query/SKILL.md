@@ -55,7 +55,7 @@ A four-step **hybrid retrieval** flow. Stop at the earliest step that answers th
 After candidates are read:
 
 5. **Step leaf → hub when broader topic context is needed.** If a candidate page is a leaf and the answer needs the wider topic, run `obsidian backlinks path=<leaf> format=json` and read the entries whose frontmatter `type: domain`. That file is the leaf's containing hub. Hub membership is forward-only (hubs link to leaves; leaves never declare membership), so backlinks of `type: domain` are the canonical leaf→hub traversal. Below the hub threshold no hub exists — that is expected, not a gap.
-6. **Step synthesis → trail.** Whenever a candidate page has `type: synthesis` (a `Research: [Topic]` page produced by `/autoresearch`), always check for a trail: run `obsidian backlinks path=<synthesis> format=json` and filter the entries to those whose frontmatter `type: trail`. The trail is the curated reading order for that research run, with one-line annotations explaining each step's argument role — much cheaper than reconstructing the path from `related:` traversal. See **Trail Discovery** below for the multi-trail rule.
+6. **Step synthesis → trail.** Whenever a candidate page has `type: synthesis` (a `Research: [Topic]` page produced by `/autoresearch`), always check for a trail: run `obsidian backlinks path=<synthesis-path> format=json` and filter the entries to those whose frontmatter `type: trail`. The trail is the curated reading order for that research run, with one-line annotations explaining each step's argument role — much cheaper than reconstructing the path from `related:` traversal. See **Trail Discovery** below for the multi-trail rule.
 7. **Read** the candidate pages. Follow wikilinks to depth-2 for key entities. No deeper.
 8. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
 9. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
@@ -171,7 +171,7 @@ Trails are run-records emitted by `/autoresearch`. They live under `wiki/trails/
    ```bash
    obsidian backlinks path=<synthesis-path> format=json
    ```
-2. Filter the returned entries to those whose frontmatter `type: trail`. (Read the candidate's frontmatter via `obsidian read path=<entry>` if the JSON does not already include it.) These are the trails covering that research run.
+2. `backlinks format=json` returns only `{"file": "<path>"}` entries (no frontmatter), so for each entry run `obsidian properties path=<entry>` to read its frontmatter and filter to those with `type: trail`. These are the trails covering that research run.
 3. **Multi-trail rule.** If more than one trail backlinks the synthesis (multiple runs on the same topic), pick the **most recent** by the `YYYY-MM-DD` date suffix on the filename — the date suffix is canonical, not the `research_run:` field, because filename ordering is what the index/log entries point at. Read only that trail. After answering, append exactly:
    ```
    *N earlier trail(s) exist on this topic — say 'compare trails' to read all.*
@@ -181,7 +181,7 @@ Trails are run-records emitted by `/autoresearch`. They live under `wiki/trails/
 
 **Trail vs. hub** — both are reachable via backlinks, but they answer different questions and the discovery filter (`type: trail` vs. `type: domain`) is the disambiguator. A page can have both kinds of backlinks; read the trail when the user is re-entering a research topic, the hub when the user is exploring a domain.
 
-**Fallback.** If no trail exists for a synthesis page, fall back to the existing backlink/hub traversal in steps 5–6 of the standard flow. No trail is not a gap — older research runs predate this feature, and a thin run may have produced no trail at all.
+**Fallback.** If no trail exists for a synthesis page, fall back to the existing backlink/hub traversal in steps 5–6 of the standard flow. No trail is not a gap — `/autoresearch` now emits exactly one trail per run, so the only legitimate absence is a synthesis page produced before this feature shipped.
 
 ---
 

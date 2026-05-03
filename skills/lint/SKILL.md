@@ -24,12 +24,12 @@ Use the native `obsidian` CLI verbs for efficient data gathering:
 
 Work through these in order:
 
-1. **Orphan pages**. Use `obsidian orphans` to enumerate. Wiki pages with no inbound wikilinks. They exist but nothing points to them.
-2. **Dead links**. Use `obsidian deadends` to enumerate. Wikilinks that reference a page that does not exist.
+1. **Orphan pages**. Use `obsidian orphans` to enumerate. Wiki pages with no inbound wikilinks. They exist but nothing points to them. **Exclude `wiki/trails/*.md`** from this check — trails are designed-orphan: the synthesis page does not link back to them (forward-only model), so every trail would be flagged as orphan in perpetuity.
+2. **Dead links**. Use `obsidian deadends` to enumerate. Wikilinks that reference a page that does not exist. Findings inside `wiki/trails/*.md` are surfaced for visibility but **never auto-fixed** — trails are run-snapshots frozen at write time; the user repairs manually or accepts the drift (same policy as check #16).
 3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated.
 4. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
 5. **Missing cross-references**. Entities mentioned in a page but not linked.
-6. **Frontmatter gaps**. Pages missing required fields (type, status, created, updated, tags).
+6. **Frontmatter gaps**. Pages missing required fields (`type`, `status`, `created`, `updated`, `tags`, `confidence`). Additionally, flag missing `evidence:` when `confidence:` is `INFERRED` or `AMBIGUOUS` (per `_shared/frontmatter.md` rule 7 — `evidence:` is required for those confidence levels).
 7. **Empty sections**. Headings with no content underneath.
 8. **Stale index entries**. Items in `wiki/index.md` pointing to renamed or deleted pages.
 9. **hot.md size budget**. Count words in `wiki/hot.md`.
@@ -65,8 +65,8 @@ Work through these in order:
     Role: **safety net**, not the primary placement mechanism. `/save` writes new entries directly under the correct section (see #84), so a healthy vault reports zero findings here. Findings indicate drift — manual edits, pre-fix history, or an agent that picked the wrong section despite the corrected `/save` snippet. Auto-fix policy is **ask-first** (see Before Auto-Fixing).
 
 16. **Trail integrity**. Scoped to `wiki/trails/*.md`. Trails are run-records emitted by `/autoresearch` and frozen at write time, so integrity checks run against a fixed shape. For each trail page:
-    - **Required trail-specific frontmatter** — flag missing `type:` (must equal `trail`), `topic:`, `research_run:`, or `synthesis:`. The universal fields (`title`, `created`, `updated`, `tags`, `status`, `confidence`, `evidence`) are check #6's responsibility — do not duplicate.
-    - **Synthesis link resolves** — read the `synthesis:` value, strip the `[[…]]` wrap, and verify a page exists at that target via `obsidian read path=<target>` (or `obsidian unresolved` membership). Flag `synthesis: [[Research: X]] does not resolve` when missing.
+    - **Required trail-specific frontmatter** — flag missing `topic:`, `research_run:`, or `synthesis:`. The universal fields (`type`, `title`, `created`, `updated`, `tags`, `status`, `confidence`, plus `evidence` when `confidence` is `INFERRED`/`AMBIGUOUS`) are check #6's responsibility — do not duplicate.
+    - **Synthesis link resolves** — the `synthesis:` value is a wikilink-by-title (e.g. `[[Research: Topic]]`), not a vault-relative path, so `read path=` is not the right resolver. Instead, run `obsidian unresolved format=json` once per lint pass and check whether the stripped link text appears in the returned `[{"link": "..."}]` array. Membership in that array means the link is dead — flag `synthesis: [[Research: X]] does not resolve`.
     - **Body is an ordered list** — the trail body (everything below the first H1, excluding a single optional intro paragraph) must be exactly one ordered Markdown list (`1. …`, `2. …`, …). Flag `body is not an ordered list` for trails whose body has no ordered list, multiple top-level lists, prose paragraphs interleaved with list items, or nested lists.
     - **Every list item contains a wikilink and a plain-text annotation** — for each ordered-list item, flag the item if it has zero `[[wikilink]]`s, more than one `[[wikilink]]`, no annotation text after stripping the wikilink (the residue must contain at least one non-whitespace, non-punctuation character), or if the annotation text contains a URL (`https?://` or a Markdown link `[text](url)`) or an additional `[[wikilink]]` — annotation text must be plain text (inline formatting like bold/italic is permitted; links are not).
     - **No minimum link count.** A one-step trail is valid output and must not be flagged.
@@ -153,7 +153,7 @@ Scope: `wiki/trails/*.md`. Run-record snapshots; never auto-fixed.
 - `[[Trail: Topic (YYYY-MM-DD)]]`: missing trail frontmatter: <field>, <field>
 - `[[Trail: Topic (YYYY-MM-DD)]]`: synthesis link `[[Research: Topic]]` does not resolve.
 - `[[Trail: Topic (YYYY-MM-DD)]]`: body is not an ordered list (found: <prose paragraph | nested list | multiple top-level lists | no list>).
-- `[[Trail: Topic (YYYY-MM-DD)]]`: step N has <no wikilink | multiple wikilinks | no annotation>.
+- `[[Trail: Topic (YYYY-MM-DD)]]`: step N has <no wikilink | multiple wikilinks | no annotation | URL in annotation | extra wikilink in annotation>.
 ```
 
 ---
