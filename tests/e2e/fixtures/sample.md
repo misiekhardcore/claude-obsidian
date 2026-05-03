@@ -1,6 +1,5 @@
 ---
-name: E2E Sample Fixture
-description: Minimal markdown source used as the ingest fixture for the claude-obsidian E2E harness.
+title: E2E Sample Fixture
 type: source
 ---
 

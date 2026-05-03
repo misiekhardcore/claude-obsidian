@@ -21,8 +21,11 @@ echo "=== vault-shape: $VAULT ==="
 assert_file_exists "$VAULT/wiki/hot.md"   "wiki/hot.md"
 assert_file_exists "$VAULT/wiki/index.md" "wiki/index.md"
 
-# Required directories (AC4)
-for dir in wiki/concepts wiki/entities wiki/sources notes daily .raw _templates; do
+# Required directories (AC4). `/wiki init` delegates to bin/setup-vault.sh,
+# which scaffolds the wiki tree, .raw inbox, and _templates. `notes/` and
+# `daily/` are owned by their respective skills and created lazily on first
+# use — daily-shape.sh covers `daily/` after step 8c-e.
+for dir in wiki/concepts wiki/entities wiki/sources .raw _templates; do
   assert_file_exists "$VAULT/$dir" "$dir/"
 done
 

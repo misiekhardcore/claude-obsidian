@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Assert a file has a frontmatter block (between --- markers) containing
-# the required key lines. This is a shape-only check (AC16) — it does not
-# validate the YAML body itself; it only verifies the block delimiters and
-# the presence of `name:` / `description:` lines.
+# the universal required keys per `_shared/frontmatter.md`. Shape-only
+# (AC16) — verifies the block delimiters and the presence of `title:` and
+# `type:` lines, which every wiki page must carry.
 # Usage: bash frontmatter.sh <file>
 # Exits non-zero if any assertion fails. AC5.
 
@@ -38,17 +38,23 @@ else
   exit 1
 fi
 
-# Check required keys (AC5: name, description)
-if echo "$fm" | grep -qE '^name:'; then
-  pass "frontmatter has 'name' key"
+# Check universal required keys per _shared/frontmatter.md (AC5).
+if echo "$fm" | grep -qE '^title:'; then
+  pass "frontmatter has 'title' key"
 else
-  fail "frontmatter missing 'name' key"
+  fail "frontmatter missing 'title' key"
 fi
 
-if echo "$fm" | grep -qE '^description:'; then
-  pass "frontmatter has 'description' key"
+if echo "$fm" | grep -qE '^type:'; then
+  pass "frontmatter has 'type' key"
 else
-  fail "frontmatter missing 'description' key"
+  fail "frontmatter missing 'type' key"
+fi
+
+# On any failure, dump the frontmatter so the failure reason is obvious.
+if [ "$FAIL" -gt 0 ]; then
+  echo "  --- frontmatter block as parsed ---" >&2
+  printf '%s\n' "$fm" | sed 's/^/  | /' >&2
 fi
 
 echo "  pass=$PASS  fail=$FAIL"
