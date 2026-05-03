@@ -45,13 +45,22 @@ dump_artifacts() {
   fi
 }
 
+safe_rm_vault() {
+  # Refuse to rm anything outside /tmp/ to protect against a misconfigured
+  # VAULT_PATH (env override) wiping the host root or another mount.
+  case "$VAULT_PATH" in
+    /tmp/?*) rm -rf "$VAULT_PATH" 2>/dev/null || true ;;
+    *) echo "entrypoint-local: refusing to rm VAULT_PATH=$VAULT_PATH (must be under /tmp/)" >&2 ;;
+  esac
+}
+
 cleanup() {
   local rc=$?
   [ $rc -ne 0 ] && dump_artifacts || true
   [ -n "$OBSIDIAN_PID" ] && kill "$OBSIDIAN_PID" 2>/dev/null || true
   [ -n "$XVFB_PID" ] && kill "$XVFB_PID" 2>/dev/null || true
   [ -n "${DBUS_SESSION_BUS_PID:-}" ] && kill "$DBUS_SESSION_BUS_PID" 2>/dev/null || true
-  rm -rf "$VAULT_PATH" 2>/dev/null || true
+  safe_rm_vault
   exit $rc
 }
 trap cleanup EXIT INT TERM
@@ -71,14 +80,18 @@ if [ ! -r "$CREDENTIALS" ]; then
 fi
 
 # ── Step 2: Parse API key from credentials ────────────────────────────────────
-API_KEY=$(jq -re '.api_key // empty' "$CREDENTIALS") || {
-  echo "entrypoint-local: api_key not found in $CREDENTIALS" >&2
+API_KEY=$(jq -re '.api_key | select(type == "string" and length > 0)' "$CREDENTIALS") || {
+  echo "entrypoint-local: api_key missing, empty, or not a string in $CREDENTIALS" >&2
   exit 2
 }
 export ANTHROPIC_API_KEY="$API_KEY"
 echo "entrypoint-local: credentials validated"
 
 # ── Step 3: Create vault dir ──────────────────────────────────────────────────
+case "$VAULT_PATH" in
+  /tmp/?*) ;;
+  *) echo "entrypoint-local: refusing to operate on VAULT_PATH=$VAULT_PATH (must be under /tmp/)" >&2; exit 2 ;;
+esac
 rm -rf "$VAULT_PATH"
 mkdir -p "$VAULT_PATH"
 echo "entrypoint-local: vault at $VAULT_PATH"
