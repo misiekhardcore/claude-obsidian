@@ -17,6 +17,7 @@ Read this file when a skill needs to understand vault layout or interpret page m
 | `wiki/comparisons/` | `comparison` | Side-by-side analysis of 2+ alternatives | `<A>-vs-<B>` or `comparing-<topic>` |
 | `wiki/questions/` | `question` | Open questions; closed questions link to the answer | Question as written, e.g. `why-tokens-compound` |
 | `wiki/domains/` | `domain` | Universal hub root for domain hubs; each hub is `wiki/domains/<slug>/_index.md` | kebab-case slug, e.g. `machine-learning`, `sophia` |
+| `wiki/trails/` | `trail` | One reading-order record per `/autoresearch` run — lists atomic notes in argument order with one-line annotations. Created lazily on first run; never edited post-emission | `Trail: [Topic] (YYYY-MM-DD)` — date suffix distinguishes multiple runs on the same topic |
 | `wiki/meta/` | `meta` | Index files, log, hot cache, dashboards — structural pages | Short functional names: `index`, `log`, `hot` |
 
 **Examples:**
@@ -64,6 +65,7 @@ The `evidence:` field is a flat list of source wikilinks supporting the page's c
 - `concept` pages → `INFERRED` (LLM synthesis from one or more sources)
 - `entity` pages → `INFERRED` (unless the entity's details are verbatim-quoted)
 - `meta` pages (index, log, hot) → `EXTRACTED` (mechanically generated, not inferred)
+- `trail` pages → `EXTRACTED` (records what the autoresearch run produced; no inference)
 
 ---
 

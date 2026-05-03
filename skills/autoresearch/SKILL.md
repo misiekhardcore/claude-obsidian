@@ -165,7 +165,7 @@ Reading order for the [[Research: Topic]] run on YYYY-MM-DD. One step per atomic
 4. [[Atomic Note 4]] — resolves the constraint by introducing mechanism Z.
 ```
 
-The body must be a single ordered list. Each list item must contain exactly one `[[wikilink]]` to an atomic note created in this run plus exactly one annotation describing the note's argument role. No URLs, no bare-text steps, no nested lists, no prose paragraphs between items — keep the trail's argument-path semantics tight.
+The body must be a single ordered list. Each list item must contain exactly one `[[wikilink]]` to an atomic note created in this run plus exactly one annotation describing the note's argument role. Annotation text must be **plain text** (inline formatting like bold/italic is fine; wikilinks and URLs are not allowed in annotations — a wikilink in an annotation would confuse the lint check's "exactly one wikilink per step" rule). No bare-text steps, no nested lists, no prose paragraphs between items.
 
 `status: mature` reflects that trails are frozen at write time and never edited; the run produced what the run produced. `confidence: EXTRACTED` because the trail records run output, not inference. Use `evidence:` to list the atomic notes (the same wikilinks that appear in the body, in order).
 
