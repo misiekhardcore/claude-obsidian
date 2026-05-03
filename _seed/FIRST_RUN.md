@@ -108,7 +108,6 @@ Keep the structural pages (`hot.md`, `index.md`, `log.md`, `overview.md`).
 
 ### Views
 
-- `wiki/Wiki Map.canvas` — knowledge graph canvas (created once you add content)
 - Graph view — filtered to `wiki/` only, color-coded by page type
 
 ### Visual layout (optional)
