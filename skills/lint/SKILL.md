@@ -35,6 +35,11 @@ The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs
 
 **Ordering guarantee:** `lint-scan.sh` sorts all enumerations before writing JSON.
 
+**Edge case handling:**
+- **Canvas (`.canvas`) files** — treated as first-class documents; identical handling to `.md` in all 16 checks.
+- **URL-as-wikilink** (e.g. `[[https://...]]`) — flagged as `anti_patterns` in the JSON, rendered in a dedicated **Anti-patterns** section of the report. Not counted toward the dead-link total.
+- **Alias resolution** — `lint-scan.sh` relies on `obsidian unresolved`, which respects `aliases:` frontmatter. A wikilink that resolves via an alias is not a dead link. A wikilink that matches neither a filename nor any page's `aliases:` entry is a real dead link — no "title-mismatch" soft category.
+
 ---
 
 ## Repeatability Check
