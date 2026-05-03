@@ -76,6 +76,13 @@ After research is complete, create these pages:
 - Sections: Overview, Key Findings, Entities, Concepts, Contradictions, Open Questions, Sources
 - Full frontmatter with related links to all pages created in this session
 
+**wiki/trails/**. Exactly one `type: trail` page per run, regardless of atomic-note count
+- Filename: `wiki/trails/Trail: [Topic] (YYYY-MM-DD).md` (the date suffix uses the run date, so multiple runs on the same topic produce distinct files — never merge or overwrite).
+- Emit immediately **after** the synthesis page is written and **before** any `## After Filing` step (index, log, hot.md). The index and log entries naturally pick the trail up from this position.
+- Body is an ordered Markdown list. One step per atomic note created in this run, in argument order. Each step has exactly one `[[wikilink]]` to that atomic note plus a single LLM-synthesized one-line annotation describing the note's role in the argument (why this note next, what it contributes).
+- No minimum atomic-note count. A run that produced one note still emits a one-step trail — the run-record value beats the empty-trail cost.
+- Create `wiki/trails/` lazily on first emission if it does not exist.
+
 ---
 
 ## Synthesis Page Structure
@@ -127,6 +134,43 @@ sources:
 
 ---
 
+## Trail Page Structure
+
+```markdown
+---
+type: trail
+title: "Trail: [Topic] (YYYY-MM-DD)"
+topic: "<topic-slug>"
+research_run: YYYY-MM-DD
+synthesis: "[[Research: Topic]]"
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+tags:
+  - trail
+  - [topic-tag]
+status: mature
+confidence: EXTRACTED
+evidence:
+  - "[[Atomic Note 1]]"
+  - "[[Atomic Note 2]]"
+---
+
+# Trail: [Topic] (YYYY-MM-DD)
+
+Reading order for the [[Research: Topic]] run on YYYY-MM-DD. One step per atomic note; the annotation explains the note's argument role.
+
+1. [[Atomic Note 1]] — opens the question by establishing X.
+2. [[Atomic Note 2]] — sharpens X into the testable claim Y.
+3. [[Atomic Note 3]] — surfaces the counter-evidence that constrains Y to its scope.
+4. [[Atomic Note 4]] — resolves the constraint by introducing mechanism Z.
+```
+
+The body must be a single ordered list. Each list item must contain exactly one `[[wikilink]]` to an atomic note created in this run plus exactly one annotation describing the note's argument role. Annotation text must be **plain text** (inline formatting like bold/italic is fine; wikilinks and URLs are not allowed in annotations — a wikilink in an annotation would confuse the lint check's "exactly one wikilink per step" rule). No bare-text steps, no nested lists, no prose paragraphs between items.
+
+`status: mature` reflects that trails are frozen at write time and never edited; the run produced what the run produced. `confidence: EXTRACTED` because the trail records run output, not inference. Use `evidence:` to list the atomic notes (the same wikilinks that appear in the body, in order).
+
+---
+
 ## After Filing
 
 1. Update `wiki/index.md`. Add all new pages to the right sections
@@ -137,6 +181,7 @@ sources:
    - Sources found: N
    - Pages created: [[Page 1]], [[Page 2]], ...
    - Synthesis: [[Research: Topic]]
+   - Trail: [[Trail: Topic (YYYY-MM-DD)]]
    - Key finding: [one sentence]
    ```
 3. Update `wiki/hot.md` with the research summary. For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
@@ -154,6 +199,7 @@ Rounds: N | Searches: N | Pages created: N
 
 Created:
   wiki/questions/Research: [Topic].md (synthesis)
+  wiki/trails/Trail: [Topic] (YYYY-MM-DD).md (reading order)
   wiki/sources/[Source 1].md
   wiki/concepts/[Concept 1].md
   wiki/entities/[Entity 1].md

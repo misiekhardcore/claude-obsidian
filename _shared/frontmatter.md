@@ -10,7 +10,7 @@ Every page, no exceptions:
 
 ```yaml
 ---
-type: <source|entity|concept|domain|comparison|question|meta|synthesis|solution|initiative|session|reference|decision>
+type: <source|entity|concept|domain|comparison|question|meta|synthesis|solution|initiative|session|reference|decision|trail>
 title: "Human-Readable Title"
 created: 2026-04-07
 updated: 2026-04-07
@@ -131,6 +131,21 @@ verdict: "One-line conclusion."
 question: "The original query as asked."
 answer_quality: solid   # draft | solid | definitive
 ```
+
+### trail
+
+Trail pages are **autoresearch run-records** — they list the atomic notes from a single `/autoresearch` run in argument order, with a one-line annotation per step explaining its role. One trail per run, frozen at write time. Trails live under `wiki/trails/Trail: [Topic] (YYYY-MM-DD).md` so multiple runs on the same topic produce distinct files (no merge, no overwrite).
+
+```yaml
+topic: "<slug>"                         # short slug for the research topic, matches the synthesis page
+research_run: YYYY-MM-DD                # the date the autoresearch run produced this trail
+synthesis: "[[Research: Topic]]"        # wikilink to the synthesis page from the same run
+```
+
+Notes:
+- `confidence:` for trail pages is `EXTRACTED` — the trail records what the run produced, not an inference.
+- `evidence:` is the list of atomic notes the trail steps through (the same wikilinks that appear in the body, in order).
+- Trails are run-scoped and not edited after emission. Lint check #16 validates trail integrity. Per `skills/lint/SKILL.md`, trails are excluded from the orphan check (designed-orphan: the synthesis page does not link back to the trail under the forward-only model) and trail dead-link findings are surfaced but never auto-fixed (run-snapshot frozen at write time).
 
 ### domain
 
