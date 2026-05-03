@@ -5,7 +5,7 @@
 # entrypoint edits don't bust the upper layers.
 #
 # Pinning policy (AC15): no `latest` tags. Bump VERSION envs deliberately and
-# re-run `make e2e-build` (or push, and let CI rebuild) to validate.
+# rebuild the image to validate (push to trigger CI, or rebuild locally).
 #
 # AC2 — broken docs blow up the image build by design. The install steps
 # below mirror the published prerequisites (Obsidian 1.12.7+ on $PATH; the
@@ -86,9 +86,13 @@ RUN curl -fsSL \
 # pre-release / uncommitted state instead of whatever the marketplace has.
 # Hooks are blanked so PostToolUse auto-commit and SessionEnd reflection
 # don't fire inside the container.
+# PLUGIN_VERSION is the directory-name segment for the symlink target inside the
+# plugin cache. Claude Code resolves plugins by name, not by this path component,
+# so it does not need to track the published plugin.json/marketplace.json version.
+# Using a synthetic value avoids drift when the plugin's real version is bumped.
 ENV PLUGIN_NAME=claude-obsidian \
     MARKETPLACE_NAME=claude-obsidian \
-    PLUGIN_VERSION=1.0.0 \
+    PLUGIN_VERSION=0.0.0-e2e \
     PLUGIN_SRC=/opt/plugin-src \
     VAULT_PATH=/tmp/vault
 
