@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-05-03
+
+### Added
+
+- **E2E harness — CI fast tier.** `Dockerfile` and a GitHub Actions workflow that runs the smoke-test suite on every PR, against a pinned Obsidian image ([#92]).
+- **E2E harness — local full tier.** Entrypoint script, expanded assertions, and a `Makefile` so contributors run the same suite locally that CI runs ([#94]).
+- **Lint check #15** — flags index entries placed under the wrong type heading as misplaced ([#87]).
+- **Backlink-aware traversal** in `/query` and `/lint`, with a density check that surfaces over- and under-linked clusters ([#78]).
+- **`/autoresearch` trail page** recording the argument order of each run, so reruns can be replayed and audited ([#93]).
+- **Initial lint report for wiki metadata validation** — programmatic frontmatter pass that feeds the lint dashboard.
+
+### Changed
+
+- **Unified domain hub architecture.** Wiki content is reorganized around domain hubs instead of ad-hoc category folders; closes the long-standing #46 reorganization. Existing pages were migrated in place ([#79]).
+- **Vault housekeeping** — slug-generation bug fix, lint-report rotation, and seed-onboarding refinements ([#83]).
+- **`/save` index insert** is now section-aware: index updates splice into the correct section instead of prepending to the whole file, which had been disturbing surrounding content ([#86]).
+- **`/daily` capture path** uses atomic CLI verbs (`append` / `prepend`) instead of read-modify-write, eliminating bullet loss when concurrent captures land in the same daily note ([#103]).
+- `_seed/FIRST_RUN.md` no longer references the removed `Wiki Map.canvas` ([#88]).
+
+### Fixed
+
+- **`/lint` dead-link check** is now deterministic — replaced the inline scan with `lint-scan.sh`, which produces stable output across runs ([#102]).
+- **`commands/` directory registered in the plugin manifest** so slash commands appear in Claude Code's menu without depending on auto-discovery quirks ([#99]).
+
+[Full diff](https://github.com/misiekhardcore/claude-obsidian/compare/v1.0.0...v1.1.0)
+
 ## [1.0.0] — 2026-04-29
 
 Closes the CLI migration epic ([#48]). With this release, **all** vault I/O across every skill and hook routes through the Obsidian CLI; the Local REST API + MCP code path is gone.
@@ -53,6 +79,14 @@ If a regression blocks your work, pin the previous release:
 ```
 
 For a fully MCP-based rollback (no CLI dependency at all), pin `0.4.0`, re-enable the Local REST API community plugin, and follow the legacy `mcp-setup.md` (preserved in git history at the `v0.4.0` tag).
+
+## [0.5.1] — 2026-04-27
+
+### Fixed
+
+- **SessionStart and PostCompact hooks** rewritten from prompt-type to command-type, eliminating the `ToolUseContext` error that fired on every session start under recent Claude Code builds ([#58]).
+
+[Full diff](https://github.com/misiekhardcore/claude-obsidian/compare/v0.5.0...v0.5.1)
 
 ## [0.5.0] — 2026-04-26
 
@@ -146,7 +180,9 @@ The 0.4.0 plugin re-enables the Local REST API + MCP code path. After pinning, y
 - `resolve-vault.sh` falls back to `settings.local.json` for out-of-session invocations where `${user_config.*}` is unavailable ([#33], [#32]).
 - Hooks pass `vault_path` as an argument to `resolve-vault.sh` ([#29]).
 
+[1.1.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v1.1.0
 [1.0.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v1.0.0
+[0.5.1]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.5.1
 [0.5.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.5.0
 [0.4.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.4.0
 [0.3.0]: https://github.com/misiekhardcore/claude-obsidian/releases/tag/v0.3.0
@@ -182,3 +218,16 @@ The 0.4.0 plugin re-enables the Local REST API + MCP code path. After pinning, y
 [#59]: https://github.com/misiekhardcore/claude-obsidian/pull/59
 [#48]: https://github.com/misiekhardcore/claude-obsidian/issues/48
 [#53]: https://github.com/misiekhardcore/claude-obsidian/issues/53
+[#58]: https://github.com/misiekhardcore/claude-obsidian/pull/58
+[#78]: https://github.com/misiekhardcore/claude-obsidian/pull/78
+[#79]: https://github.com/misiekhardcore/claude-obsidian/pull/79
+[#83]: https://github.com/misiekhardcore/claude-obsidian/pull/83
+[#86]: https://github.com/misiekhardcore/claude-obsidian/pull/86
+[#87]: https://github.com/misiekhardcore/claude-obsidian/pull/87
+[#88]: https://github.com/misiekhardcore/claude-obsidian/pull/88
+[#92]: https://github.com/misiekhardcore/claude-obsidian/pull/92
+[#93]: https://github.com/misiekhardcore/claude-obsidian/pull/93
+[#94]: https://github.com/misiekhardcore/claude-obsidian/pull/94
+[#99]: https://github.com/misiekhardcore/claude-obsidian/pull/99
+[#102]: https://github.com/misiekhardcore/claude-obsidian/pull/102
+[#103]: https://github.com/misiekhardcore/claude-obsidian/pull/103
