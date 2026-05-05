@@ -220,8 +220,8 @@ fi
 
 declare -A backlink_counts
 for page in "${scope_pages[@]}"; do
-  count=$("$CLI" backlinks "path=${page}" format=json 2>/dev/null \
-           | jq 'length' 2>/dev/null) || count=0
+  raw=$("$CLI" backlinks "path=${page}" format=json 2>/dev/null) || true
+  count=$(jq 'length' <<< "${raw:-[]}" 2>/dev/null) || count=0
   backlink_counts["$page"]="${count:-0}"
 done
 
