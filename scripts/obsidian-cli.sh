@@ -126,7 +126,7 @@ fi
 run_obs() {
   local tmp first cli_exit
   tmp="$(mktemp)"
-  obsidian "vault=$VAULT_NAME" "$@" >"$tmp" 2>&2
+  obsidian "$@" "vault=$VAULT_NAME" >"$tmp" 2>&2
   cli_exit=$?
   cat "$tmp"
   first="$(head -n 1 "$tmp" 2>/dev/null || true)"
@@ -163,7 +163,7 @@ do_create_or_append() {
   # into memory just to learn whether the file exists.
   local append_out append_first append_rc
   append_out="$(mktemp)"
-  obsidian "vault=$VAULT_NAME" append "file=$file" "content=$content" \
+  obsidian append "file=$file" "content=$content" "vault=$VAULT_NAME" \
     >"$append_out" 2>&2
   append_rc=$?
   append_first="$(head -n 1 "$append_out" 2>/dev/null || true)"
@@ -298,7 +298,7 @@ esac
 TMP_OUT="$(mktemp)"
 trap 'rm -f "$TMP_OUT"' EXIT
 
-obsidian "vault=$VAULT_NAME" "$@" >"$TMP_OUT" 2>&2
+obsidian "$@" "vault=$VAULT_NAME" >"$TMP_OUT" 2>&2
 CLI_EXIT=$?
 
 # 5. Pass stdout through to the caller verbatim.
