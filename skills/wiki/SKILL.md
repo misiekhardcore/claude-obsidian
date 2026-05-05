@@ -1,12 +1,6 @@
 ---
 name: wiki
-description: >
-  Claude + Obsidian knowledge companion. Sets up a persistent wiki vault, scaffolds
-  structure from a one-sentence description, and routes to specialized sub-skills.
-  Use for setup, scaffolding, cross-project referencing, and hot cache management.
-  Triggers on: "set up wiki", "scaffold vault", "create knowledge base", "/wiki",
-  "wiki setup", "obsidian vault", "knowledge base", "second brain setup",
-  "running notetaker", "persistent memory", "llm wiki".
+description: Claude + Obsidian knowledge companion. Bootstraps the vault, scaffolds structure, and routes to specialized sub-skills.
 allowed-tools: Bash Read Glob Grep
 ---
 

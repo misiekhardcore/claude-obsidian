@@ -1,12 +1,6 @@
 ---
 name: braindump
-description: >
-  Split a long-form text stream into atomic thoughts and file each as a
-  separate inbox note — without breaking flow. Accepts inline text or a
-  file path (vault-relative or absolute). Each chunk goes through the full
-  CAPTURE pipeline (MATCH/NEW per chunk). Triage later via /note process.
-  Triggers on: "/braindump", "brain dump this", "dump the following thoughts",
-  "dump these thoughts", "braindump:", "split this into notes".
+description: Split long-form text into atomic inbox notes. Accepts inline text or file paths. Triage later via /note process.
 allowed-tools: Bash Read Glob Grep
 ---
 

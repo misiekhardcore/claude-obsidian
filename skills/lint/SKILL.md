@@ -1,10 +1,6 @@
 ---
 name: lint
-description: >
-  Health check the Obsidian wiki vault. Finds orphan pages, dead wikilinks, stale claims,
-  missing cross-references, frontmatter gaps, and empty sections. Creates or updates
-  Bases dashboards. Generates canvas maps. Triggers on: "lint", "health check",
-  "clean up wiki", "check the wiki", "wiki maintenance", "find orphans", "wiki audit".
+description: Health check the wiki vault. Finds orphans, dead wikilinks, stale claims, and frontmatter gaps. Generates canvas maps and Bases dashboards.
 allowed-tools: Bash Read Glob Grep
 ---
 
