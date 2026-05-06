@@ -1,0 +1,38 @@
+{
+  // Rule-disable rationale:
+  // MD013 off  — line-length conflicts with proseWrap:preserve; prettier owns width
+  // MD018 off  — Obsidian uses #tag syntax inline; ATX heading space check fires on tags
+  // MD024 siblings_only — allows duplicate H2 under different parents (daily-log pattern)
+  // MD025 off  — 15 skill files use multi-H1 modular structure by design
+  // MD029 off  — continuation lists (e.g. steps 5-10 following 1-4 across paragraphs) are valid authoring
+  // MD031 off  — code fences inside list items lack surrounding blank lines by design (inline examples)
+  // MD034 off  — many prose URLs are bare by convention; not a quality concern for this corpus
+  // MD041 off  — commands/ and agents/ files start with YAML frontmatter + H2 by convention
+  // MD033 on, empty allowlist — no inline HTML in corpus; ready to extend if needed
+  // MD040 on   — keep flagging untyped fenced code blocks
+  // MD046 off  — list-item continuations at 4-space indent are treated as indented code blocks by the parser
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD018": false,
+    "MD024": { "siblings_only": true },
+    "MD025": false,
+    "MD029": false,
+    "MD031": false,
+    "MD034": false,
+    "MD041": false,
+    "MD033": { "allowed_elements": [] },
+    "MD040": true,
+    "MD046": false
+  },
+  "ignores": [
+    ".raw/**",
+    ".claude/**",
+    ".worktrees/**",
+    ".git/**",
+    "node_modules/**",
+    "_attachments/**",
+    "AGENTS.md",
+    "tests/fixtures/**"
+  ]
+}

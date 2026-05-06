@@ -1,0 +1,25 @@
+{
+  "name": "claude-obsidian",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "format": "prettier --write \"**/*.md\" && markdownlint-cli2 --fix \"**/*.md\"",
+    "lint": "prettier --check \"**/*.md\" && markdownlint-cli2 \"**/*.md\""
+  },
+  "devDependencies": {
+    "husky": "^9.1",
+    "lint-staged": "^15.5",
+    "markdownlint-cli2": "^0.18",
+    "prettier": "^3.4"
+  },
+  "lint-staged": {
+    "*.md": [
+      "prettier --write",
+      "markdownlint-cli2 --fix"
+    ]
+  }
+}
