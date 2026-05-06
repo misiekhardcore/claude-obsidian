@@ -17,9 +17,7 @@ related:
 
 # Recent Context
 
-> **Demo content** — this file is overwritten at the end of every wiki operation.
-> It shows what a populated hot cache looks like. Delete this notice once your
-> first real ingest has run and replaced this content.
+> **Demo content** — this file is overwritten at the end of every wiki operation. It shows what a populated hot cache looks like. Delete this notice once your first real ingest has run and replaced this content.
 
 ## Last Updated
 
@@ -27,20 +25,11 @@ related:
 
 ## Key Recent Facts
 
-This vault uses a four-layer wiki schema: **sources** capture what documents say,
-**entities** record named real-world things, **concepts** synthesize patterns across
-sources, and **questions** track open and answered queries. All pages carry
-`confidence:` (EXTRACTED | INFERRED | AMBIGUOUS) and an `evidence:` list so
-claims can be traced to their origin.
+This vault uses a four-layer wiki schema: **sources** capture what documents say, **entities** record named real-world things, **concepts** synthesize patterns across sources, and **questions** track open and answered queries. All pages carry `confidence:` (EXTRACTED | INFERRED | AMBIGUOUS) and an `evidence:` list so claims can be traced to their origin.
 
-The **hot cache** (this file) is the cheapest entry point for any session — it
-answers "what happened recently?" without opening the full index. Claude reads it
-silently at session start. Keep it under 500 words and overwrite it completely
-after every operation.
+The **hot cache** (this file) is the cheapest entry point for any session — it answers "what happened recently?" without opening the full index. Claude reads it silently at session start. Keep it under 500 words and overwrite it completely after every operation.
 
-The **index** ([[index]]) is the master catalog; the **log** ([[log]]) is the
-chronological record of operations; **overview** ([[overview]]) is the
-executive summary of what this vault covers.
+The **index** ([[index]]) is the master catalog; the **log** ([[log]]) is the chronological record of operations; **overview** ([[overview]]) is the executive summary of what this vault covers.
 
 ## Recent Changes
 

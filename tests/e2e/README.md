@@ -1,10 +1,8 @@
 # E2E harness
 
-Docker-based end-to-end harness that builds an Ubuntu image, boots Obsidian
-under Xvfb, and runs `tests/cli-smoke.sh` against a freshly scaffolded vault.
+Docker-based end-to-end harness that builds an Ubuntu image, boots Obsidian under Xvfb, and runs `tests/cli-smoke.sh` against a freshly scaffolded vault.
 
-The same image is used by the GitHub Actions workflow (`.github/workflows/e2e.yml`)
-and for local debugging.
+The same image is used by the GitHub Actions workflow (`.github/workflows/e2e.yml`) and for local debugging.
 
 ## Layout
 
@@ -88,9 +86,7 @@ docker run --rm \
   claude-obsidian-e2e:latest
 ```
 
-`make e2e-preflight` fails fast (exit 2) before any build if `~/.claude/.credentials.json`
-is missing or carries neither a non-empty `claudeAiOauth.accessToken`
-(OAuth login from `claude login`) nor a non-empty `api_key` (AC12).
+`make e2e-preflight` fails fast (exit 2) before any build if `~/.claude/.credentials.json` is missing or carries neither a non-empty `claudeAiOauth.accessToken` (OAuth login from `claude login`) nor a non-empty `api_key` (AC12).
 
 Expected exit 0 sequence:
 
@@ -147,11 +143,4 @@ obsidian read path=wiki/hot.md
 
 ## AppArmor on Linux hosts
 
-CI passes `--security-opt apparmor=unconfined` to `docker run`. GitHub's
-`ubuntu-24.04` runners (and any native Linux Docker on Ubuntu 24.04+) apply
-the `docker-default` AppArmor profile, which blocks the user-namespace
-syscalls Chromium uses during Electron init even with `--no-sandbox`.
-Without the flag, Obsidian crashes with `SIGTRAP` mid-boot. Docker Desktop
-(macOS / Windows / WSL) runs containers in a linuxkit VM with no host
-AppArmor and is unaffected, so locally the flag is optional. Add it when
-reproducing a CI failure on a native Linux Docker host.
+CI passes `--security-opt apparmor=unconfined` to `docker run`. GitHub's `ubuntu-24.04` runners (and any native Linux Docker on Ubuntu 24.04+) apply the `docker-default` AppArmor profile, which blocks the user-namespace syscalls Chromium uses during Electron init even with `--no-sandbox`. Without the flag, Obsidian crashes with `SIGTRAP` mid-boot. Docker Desktop (macOS / Windows / WSL) runs containers in a linuxkit VM with no host AppArmor and is unaffected, so locally the flag is optional. Add it when reproducing a CI failure on a native Linux Docker host.
