@@ -1,8 +1,8 @@
 ---
 type: meta
-title: "Notes Inbox"
-created: "{{today}}"
-updated: "{{today}}"
+title: 'Notes Inbox'
+created: '{{today}}'
+updated: '{{today}}'
 tags:
   - meta
   - notes
@@ -10,7 +10,7 @@ status: evergreen
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[wiki/index]]"
+  - '[[wiki/index]]'
 ---
 
 # Notes Inbox

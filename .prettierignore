@@ -1,8 +1,0 @@
-.raw/
-.claude/
-.worktrees/
-.git/
-node_modules/
-_attachments/
-package-lock.json
-AGENTS.md

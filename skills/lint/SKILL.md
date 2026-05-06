@@ -198,8 +198,7 @@ Scope: `wiki/trails/*.md`. Run-record snapshots; never auto-fixed.
 
 ## Anti-patterns
 
-Source: `anti_patterns` array from `wiki/meta/lint-data-YYYY-MM-DD.json`.
-Not counted toward dead-link total. Each entry is `[[https://...]]` used as a wikilink.
+Source: `anti_patterns` array from `wiki/meta/lint-data-YYYY-MM-DD.json`. Not counted toward dead-link total. Each entry is `[[https://...]]` used as a wikilink.
 
 - `[[Source Page]]`: URL-as-wikilink `[[https://example.com]]`. Suggest: convert to a plain `[text](url)` Markdown link.
 ```

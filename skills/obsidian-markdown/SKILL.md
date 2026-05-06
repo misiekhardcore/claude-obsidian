@@ -51,17 +51,13 @@ Embeds use `!` before the wikilink. They display the content inline.
 Callouts are blockquotes with a type keyword. They render as styled alert boxes.
 
 ```markdown
-> [!note]
-> Default informational callout.
+> [!note] Default informational callout.
 
-> [!note] Custom Title
-> Callout with a custom title.
+> [!note] Custom Title Callout with a custom title.
 
-> [!note]- Collapsible (closed by default)
-> Click to expand.
+> [!note]- Collapsible (closed by default) Click to expand.
 
-> [!note]+ Collapsible (open by default)
-> Click to collapse.
+> [!note]+ Collapsible (open by default) Click to collapse.
 ```
 
 ### All callout types
@@ -121,8 +117,7 @@ Rules:
 Two valid forms:
 
 ```markdown
-#tag-name : inline tag anywhere in the body
-#parent/child-tag : nested tag (shows hierarchy in tag pane)
+#tag-name : inline tag anywhere in the body #parent/child-tag : nested tag (shows hierarchy in tag pane)
 ```
 
 In frontmatter:

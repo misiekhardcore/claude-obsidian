@@ -104,17 +104,13 @@ This vault defines **four custom callout types** beyond Obsidian's built-in set 
 Use these in wiki pages to flag important states:
 
 ```markdown
-> [!contradiction] Title
-> [[Page A]] claims X. [[Page B]] says Y. Needs resolution.
+> [!contradiction] Title [[Page A]] claims X. [[Page B]] says Y. Needs resolution.
 
-> [!gap] Title
-> This topic has no source yet. Consider finding one.
+> [!gap] Title This topic has no source yet. Consider finding one.
 
-> [!key-insight] Title
-> The most important takeaway from this section.
+> [!key-insight] Title The most important takeaway from this section.
 
-> [!stale] Title
-> This claim may be outdated. Source was from 2022.
+> [!stale] Title This claim may be outdated. Source was from 2022.
 ```
 
 ### Why custom callouts (vs built-in)
