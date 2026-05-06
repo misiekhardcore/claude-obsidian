@@ -117,7 +117,7 @@ For detailed CLI setup (troubleshooting, Flatpak, sanity checks), see `skills/wi
 
 ## Vault structure
 
-```
+```text
 <vault_path>/
   wiki/          agent-generated knowledge (hot.md, index.md, concepts/, entities/, sources/)
   notes/         inbox: verbatim quick-capture notes (owned by `notes` skill)
@@ -164,6 +164,32 @@ Weekly is a conservative default that matches the `lint` skill's own "after ever
 ### systemd user timer (alternative)
 
 If you prefer systemd timers, create `~/.config/systemd/user/wiki-lint.service` and `~/.config/systemd/user/wiki-lint.timer`, then `systemctl --user enable --now wiki-lint.timer`. The service's `ExecStart=` should point at `/absolute/path/to/claude-obsidian/bin/wiki-lint-cron.sh`.
+
+## Contributing
+
+**Prerequisites:** Node.js ≥ 20 and npm.
+
+After cloning, install the formatting toolchain:
+
+```bash
+npm install
+```
+
+This installs prettier, markdownlint-cli2, husky, and lint-staged and wires the pre-commit hook.
+
+To format all Markdown files locally:
+
+```bash
+npm run format
+```
+
+To check formatting without writing (same as CI):
+
+```bash
+npm run lint
+```
+
+The pre-commit hook runs `lint-staged`, which applies prettier and markdownlint auto-fixes to staged `*.md` files before each commit.
 
 ## More
 
