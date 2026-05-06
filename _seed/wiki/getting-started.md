@@ -33,6 +33,7 @@ The canvas shows you (yellow) interacting through capture surfaces (yellow) that
 ### 1. Drop a source
 
 Put any document into the `.raw/` folder:
+
 - PDFs, markdown files, transcripts, articles
 - Or paste a URL and ask Claude to fetch it
 
@@ -40,7 +41,7 @@ Put any document into the `.raw/` folder:
 
 Tell Claude in any Claude Code session:
 
-```
+```text
 ingest [filename]
 ```
 
@@ -48,7 +49,7 @@ Claude reads the source, creates 8–15 wiki pages under `wiki/`, cross-referenc
 
 ### 3. Ask questions
 
-```
+```text
 what do you know about [topic]?
 ```
 
@@ -81,14 +82,14 @@ After 3–5 ingests, the graph starts to look like a real knowledge network. Cro
 
 ## Key Commands
 
-| You say | Claude does |
-|---------|-------------|
-| `ingest [file]` | Creates 8–15 wiki pages from a source |
-| `what do you know about X?` | Queries the wiki, cites pages |
-| `/save` | Files this conversation as a wiki note |
-| `/autoresearch [topic]` | Searches the web, ingests results autonomously |
-| `lint the wiki` | Health check — finds orphans, gaps, stale links |
-| `update hot cache` | Refreshes the session context summary |
+| You say                     | Claude does                                     |
+| --------------------------- | ----------------------------------------------- |
+| `ingest [file]`             | Creates 8–15 wiki pages from a source           |
+| `what do you know about X?` | Queries the wiki, cites pages                   |
+| `/save`                     | Files this conversation as a wiki note          |
+| `/autoresearch [topic]`     | Searches the web, ingests results autonomously  |
+| `lint the wiki`             | Health check — finds orphans, gaps, stale links |
+| `update hot cache`          | Refreshes the session context summary           |
 
 ---
 
@@ -100,4 +101,4 @@ After 3–5 ingests, the graph starts to look like a real knowledge network. Cro
 
 ---
 
-*Built on the LLM Wiki pattern by Andrej Karpathy: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f*
+_Built on the LLM Wiki pattern by Andrej Karpathy: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f_

@@ -22,7 +22,7 @@ Uses `create-or-append` and `frontmatter-set` (see `${CLAUDE_PLUGIN_ROOT}/_share
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with:
 
-```
+```text
 No vault configured — run /wiki init first.
 ```
 
@@ -73,9 +73,9 @@ Steps:
    ```
 
 8. **Confirm** with exactly one line:
-    ```
-    Logged to daily/YYYY-MM-DD.md
-    ```
+   ```text
+   Logged to daily/YYYY-MM-DD.md
+   ```
 
 Do **not** print the diff, the reasoning, or any other output. One line only.
 
@@ -98,7 +98,7 @@ See [§2 Frontmatter schema — daily shape](${CLAUDE_PLUGIN_ROOT}/_shared/captu
 
 **First call of the day (file does not exist):**
 
-```
+```text
 user> /daily shipped the /note slug rewrite
 # daily/2026-04-27.md created with frontmatter + ## Captures heading
 assistant> Logged to daily/2026-04-27.md
@@ -106,7 +106,7 @@ assistant> Logged to daily/2026-04-27.md
 
 **Subsequent call (file exists, heading present):**
 
-```
+```text
 user> log to today: pairing session with @dana on the wiki lint refactor
 # one bullet appended under ## Captures
 assistant> Logged to daily/2026-04-27.md
@@ -114,7 +114,7 @@ assistant> Logged to daily/2026-04-27.md
 
 **Two calls in the same minute:**
 
-```
+```text
 user> /daily standup done
 assistant> Logged to daily/2026-04-27.md
 
@@ -125,7 +125,7 @@ assistant> Logged to daily/2026-04-27.md
 
 **No vault configured:**
 
-```
+```text
 user> /daily fixed the flaky test
 assistant> No vault configured — run /wiki init first.
 ```

@@ -20,29 +20,46 @@ Create this file at `.obsidian/snippets/vault-colors.css` inside the vault:
 }
 
 /* Folder colors in file explorer */
-.nav-folder-title[data-path^="wiki/domains"]     { color: var(--wiki-1); }
-.nav-folder-title[data-path^="wiki/entities"]    { color: var(--wiki-2); }
-.nav-folder-title[data-path^="wiki/concepts"]    { color: var(--wiki-3); }
-.nav-folder-title[data-path^="wiki/sources"]     { color: var(--wiki-4); }
-.nav-folder-title[data-path^="wiki/questions"]   { color: var(--wiki-5); }
-.nav-folder-title[data-path^="wiki/comparisons"] { color: var(--wiki-6); }
-.nav-folder-title[data-path^="wiki/meta"]        { color: var(--wiki-7); }
-.nav-folder-title[data-path=".raw"]              { color: #808080; opacity: 0.6; }
+.nav-folder-title[data-path^="wiki/domains"] {
+  color: var(--wiki-1);
+}
+.nav-folder-title[data-path^="wiki/entities"] {
+  color: var(--wiki-2);
+}
+.nav-folder-title[data-path^="wiki/concepts"] {
+  color: var(--wiki-3);
+}
+.nav-folder-title[data-path^="wiki/sources"] {
+  color: var(--wiki-4);
+}
+.nav-folder-title[data-path^="wiki/questions"] {
+  color: var(--wiki-5);
+}
+.nav-folder-title[data-path^="wiki/comparisons"] {
+  color: var(--wiki-6);
+}
+.nav-folder-title[data-path^="wiki/meta"] {
+  color: var(--wiki-7);
+}
+.nav-folder-title[data-path=".raw"] {
+  color: #808080;
+  opacity: 0.6;
+}
 
 /* Custom callouts */
-.callout[data-callout='contradiction'] {
+.callout[data-callout="contradiction"] {
   --callout-color: 209, 105, 105;
   --callout-icon: lucide-alert-triangle;
 }
-.callout[data-callout='gap'] {
+.callout[data-callout="gap"] {
   --callout-color: 220, 220, 170;
   --callout-icon: lucide-help-circle;
 }
-.callout[data-callout='key-insight'] {
+.callout[data-callout="key-insight"] {
   --callout-color: 79, 193, 255;
   --callout-icon: lucide-lightbulb;
 }
-.callout[data-callout='stale'] {
+.callout[data-callout="stale"] {
   --callout-color: 128, 128, 128;
   --callout-icon: lucide-clock;
 }
@@ -60,14 +77,14 @@ Tell the user: Settings > Appearance > CSS Snippets > open folder > paste the fi
 
 Guide the user to set these in Graph View settings (click the settings icon in the graph view):
 
-| Query | Color |
-|-------|-------|
-| `path:wiki/domains` | Blue (`#4fc1ff`) |
-| `path:wiki/entities` | Purple (`#c586c0`) |
-| `path:wiki/concepts` | Yellow (`#dcdcaa`) |
-| `path:wiki/sources` | Orange (`#ce9178`) |
-| `path:wiki/questions` | Green (`#6a9955`) |
-| `path:.raw` | Gray (dimmed) |
+| Query                 | Color              |
+| --------------------- | ------------------ |
+| `path:wiki/domains`   | Blue (`#4fc1ff`)   |
+| `path:wiki/entities`  | Purple (`#c586c0`) |
+| `path:wiki/concepts`  | Yellow (`#dcdcaa`) |
+| `path:wiki/sources`   | Orange (`#ce9178`) |
+| `path:wiki/questions` | Green (`#6a9955`)  |
+| `path:.raw`           | Gray (dimmed)      |
 
 ---
 
@@ -75,12 +92,12 @@ Guide the user to set these in Graph View settings (click the settings icon in t
 
 This vault defines **four custom callout types** beyond Obsidian's built-in set (`note`, `tip`, `warning`, `info`, `todo`, `success`, `question`, `failure`, `danger`, `bug`, `example`, `quote`). They render correctly **only when `vault-colors.css` is enabled**. Without the snippet, they fall back to default callout styling (still readable, just plain).
 
-| Custom callout | Color | Icon | Use for |
-|---|---|---|---|
-| `contradiction` | reddish-brown (rgb 209,105,105) | `lucide-alert-triangle` | New source conflicts with existing claim |
-| `gap` | beige (rgb 220,220,170) | `lucide-help-circle` | Topic has no source yet |
-| `key-insight` | bright blue (rgb 79,193,255) | `lucide-lightbulb` | Important takeaway worth highlighting |
-| `stale` | gray (rgb 128,128,128) | `lucide-clock` | Claim may be outdated, source older than threshold |
+| Custom callout  | Color                           | Icon                    | Use for                                            |
+| --------------- | ------------------------------- | ----------------------- | -------------------------------------------------- |
+| `contradiction` | reddish-brown (rgb 209,105,105) | `lucide-alert-triangle` | New source conflicts with existing claim           |
+| `gap`           | beige (rgb 220,220,170)         | `lucide-help-circle`    | Topic has no source yet                            |
+| `key-insight`   | bright blue (rgb 79,193,255)    | `lucide-lightbulb`      | Important takeaway worth highlighting              |
+| `stale`         | gray (rgb 128,128,128)          | `lucide-clock`          | Claim may be outdated, source older than threshold |
 
 ### Usage
 
@@ -110,6 +127,7 @@ The four custom types map to wiki-specific concepts that don't fit cleanly into 
 - `stale` has no built-in equivalent: it signals time-based decay of a claim.
 
 If you don't want custom callouts, replace them with built-ins:
+
 - `[!contradiction]` → `[!warning] Contradiction`
 - `[!gap]` → `[!question] Gap`
 - `[!key-insight]` → `[!tip] Key insight`

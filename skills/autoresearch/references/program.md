@@ -53,14 +53,17 @@ Always note the source date for factual claims. Mark claims from sources older t
 [Add domain-specific instructions here. Examples:]
 
 For AI/tech research:
+
 - Prefer: arXiv, official GitHub repos, official product documentation, Hacker News discussions with high karma
 - Note: LLM benchmarks are often gamed: treat leaderboard claims as low confidence unless independently verified
 
 For business/market research:
+
 - Prefer: company filings, Crunchbase, Bloomberg, verified industry reports
 - Flag: press releases as low confidence without independent verification
 
 For medical/health research:
+
 - Prefer: PubMed, Cochrane reviews, peer-reviewed clinical trials
 - Always note: sample size, study type (RCT vs observational), and recency
 
@@ -69,6 +72,7 @@ For medical/health research:
 ## Exclusions
 
 Do not cite as high-confidence sources:
+
 - Reddit posts or forums (use as pointers to primary sources only)
 - Social media posts
 - Undated web pages

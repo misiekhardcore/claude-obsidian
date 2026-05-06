@@ -19,7 +19,7 @@ git commit -m "Initial vault scaffold"
 
 The root `.gitignore` in this repo already covers the right exclusions:
 
-```
+```text
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 .smart-connections/

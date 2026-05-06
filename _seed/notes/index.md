@@ -1,8 +1,8 @@
 ---
 type: meta
 title: "Notes Inbox"
-created: {{today}}
-updated: {{today}}
+created: { { today } }
+updated: { { today } }
 tags:
   - meta
   - notes

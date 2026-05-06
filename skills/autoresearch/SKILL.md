@@ -33,7 +33,7 @@ All vault writes (sources, concepts, entities, synthesis page, index, log, hot c
 
 ## Research Loop
 
-```
+```text
 Input: topic (from user command)
 
 Round 1. Broad search
@@ -61,22 +61,27 @@ Max rounds: 3 (as set in program.md). Stop when depth is reached or max rounds h
 After research is complete, create these pages:
 
 **wiki/sources/**. One page per major reference found
+
 - Use source frontmatter (type, source_type, author, date_published, url, confidence, key_claims)
 - Body: summary of the source, what it contributes to the topic
 
 **wiki/concepts/**. One page per significant concept extracted
+
 - Only create a page if the concept is substantive enough to stand alone
 - Check the index first: update existing concept pages rather than creating duplicates
 
 **wiki/entities/**. One page per significant person, org, or product identified
+
 - Check the index first: update existing entity pages
 
 **wiki/questions/**. One synthesis page titled "Research: [Topic]"
+
 - This is the master synthesis. Everything comes together here.
 - Sections: Overview, Key Findings, Entities, Concepts, Contradictions, Open Questions, Sources
 - Full frontmatter with related links to all pages created in this session
 
 **wiki/trails/**. Exactly one `type: trail` page per run, regardless of atomic-note count
+
 - Filename: `wiki/trails/Trail: [Topic] (YYYY-MM-DD).md` (the date suffix uses the run date, so multiple runs on the same topic produce distinct files — never merge or overwrite).
 - Emit immediately **after** the synthesis page is written and **before** any `## After Filing` step (index, log, hot.md). The index and log entries naturally pick the trail up from this position.
 - Body is an ordered Markdown list. One step per atomic note created in this run, in argument order. Each step has exactly one `[[wikilink]]` to that atomic note plus a single LLM-synthesized one-line annotation describing the note's role in the argument (why this note next, what it contributes).
@@ -107,27 +112,34 @@ sources:
 # Research: [Topic]
 
 ## Overview
+
 [2-3 sentence summary of what was found]
 
 ## Key Findings
+
 - Finding 1 (Source: [[Source Page]])
 - Finding 2 (Source: [[Source Page]])
 - ...
 
 ## Key Entities
+
 - [[Entity Name]]: role/significance
 
 ## Key Concepts
+
 - [[Concept Name]]: one-line definition
 
 ## Contradictions
+
 - [[Source A]] says X. [[Source B]] says Y. [Brief note on which is more credible and why]
 
 ## Open Questions
+
 - [Question that research didn't fully answer]
 - [Gap that needs more sources]
 
 ## Sources
+
 - [[Source 1]]: author, date
 - [[Source 2]]: author, date
 ```
@@ -175,7 +187,7 @@ The body must be a single ordered list. Each list item must contain exactly one 
 
 1. Update `wiki/index.md`. Add all new pages to the right sections
 2. Append to `wiki/log.md` (at the TOP):
-   ```
+   ```text
    ## [YYYY-MM-DD] autoresearch | [Topic]
    - Rounds: N
    - Sources found: N
@@ -192,7 +204,7 @@ The body must be a single ordered list. Each list item must contain exactly one 
 
 After filing everything:
 
-```
+```text
 Research complete: [Topic]
 
 Rounds: N | Searches: N | Pages created: N
@@ -217,6 +229,7 @@ Open questions filed: N
 ## Constraints
 
 Follow the limits in `references/program.md`:
+
 - Max rounds (default: 3)
 - Max pages per session (default: 15)
 - Confidence scoring rules

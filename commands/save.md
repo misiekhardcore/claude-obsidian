@@ -5,6 +5,7 @@ description: Save the current conversation or a specific insight into the wiki v
 Read the `save` skill. Then run the save workflow for this conversation.
 
 Usage:
+
 - `/save` — analyze the full conversation and save the most valuable content
 - `/save [name]` — save with a specific note title (skip the naming question)
 - `/save session` — save a complete session summary

@@ -10,11 +10,11 @@ Validate ALL image paths before any vision-LLM call or file move:
 
 - Path exists and is a readable regular file → continue.
 - Path exists but unsupported extension:
-  ```
+  ```text
   Unsupported input type: <ext>. /braindump and capture skills accept text, markdown, and image inputs.
   ```
 - Path missing, unreadable, or not a regular file:
-  ```
+  ```text
   Image not found or unreadable: <path>
   ```
 
@@ -42,7 +42,7 @@ Single LLM call including all images + any text argument in the user's input.
 
 On failure:
 
-```
+```text
 Vision processing failed: <reason>. Image not moved, note not created.
 ```
 
@@ -65,7 +65,7 @@ Move (not copy) images from their source path to `<vault_root>/_attachments/`. N
 
 Embed images in note body using Obsidian embed syntax:
 
-```
+```text
 ![[filename.png]]
 ```
 

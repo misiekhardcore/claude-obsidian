@@ -28,13 +28,13 @@ See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, the `overwrite` flag
 
 Determine the best type from the conversation content:
 
-| Type | Folder | Use when |
-|------|--------|---------|
+| Type      | Folder          | Use when                                                          |
+| --------- | --------------- | ----------------------------------------------------------------- |
 | synthesis | wiki/questions/ | Multi-step analysis, comparison, or answer to a specific question |
-| concept | wiki/concepts/ | Explaining or defining an idea, pattern, or framework |
-| source | wiki/sources/ | Summary of external material discussed in the session |
-| decision | wiki/meta/ | Architectural, project, or strategic decision that was made |
-| session | wiki/meta/ | Full session summary: captures everything discussed |
+| concept   | wiki/concepts/  | Explaining or defining an idea, pattern, or framework             |
+| source    | wiki/sources/   | Summary of external material discussed in the session             |
+| decision  | wiki/meta/      | Architectural, project, or strategic decision that was made       |
+| session   | wiki/meta/      | Full session summary: captures everything discussed               |
 
 If the user specifies a type, use that. If not, pick the best fit based on the content. When in doubt, use `synthesis`.
 
@@ -58,24 +58,26 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
 
    **Type → section** (deterministic; do not choose freehand):
 
-   | Note type | Target section |
-   |-----------|----------------|
-   | `concept` | `## Concepts` |
-   | `source` | `## Sources` |
-   | `decision` | `## Plans & Decisions` |
-   | `synthesis` | `## Questions` |
-   | `session` | *(skip — not indexed; chronology lives in `wiki/log.md` and `daily/`)* |
+   | Note type   | Target section                                                         |
+   | ----------- | ---------------------------------------------------------------------- |
+   | `concept`   | `## Concepts`                                                          |
+   | `source`    | `## Sources`                                                           |
+   | `decision`  | `## Plans & Decisions`                                                 |
+   | `synthesis` | `## Questions`                                                         |
+   | `session`   | _(skip — not indexed; chronology lives in `wiki/log.md` and `daily/`)_ |
 
    **Entry format:** `- [[<slug>|<Display Name>]] — <one-line description>`
    Omit `|<Display Name>` when the display name matches the slug exactly (after converting hyphens/underscores to spaces and title-casing).
 
    **Pattern:** delegate the read-splice-overwrite to `scripts/index-section-insert.sh`. It reads via `obsidian read`, splices the entry on the line immediately after the matching heading, and writes back via `obsidian create overwrite=true`. If the heading is absent, the script appends `<heading>\n<entry>` at the end of the file.
+
    ```bash
    # section is determined from the type table above
    new_entry="- [[$slug|$display_name]] — $description"
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-section-insert.sh" \
      wiki/index.md "$section" "$new_entry"
    ```
+
 8. **Prepend** the latest entry to `wiki/log.md` (new entry goes at the TOP):
    ```bash
    obsidian prepend \
@@ -106,12 +108,14 @@ sources:
 ```
 
 For `question` type, add:
+
 ```yaml
 question: "The original query as asked."
 answer_quality: solid
 ```
 
 For `decision` type, add:
+
 ```yaml
 decision_date: YYYY-MM-DD
 status: active
@@ -137,6 +141,7 @@ Do **not** write a `domain:` field on any leaf you save. Hub membership is forwa
 ## What to Save vs. Skip
 
 Save:
+
 - Non-obvious insights or synthesis
 - Decisions with rationale
 - Analyses that took significant effort
@@ -144,6 +149,7 @@ Save:
 - Research findings
 
 Skip:
+
 - Mechanical Q&A (lookup questions with obvious answers)
 - Setup steps already documented elsewhere
 - Temporary debugging sessions with no lasting insight

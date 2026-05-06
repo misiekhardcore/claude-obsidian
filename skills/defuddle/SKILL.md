@@ -25,24 +25,30 @@ Verify: `defuddle --version`
 ## Usage
 
 ### Clean a URL directly
+
 ```bash
 defuddle https://example.com/article
 ```
+
 Outputs clean markdown to stdout.
 
 ### Save to .raw/
+
 ```bash
 defuddle https://example.com/article > .raw/articles/article-slug-$(date +%Y-%m-%d).md
 ```
 
 ### Add frontmatter header after saving
+
 After running defuddle, prepend the source URL and fetch date:
+
 ```bash
 SLUG="article-slug-$(date +%Y-%m-%d)"
 { echo "---"; echo "source_url: https://example.com/article"; echo "fetched: $(date +%Y-%m-%d)"; echo "---"; echo ""; defuddle https://example.com/article; } > .raw/articles/$SLUG.md
 ```
 
 ### Clean a local HTML file
+
 ```bash
 defuddle page.html
 ```
@@ -52,11 +58,13 @@ defuddle page.html
 ## When to Use
 
 **Use defuddle when:**
+
 - Ingesting a news article, blog post, or documentation page from a URL
 - The page has a lot of surrounding content (most web pages do)
 - You want to stay within token budget on a long article
 
 **Skip defuddle when:**
+
 - The source is already a clean markdown or PDF file
 - The page is a dashboard, app, or structured data (defuddle expects article-style content)
 - defuddle is not installed and the article is short enough to process raw
@@ -80,5 +88,6 @@ If not installed: use WebFetch directly. The content will be less clean but stil
 The `/ingest` skill checks for defuddle automatically when a URL is passed. You do not need to run defuddle manually before ingesting a URL. The ingest skill will call it if available.
 
 To manually clean a page and save before ingesting:
+
 1. Run the save command above
 2. Then: `ingest .raw/articles/[slug].md`

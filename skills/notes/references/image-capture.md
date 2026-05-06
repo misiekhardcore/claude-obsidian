@@ -27,7 +27,7 @@ On MATCH path: use the LLM description from the initial call as the appended bod
 
 The note body is the LLM-generated `description`. Embed lines appear at the end, in input order:
 
-```
+```text
 <LLM description>
 
 ![[note-slug.png]]

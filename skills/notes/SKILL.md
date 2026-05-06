@@ -82,7 +82,7 @@ Steps:
 2. Sort by `updated` descending.
 3. Render flat reverse-chronological bullets:
 
-   ```
+   ```text
    Pending notes (N):
 
    - [ ] YYYY-MM-DD [source_project] title
@@ -110,7 +110,7 @@ Steps:
 1. Enumerate pending notes (skip `status: deferred` unless `--include-deferred`). Sort by `updated` ascending — oldest first. If there are no notes to process, print `Inbox is empty.` and exit.
 2. For each note, read full frontmatter + body and display:
 
-   ```
+   ```text
    [N/total] YYYY-MM-DD [source_project]
    title: <title>
    body:
@@ -151,14 +151,14 @@ See [§6 Index patching](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-ind
 
 **Capture (NEW):**
 
-```
+```text
 user> /note inbox count missing from /wiki status
 assistant> Captured to notes/2026-04-25-inbox-count-missing-from-wiki-status.md
 ```
 
 **Capture (NEW, filler stripped from title):**
 
-```
+```text
 user> /note we need to check why claude-workflow is not using 'wt' for worktrees but the git cli directly
 # title summarised to "claude-workflow uses git CLI instead of wt for worktrees"
 # slug exceeds 40 chars; truncated at last `-` before char 40
@@ -167,14 +167,14 @@ assistant> Captured to notes/2026-04-26-claude-workflow-uses-git-cli-instead.md
 
 **Capture (MATCH-append, scope unchanged):**
 
-```
+```text
 user> note this: still seeing the same flaky behaviour on macOS
 assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
 ```
 
 **Capture (MATCH-append with title rewrite):**
 
-```
+```text
 user> /dump same issue now reproduces on Linux too
 # existing note title was "flaky macOS runner"; new content broadens scope
 assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
@@ -183,7 +183,7 @@ assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
 
 **List, filtered:**
 
-```
+```text
 user> /note list --project=claude-obsidian
 assistant>
 Pending notes (2):
@@ -198,7 +198,7 @@ Deferred (1):
 
 **Process:**
 
-```
+```text
 user> /note process
 assistant>
 [1/3] 2026-04-25 [claude-obsidian]
@@ -214,7 +214,7 @@ assistant> Saved as [[Confidence threshold reuse]] in wiki/concepts/. Note delet
 
 **URL redirect (yes):**
 
-```
+```text
 user> /note https://example.com/article
 assistant> Detected URL: https://example.com/article. Ingest via /ingest? [y/n]
 user> y
@@ -224,7 +224,7 @@ assistant> Ingested via /ingest: [[Article Title]]
 
 **URL redirect (no):**
 
-```
+```text
 user> /note https://example.com/article
 assistant> Detected URL: https://example.com/article. Ingest via /ingest? [y/n]
 user> n

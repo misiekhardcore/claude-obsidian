@@ -4,8 +4,8 @@ title: "Example Entity"
 entity_type: person
 role: "Illustrative example"
 first_mentioned: "[[example-source]]"
-created: {{today}}
-updated: {{today}}
+created: { { today } }
+updated: { { today } }
 tags:
   - entity
   - example

@@ -30,23 +30,23 @@ obsidian read path=wiki/hot.md
 
 The upstream CLI always returns exit 0. The wrapper normalizes:
 
-| Code | Meaning | stdout first-line pattern |
-|------|---------|--------------------------|
-| 0 | Success | Any non-error output, or empty stdout |
-| 1 | Generic CLI error | `Error: ...` |
-| 2 | Vault not found | `Vault not found.` |
-| 3 | Pre-flight failed | (wrapper emits to stderr; binary missing or Obsidian not running) |
-| 4 | Vault resolution failed | (wrapper emits to stderr; `resolve-vault.sh` exited non-zero) |
+| Code | Meaning                 | stdout first-line pattern                                         |
+| ---- | ----------------------- | ----------------------------------------------------------------- |
+| 0    | Success                 | Any non-error output, or empty stdout                             |
+| 1    | Generic CLI error       | `Error: ...`                                                      |
+| 2    | Vault not found         | `Vault not found.`                                                |
+| 3    | Pre-flight failed       | (wrapper emits to stderr; binary missing or Obsidian not running) |
+| 4    | Vault resolution failed | (wrapper emits to stderr; `resolve-vault.sh` exited non-zero)     |
 
 Hooks that want fail-soft behavior chain `|| exit 0`. Skills that need to act on errors check `$?` after the call.
 
 **Known error patterns detected as exit 1:**
 
-| Error message (stdout) | Trigger |
-|------------------------|---------|
-| `Error: File "<path>" not found.` | `read`/`append`/`prepend` against a missing file |
-| `Error: Command "<verb>" not found. ...` | Unknown verb or bad `command id=` |
-| `Error: No active file. Use file=<name> or path=<path> to specify a file.` | Verb called with neither `file=` nor `path=` |
+| Error message (stdout)                                                     | Trigger                                          |
+| -------------------------------------------------------------------------- | ------------------------------------------------ |
+| `Error: File "<path>" not found.`                                          | `read`/`append`/`prepend` against a missing file |
+| `Error: Command "<verb>" not found. ...`                                   | Unknown verb or bad `command id=`                |
+| `Error: No active file. Use file=<name> or path=<path> to specify a file.` | Verb called with neither `file=` nor `path=`     |
 
 ---
 
@@ -54,26 +54,26 @@ Hooks that want fail-soft behavior chain `|| exit 0`. Skills that need to act on
 
 Locked by the empirical spike. Skills must not override these without a documented reason.
 
-| Verb | Output format | Notes |
-|------|--------------|-------|
-| `read` | plain text | File contents verbatim |
-| `create` | `Created: <path>` | Confirmation line; use `overwrite` flag to replace existing |
-| `append` | `Appended to: <path>` | Confirmation line |
-| `prepend` | `Prepended to: <path>` | Confirmation line |
-| `backlinks` | **json** | Override from CLI default (tsv). Array of `{"file": "<path>"}` |
-| `unresolved` | **json** | Array of `{"link": "<link-text>"}` |
-| `search` | json | Array of match objects |
-| `search:context` | plain text | Contextual snippets |
-| `orphans` | plain text | One vault-relative path per line; **no format=json support** |
-| `deadends` | plain text | One vault-relative path per line; **no format=json support** |
-| `tasks` | plain text | Markdown task-list lines; **no format=json support** |
-| `tags` | plain text | One tag per line (with `#` prefix); **no format=json support** |
-| `properties` | plain text | YAML frontmatter block; **no format=json support** |
-| `bases` | plain text | One `.base` path per line |
-| `commands` | plain text | One `plugin:command-id` per line |
-| `outline` | plain text | Heading hierarchy |
-| `create-or-append` | plain text | **Wrapper-only** verb — see §3.1 |
-| `frontmatter-set` | plain text | **Wrapper-only** verb — see §3.2 |
+| Verb               | Output format          | Notes                                                          |
+| ------------------ | ---------------------- | -------------------------------------------------------------- |
+| `read`             | plain text             | File contents verbatim                                         |
+| `create`           | `Created: <path>`      | Confirmation line; use `overwrite` flag to replace existing    |
+| `append`           | `Appended to: <path>`  | Confirmation line                                              |
+| `prepend`          | `Prepended to: <path>` | Confirmation line                                              |
+| `backlinks`        | **json**               | Override from CLI default (tsv). Array of `{"file": "<path>"}` |
+| `unresolved`       | **json**               | Array of `{"link": "<link-text>"}`                             |
+| `search`           | json                   | Array of match objects                                         |
+| `search:context`   | plain text             | Contextual snippets                                            |
+| `orphans`          | plain text             | One vault-relative path per line; **no format=json support**   |
+| `deadends`         | plain text             | One vault-relative path per line; **no format=json support**   |
+| `tasks`            | plain text             | Markdown task-list lines; **no format=json support**           |
+| `tags`             | plain text             | One tag per line (with `#` prefix); **no format=json support** |
+| `properties`       | plain text             | YAML frontmatter block; **no format=json support**             |
+| `bases`            | plain text             | One `.base` path per line                                      |
+| `commands`         | plain text             | One `plugin:command-id` per line                               |
+| `outline`          | plain text             | Heading hierarchy                                              |
+| `create-or-append` | plain text             | **Wrapper-only** verb — see §3.1                               |
+| `frontmatter-set`  | plain text             | **Wrapper-only** verb — see §3.2                               |
 
 **Multiline `content=`:** `\n` and `\t` escapes in `content=` values round-trip correctly (verified by spike `ingest-create-multiline`). Use `\n` for newlines in `create`, `append`, `prepend`.
 
@@ -99,14 +99,14 @@ obsidian create-or-append \
   content="- HH:MM <verbatim text>"
 ```
 
-| Aspect | Behavior |
-|--------|---------|
-| File missing | Writes `template` via `obsidian create`, then appends `content`. |
-| File exists | Appends `content` only; `template` is ignored. |
-| `template=` | **Required.** No caller in the codebase needs an empty template; YAGNI. |
-| Output (missing → created) | `Created and appended: <path>` |
-| Output (exists → append) | `Appended to: <path>` |
-| Exit | 0 success; 1 if any underlying `create` or `append` fails. |
+| Aspect                     | Behavior                                                                |
+| -------------------------- | ----------------------------------------------------------------------- |
+| File missing               | Writes `template` via `obsidian create`, then appends `content`.        |
+| File exists                | Appends `content` only; `template` is ignored.                          |
+| `template=`                | **Required.** No caller in the codebase needs an empty template; YAGNI. |
+| Output (missing → created) | `Created and appended: <path>`                                          |
+| Output (exists → append)   | `Appended to: <path>`                                                   |
+| Exit                       | 0 success; 1 if any underlying `create` or `append` fails.              |
 
 The verb does **not** read the file body and does **not** touch frontmatter. Use `frontmatter-set` (§3.2) for frontmatter mutations like bumping `updated:`.
 
@@ -121,13 +121,13 @@ obsidian frontmatter-set \
   value=YYYY-MM-DD
 ```
 
-| Aspect | Behavior |
-|--------|---------|
-| Key present | Replace its value on the first occurrence in the frontmatter block. |
-| Key absent | Insert `key: value` on the line before the closing `---`. |
-| Body | Untouched. Bullets, headings, code fences are passed through verbatim. |
-| Output | `Set frontmatter: <path>` |
-| Exit | 0 success; 1 if the file is missing, has no opening `---`, or has no closing `---`. |
+| Aspect      | Behavior                                                                            |
+| ----------- | ----------------------------------------------------------------------------------- |
+| Key present | Replace its value on the first occurrence in the frontmatter block.                 |
+| Key absent  | Insert `key: value` on the line before the closing `---`.                           |
+| Body        | Untouched. Bullets, headings, code fences are passed through verbatim.              |
+| Output      | `Set frontmatter: <path>`                                                           |
+| Exit        | 0 success; 1 if the file is missing, has no opening `---`, or has no closing `---`. |
 
 **Out of scope (errors silently or behaves naively):** multi-line YAML values (folded `>`, literal `|`), quoted strings whose content includes `:`, nested mappings. The verb assumes a flat YAML header per `${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md` §2.
 
@@ -159,12 +159,12 @@ The CLI requires Obsidian to be running. Cron invocations from a closed-laptop c
 
 The following paths bypass the CLI intentionally. Each bypass is load-bearing; do not remove without verifying the call sites.
 
-| Path / pattern | Why CLI is bypassed |
-|----------------|---------------------|
-| `.raw/.manifest.json` | Bookkeeping JSON for the raw inbox; not a wiki page. Mutated via `jq + mv` in-place. The CLI has no JSON-mutate verb. |
-| `_attachments/images/**` | Binary writes (canvas, defuddle). The CLI has no binary upload verb. |
-| Cron-time vault writes | Obsidian is closed; CLI is unreachable. See §5 and #52. |
-| `bin/setup-vault.sh`, `bin/seed-demo.sh` | Bootstrap scripts that run before vault registration. The vault is not yet addressable by the CLI. |
+| Path / pattern                           | Why CLI is bypassed                                                                                                   |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `.raw/.manifest.json`                    | Bookkeeping JSON for the raw inbox; not a wiki page. Mutated via `jq + mv` in-place. The CLI has no JSON-mutate verb. |
+| `_attachments/images/**`                 | Binary writes (canvas, defuddle). The CLI has no binary upload verb.                                                  |
+| Cron-time vault writes                   | Obsidian is closed; CLI is unreachable. See §5 and #52.                                                               |
+| `bin/setup-vault.sh`, `bin/seed-demo.sh` | Bootstrap scripts that run before vault registration. The vault is not yet addressable by the CLI.                    |
 
 ---
 
@@ -172,16 +172,17 @@ The following paths bypass the CLI intentionally. Each bypass is load-bearing; d
 
 Canvas files (`.canvas`) are first-class vault documents, but the Obsidian CLI has no canvas-specific verbs. Skills that need to work with canvases use a combination of standard verbs and direct filesystem reads.
 
-| Operation | Approach |
-|-----------|----------|
-| List canvas files | `obsidian files dir=wiki/canvases format=json` — returns `[{"path": "wiki/canvases/foo.canvas", ...}]` |
-| Read canvas content | Direct filesystem read (documented bypass — canvas JSON is not Markdown; `obsidian read` returns raw JSON but the `content=` escape asymmetry in §3 does not affect reads) |
-| Extract wikilinks | Parse `.nodes[]?.text` JSON fields for `[[...]]` patterns. `obsidian unresolved` does **not** cover canvas wikilinks — a separate pass using the filesystem resolver pool is required. |
-| Verify canvas dead links | Build a resolver pool from `find $VAULT -name "*.md" -o -name "*.canvas" ...` and test each extracted link against it. Reference implementation: `scripts/lint-scan.sh`. |
-| Write canvas files | Direct filesystem write (documented bypass — canvas JSON `text` fields contain literal `\n` sequences that `content=` would corrupt per §3 escape asymmetry) |
-| Backlinks to a canvas | `obsidian backlinks path=wiki/canvases/foo.canvas format=json` — works identically to `.md` files |
+| Operation                | Approach                                                                                                                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| List canvas files        | `obsidian files dir=wiki/canvases format=json` — returns `[{"path": "wiki/canvases/foo.canvas", ...}]`                                                                                 |
+| Read canvas content      | Direct filesystem read (documented bypass — canvas JSON is not Markdown; `obsidian read` returns raw JSON but the `content=` escape asymmetry in §3 does not affect reads)             |
+| Extract wikilinks        | Parse `.nodes[]?.text` JSON fields for `[[...]]` patterns. `obsidian unresolved` does **not** cover canvas wikilinks — a separate pass using the filesystem resolver pool is required. |
+| Verify canvas dead links | Build a resolver pool from `find $VAULT -name "*.md" -o -name "*.canvas" ...` and test each extracted link against it. Reference implementation: `scripts/lint-scan.sh`.               |
+| Write canvas files       | Direct filesystem write (documented bypass — canvas JSON `text` fields contain literal `\n` sequences that `content=` would corrupt per §3 escape asymmetry)                           |
+| Backlinks to a canvas    | `obsidian backlinks path=wiki/canvases/foo.canvas format=json` — works identically to `.md` files                                                                                      |
 
 **`obsidian files` verb** (not in the §3 table; no locked output format):
+
 - `obsidian files dir=<vault-relative-dir> format=json` → `[{"path": "<vault-relative-path>", ...}]`
 - Works for any directory: `wiki/canvases/`, `wiki/meta/`, `notes/`, etc.
 - Extension filtering is not supported by the verb — filter client-side with `jq select(.path | endswith(".canvas"))`

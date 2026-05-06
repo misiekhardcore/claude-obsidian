@@ -29,7 +29,7 @@ This is both a Claude Code plugin and an Obsidian vault. To use it:
 
 Your vault must contain:
 
-```
+```text
 wiki/              Claude-generated knowledge base
   hot.md           Recent context cache (read first at session start)
   index.md         Master index of all pages
@@ -76,22 +76,22 @@ All skills live in `skills/<name>/SKILL.md` and are auto-discovered by Claude Co
 
 ## Available Skills
 
-| Skill | Trigger phrases |
-|---|---|
-| `wiki` | `/wiki`, set up wiki, scaffold vault, check setup |
-| `ingest` | ingest, ingest this url, ingest this image, batch ingest |
-| `query` | query, what do you know about, query quick:, query deep: |
-| `lint` | lint the wiki, health check, find orphans, dead links |
-| `save` | `/save`, file this conversation, save insight |
-| `notes` | `/note`, `/dump`, note this, todo:, show my inbox, `/note process` |
-| `daily` | `/daily`, daily note this, log to today, log this, add to today's log |
-| `daily-close` | `/daily-close`, close today, wrap up today, synthesize today |
-| `braindump` | `/braindump`, brain dump this, dump the following thoughts, dump these thoughts, braindump:, split this into notes |
-| `autoresearch` | autoresearch, autonomous research loop |
-| `canvas` | `/canvas`, add to canvas, create canvas |
-| `defuddle` | clean this url, defuddle, strip clutter |
-| `obsidian-markdown` | obsidian syntax, wikilink, callout, embed |
-| `obsidian-bases` | obsidian bases, .base file, dynamic table |
+| Skill               | Trigger phrases                                                                                                    |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `wiki`              | `/wiki`, set up wiki, scaffold vault, check setup                                                                  |
+| `ingest`            | ingest, ingest this url, ingest this image, batch ingest                                                           |
+| `query`             | query, what do you know about, query quick:, query deep:                                                           |
+| `lint`              | lint the wiki, health check, find orphans, dead links                                                              |
+| `save`              | `/save`, file this conversation, save insight                                                                      |
+| `notes`             | `/note`, `/dump`, note this, todo:, show my inbox, `/note process`                                                 |
+| `daily`             | `/daily`, daily note this, log to today, log this, add to today's log                                              |
+| `daily-close`       | `/daily-close`, close today, wrap up today, synthesize today                                                       |
+| `braindump`         | `/braindump`, brain dump this, dump the following thoughts, dump these thoughts, braindump:, split this into notes |
+| `autoresearch`      | autoresearch, autonomous research loop                                                                             |
+| `canvas`            | `/canvas`, add to canvas, create canvas                                                                            |
+| `defuddle`          | clean this url, defuddle, strip clutter                                                                            |
+| `obsidian-markdown` | obsidian syntax, wikilink, callout, embed                                                                          |
+| `obsidian-bases`    | obsidian bases, .base file, dynamic table                                                                          |
 
 ## Bootstrap
 
@@ -108,6 +108,7 @@ When the user opens this plugin for the first time:
 ## Ingest Rules
 
 Single-source ingests via `/wiki-ingest` require an interactive discussion before writing pages. After reading the source, Claude must ask:
+
 - What to emphasize
 - How granular to go
 - What existing wiki context to link against
@@ -144,6 +145,7 @@ To reference this vault from another Claude Code project, add to that project's 
 Path: /path/to/vault
 
 When you need context:
+
 1. Read wiki/hot.md first (recent context)
 2. If not enough, read wiki/index.md
 3. Drill into domain-specific pages as needed

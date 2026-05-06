@@ -25,6 +25,7 @@ The key difference from RAG: the wiki is a persistent artifact. Cross-references
 For the directory map, page-type table, and folder semantics, see `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md`. That file is the single source of truth — do not duplicate it here.
 
 Two top-level peers of `wiki/`:
+
 - `notes/` — verbatim quick-capture inbox owned by the `notes` skill.
 - `daily/` — append-only daily log owned by the `daily` skill.
 
@@ -46,18 +47,18 @@ For the full protocol — when to read, when to update, the exact format, and su
 
 Route to the correct operation based on what the user says:
 
-| User says | Operation | Sub-skill |
-|-----------|-----------|-----------|
-| "/wiki init", "init vault", "bootstrap vault" | INIT | this skill |
-| "scaffold", "set up vault", "create wiki" | SCAFFOLD | this skill |
-| "/wiki promote <tag>", "promote tag", "scaffold a hub" | PROMOTE | this skill |
-| "ingest [source]", "process this", "add this" | INGEST | `ingest` |
-| "what do you know about X", "query:" | QUERY | `query` |
-| "lint", "health check", "clean up" | LINT | `lint` |
-| "save this", "file this", "/save" | SAVE | `save` |
-| "/note", "/dump", "note this", "todo:", "show my inbox", "/note process" | NOTE | `notes` |
-| "/autoresearch [topic]", "research [topic]" | AUTORESEARCH | `autoresearch` |
-| "/canvas", "add to canvas", "open canvas" | CANVAS | `canvas` |
+| User says                                                                | Operation    | Sub-skill      |
+| ------------------------------------------------------------------------ | ------------ | -------------- |
+| "/wiki init", "init vault", "bootstrap vault"                            | INIT         | this skill     |
+| "scaffold", "set up vault", "create wiki"                                | SCAFFOLD     | this skill     |
+| "/wiki promote &lt;tag&gt;", "promote tag", "scaffold a hub"             | PROMOTE      | this skill     |
+| "ingest [source]", "process this", "add this"                            | INGEST       | `ingest`       |
+| "what do you know about X", "query:"                                     | QUERY        | `query`        |
+| "lint", "health check", "clean up"                                       | LINT         | `lint`         |
+| "save this", "file this", "/save"                                        | SAVE         | `save`         |
+| "/note", "/dump", "note this", "todo:", "show my inbox", "/note process" | NOTE         | `notes`        |
+| "/autoresearch [topic]", "research [topic]"                              | AUTORESEARCH | `autoresearch` |
+| "/canvas", "add to canvas", "open canvas"                                | CANVAS       | `canvas`       |
 
 ---
 
@@ -108,15 +109,18 @@ In another project's CLAUDE.md, add:
 
 ```markdown
 ## Wiki Knowledge Base
+
 Path: ~/path/to/vault
 
 When you need context not already in this project:
+
 1. Read wiki/hot.md first (recent context, ~500 words)
-2. Tag-match the question against leaves; check wiki/domains/<tag>/_index.md for a curated hub
+2. Tag-match the question against leaves; check wiki/domains/<tag>/\_index.md for a curated hub
 3. If no hub matches, read wiki/index.md (master flat registry)
 4. Only then read individual wiki pages
 
 Do NOT read the wiki for:
+
 - General coding questions or language syntax
 - Things already in this project's files or conversation
 - Tasks unrelated to [your domain]
@@ -129,6 +133,7 @@ This keeps token usage low. Hot cache costs ~500 tokens. Index costs ~1000 token
 ## Summary
 
 Your job as the LLM:
+
 1. Set up the vault (once)
 2. Scaffold wiki structure from user's domain description
 3. Route ingest, query, and lint to the correct sub-skill

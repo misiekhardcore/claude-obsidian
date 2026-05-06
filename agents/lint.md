@@ -19,6 +19,7 @@ tools: Read, Write, Glob, Grep, Bash
 You are a wiki health specialist. Your job is to scan the vault and produce a comprehensive lint report.
 
 You will be given:
+
 - The vault path
 - The scope (full wiki, or a specific folder)
 

@@ -20,11 +20,11 @@ See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, output formats, and 
 
 Three depths. Choose based on the question complexity.
 
-| Mode | Trigger | Reads | Token cost | Best for |
-|------|---------|-------|------------|---------|
-| **Quick** | `query quick: ...` or simple factual Q | hot.md + index.md only | ~1,500 | "What is X?", date lookups, quick facts |
-| **Standard** | default (no flag) | hot.md + index + 3-5 pages | ~3,000 | Most questions |
-| **Deep** | `query deep: ...` or "thorough", "comprehensive" | Full wiki + optional web | ~8,000+ | "Compare A vs B across everything", synthesis, gap analysis |
+| Mode         | Trigger                                          | Reads                      | Token cost | Best for                                                    |
+| ------------ | ------------------------------------------------ | -------------------------- | ---------- | ----------------------------------------------------------- |
+| **Quick**    | `query quick: ...` or simple factual Q           | hot.md + index.md only     | ~1,500     | "What is X?", date lookups, quick facts                     |
+| **Standard** | default (no flag)                                | hot.md + index + 3-5 pages | ~3,000     | Most questions                                              |
+| **Deep**     | `query deep: ...` or "thorough", "comprehensive" | Full wiki + optional web   | ~8,000+    | "Compare A vs B across everything", synthesis, gap analysis |
 
 ---
 
@@ -82,12 +82,12 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
 
 Read the minimum needed:
 
-| Start with | Cost (approx) | When to stop |
-|------------|---------------|--------------|
-| hot.md | ~500 tokens | If it has the answer |
-| index.md | ~1000 tokens | If you can identify 3-5 relevant pages |
-| 3-5 wiki pages | ~300 tokens each | Usually sufficient |
-| 10+ wiki pages | expensive | Only for synthesis across the entire wiki |
+| Start with     | Cost (approx)    | When to stop                              |
+| -------------- | ---------------- | ----------------------------------------- |
+| hot.md         | ~500 tokens      | If it has the answer                      |
+| index.md       | ~1000 tokens     | If you can identify 3-5 relevant pages    |
+| 3-5 wiki pages | ~300 tokens each | Usually sufficient                        |
+| 10+ wiki pages | expensive        | Only for synthesis across the entire wiki |
 
 If hot.md has the answer, respond without reading further.
 
@@ -101,18 +101,23 @@ The master index (`wiki/index.md`) looks like:
 
 ```markdown
 ## Domains
+
 - [[Domain Name]]: description (N sources)
 
 ## Entities
+
 - [[Entity Name]]: role (first: [[Source]])
 
 ## Concepts
+
 - [[Concept Name]]: definition (status: developing)
 
 ## Sources
+
 - [[Source Title]]: author, date, type
 
 ## Questions
+
 - [[Question Title]]: answer summary
 ```
 
@@ -148,10 +153,12 @@ related:
 One-paragraph hub description.
 
 ## Core concepts
+
 - [[llm-wiki-pattern|LLM Wiki Pattern]] — one-line description
 - [[compounding-knowledge|Compounding Knowledge]] — one-line description
 
 ## Sources
+
 - [[llm-wiki-karpathy-gist|Karpathy's LLM Wiki Gist]] — origin source
 ```
 
@@ -173,7 +180,7 @@ Trails are run-records emitted by `/autoresearch`. They live under `wiki/trails/
    ```
 2. `backlinks format=json` returns only `{"file": "<path>"}` entries (no frontmatter), so for each entry run `obsidian properties path=<entry>` to read its frontmatter and filter to those with `type: trail`. These are the trails covering that research run.
 3. **Multi-trail rule.** If more than one trail backlinks the synthesis (multiple runs on the same topic), pick the **most recent** by the `YYYY-MM-DD` date suffix on the filename — the date suffix is canonical, not the `research_run:` field, because filename ordering is what the index/log entries point at. Read only that trail. After answering, append exactly:
-   ```
+   ```text
    *N earlier trail(s) exist on this topic — say 'compare trails' to read all.*
    ```
    where N is the count of older trails. Skip the line entirely when only one trail exists.

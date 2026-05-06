@@ -8,8 +8,8 @@ Only plugins that require user action are listed here. Plugins enabled by defaul
 
 These ship with Obsidian but are off by default. Enable them in **Settings → Core plugins**.
 
-| Plugin | Why we need it |
-|--------|----------------|
+| Plugin    | Why we need it                                                                                                                                    |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Bases** | Native database views over `.base` files. Powers `wiki/meta/dashboard.base` and the `obsidian-bases` skill. Requires Obsidian 1.9.10+ (Aug 2025). |
 
 ---
@@ -18,6 +18,6 @@ These ship with Obsidian but are off by default. Enable them in **Settings → C
 
 Install in **Settings → Community plugins → Browse**.
 
-| Plugin | Why we need it |
-|--------|----------------|
+| Plugin        | Why we need it                                                                                                                                                                     |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Templater** | Resolves `<% tp.file.title %>` and `<% tp.date.now(...) %>` in `_templates/*.md` so new notes get auto-populated frontmatter. Without it, new notes ship with raw template syntax. |

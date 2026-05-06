@@ -22,13 +22,17 @@ Before ingesting any file, check `.raw/.manifest.json` to avoid re-processing un
 ```
 
 **Manifest format** (create if missing):
+
 ```json
 {
   "sources": {
     ".raw/articles/article-slug-2026-04-08.md": {
       "hash": "abc123",
       "ingested_at": "2026-04-08",
-      "pages_created": ["wiki/sources/article-slug.md", "wiki/entities/Person.md"],
+      "pages_created": [
+        "wiki/sources/article-slug.md",
+        "wiki/entities/Person.md"
+      ],
       "pages_updated": ["wiki/index.md"]
     }
   }
@@ -36,12 +40,14 @@ Before ingesting any file, check `.raw/.manifest.json` to avoid re-processing un
 ```
 
 **Before ingesting a file:**
+
 1. Compute a hash: `md5sum [file] | cut -d' ' -f1` (or `sha256sum` on Linux).
 2. Check if the path exists in `.manifest.json` with the same hash.
 3. If hash matches, skip. Report: "Already ingested (unchanged). Use `force` to re-ingest."
 4. If missing or hash differs, proceed with ingest.
 
 **After ingesting a file:**
+
 1. Record `{hash, ingested_at, pages_created, pages_updated}` in `.manifest.json`.
 2. Write the updated manifest back.
 
@@ -86,16 +92,19 @@ Steps:
 1. **Read** the image file using the Read tool. Claude can process images natively.
 2. **Describe** the image contents: extract all text (OCR), identify key concepts, entities, diagrams, and data visible in the image.
 3. **Derive slug** from the image filename (basename without extension) via `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<basename>"`. **Save** the description to `.raw/images/[slug]-[YYYY-MM-DD].md`:
+
    ```markdown
    ---
    source_type: image
    original_file: [original path]
    fetched: YYYY-MM-DD
    ---
+
    # Image: [slug]
 
    [Full description of image contents, transcribed text, entities visible, etc.]
    ```
+
 4. Copy the image to `_attachments/images/[slug].[ext]` if it's not already in the vault.
 5. Proceed with **Single Source Ingest** on the saved description file.
 
@@ -114,8 +123,8 @@ Steps:
    - "What should I emphasize from this source?"
    - "How granular should I go?"
    - "Is there existing wiki context I should link against?"
-   **Wait for the user's response before proceeding.** Do not assume defaults and do not skip ahead.
-   **Skip this step only if** the user's original message included "just ingest it" or "auto-ingest".
+     **Wait for the user's response before proceeding.** Do not assume defaults and do not skip ahead.
+     **Skip this step only if** the user's original message included "just ingest it" or "auto-ingest".
 3. **Create** source summary in `wiki/sources/`. Use the source frontmatter schema from `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 4. **Create or update** entity pages for every person, org, product, and repo mentioned. One page per entity.
 5. **Create or update** concept pages for significant ideas and frameworks.
@@ -124,14 +133,17 @@ Steps:
 7. **Update** `wiki/index.md`. Add entries for all new pages.
 8. **Update** `wiki/hot.md` with this ingest's context.
 9. **Append** to `wiki/log.md` (new entries at the TOP):
-    ```markdown
-    ## [YYYY-MM-DD] ingest | Source Title
-    - Source: `.raw/articles/filename.md`
-    - Summary: [[Source Title]]
-    - Pages created: [[Page 1]], [[Page 2]]
-    - Pages updated: [[Page 3]], [[Page 4]]
-    - Key insight: One sentence on what is new.
-    ```
+
+   ```markdown
+   ## [YYYY-MM-DD] ingest | Source Title
+
+   - Source: `.raw/articles/filename.md`
+   - Summary: [[Source Title]]
+   - Pages created: [[Page 1]], [[Page 2]]
+   - Pages updated: [[Page 3]], [[Page 4]]
+   - Key insight: One sentence on what is new.
+   ```
+
 10. **Check for contradictions.** If new info conflicts with existing pages, add `> [!contradiction]` callouts on both pages.
 
 ---
@@ -173,6 +185,7 @@ Token budget matters. Follow these rules during ingest:
 When new info contradicts an existing wiki page:
 
 On the existing page, add:
+
 ```markdown
 > [!contradiction] Conflict with [[New Source]]
 > [[Existing Page]] claims X. [[New Source]] says Y.
@@ -180,6 +193,7 @@ On the existing page, add:
 ```
 
 On the new source summary, reference it:
+
 ```markdown
 > [!contradiction] Contradicts [[Existing Page]]
 > This source says Y, but existing wiki says X. See [[Existing Page]] for details.

@@ -23,7 +23,7 @@ This skill reads the daily file, dated inbox notes, dated wiki pages, `wiki/hot.
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with:
 
-```
+```text
 No vault configured — run /wiki init first.
 ```
 
@@ -74,11 +74,14 @@ No vault configured — run /wiki init first.
    The `overwrite` flag replaces the file in one operation; the wrapper keeps Obsidian's index consistent. If the call returns non-zero, abort with the wrapper's error and leave the daily file unchanged (the upstream CLI either succeeds atomically or reports an error before mutating).
 
 9. **Confirm** with exactly one line:
-   ```
+
+   ```text
    Closed daily/YYYY-MM-DD.md (N follow-ups)
    ```
+
    Omit the `(N follow-ups)` suffix entirely when there are none:
-   ```
+
+   ```text
    Closed daily/YYYY-MM-DD.md
    ```
 
@@ -88,7 +91,7 @@ No vault configured — run /wiki init first.
 
 ## Prompt template (step 6)
 
-```
+```text
 You are synthesizing a daily capture log for {{ date }}.
 
 ## Daily Captures
@@ -126,61 +129,68 @@ Output only the prose and optional section headers/bullets. Do not include the i
 
 ## Failure modes
 
-| Condition | Abort message |
-|-----------|---------------|
-| No vault configured | `No vault configured — run /wiki init first.` |
-| Invalid date format | `Invalid date: <arg>. Expected YYYY-MM-DD.` |
-| Future date | `Cannot close a future date: <date>.` |
-| Daily file not found | `No daily file for YYYY-MM-DD.` |
-| Nothing to synthesize | `Nothing to synthesize for YYYY-MM-DD.` |
-| LLM synthesis fails | `Synthesis failed: <reason>.` — daily file left unchanged |
-| File write fails | filesystem error — daily file left in pre-close state (atomic write) |
+| Condition             | Abort message                                                        |
+| --------------------- | -------------------------------------------------------------------- |
+| No vault configured   | `No vault configured — run /wiki init first.`                        |
+| Invalid date format   | `Invalid date: <arg>. Expected YYYY-MM-DD.`                          |
+| Future date           | `Cannot close a future date: <date>.`                                |
+| Daily file not found  | `No daily file for YYYY-MM-DD.`                                      |
+| Nothing to synthesize | `Nothing to synthesize for YYYY-MM-DD.`                              |
+| LLM synthesis fails   | `Synthesis failed: <reason>.` — daily file left unchanged            |
+| File write fails      | filesystem error — daily file left in pre-close state (atomic write) |
 
 ---
 
 ## Examples
 
 **Close today (no argument):**
-```
+
+```text
 user> /daily-close
 # Synthesizes daily/2026-04-27.md
 assistant> Closed daily/2026-04-27.md (3 follow-ups)
 ```
 
 **Close a past date:**
-```
+
+```text
 user> /daily-close 2026-04-20
 # Closes daily/2026-04-20.md; updated: bumped to today (2026-04-27)
 assistant> Closed daily/2026-04-20.md
 ```
 
 **Re-run (replaces prior summary):**
-```
+
+```text
 user> /daily-close
 # prior ## Summary section removed and replaced
 assistant> Closed daily/2026-04-27.md (1 follow-up)
 ```
 
 **Empty day (no captures, no related activity):**
-```
+
+```text
 user> /daily-close 2026-04-15
 assistant> Nothing to synthesize for 2026-04-15.
 ```
 
 **File does not exist:**
-```
+
+```text
 user> /daily-close 2026-03-01
 assistant> No daily file for 2026-03-01.
 ```
 
 **Future date:**
-```
+
+```text
 user> /daily-close 2026-05-01
 assistant> Cannot close a future date: 2026-05-01.
 ```
 
 **Invalid date format:**
-```
+
+```text
 user> /daily-close next Monday
 assistant> Invalid date: next Monday. Expected YYYY-MM-DD.
 ```

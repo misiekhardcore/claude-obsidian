@@ -78,7 +78,7 @@ For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk 
 
 ## Confirmation output
 
-```
+```text
 Captured N notes:            ← "note" singular when N=1
 - notes/YYYY-MM-DD-<slug>.md
 …
@@ -88,7 +88,7 @@ No NEW/MATCH labels. No diff. No reasoning.
 
 If any chunks failed:
 
-```
+```text
 Captured N notes:
 - notes/YYYY-MM-DD-<slug>.md
 …
@@ -104,7 +104,7 @@ Failed: K chunks.            ← "chunk" singular when K=1
 
 **Multi-thought:**
 
-```
+```text
 user> /braindump I keep forgetting to check the lint score before PRs. Also need to revisit the hot cache size — it's been growing. And the daily skill confirmation message looks wrong in dark mode.
 assistant>
 Captured 3 notes:
@@ -115,7 +115,7 @@ Captured 3 notes:
 
 **Single thought (no spurious split):**
 
-```
+```text
 user> /braindump The slug truncation rule needs to account for multi-byte unicode characters — right now it can split in the middle of a grapheme cluster, which breaks vault filenames on some filesystems.
 assistant>
 Captured 1 note:
@@ -124,7 +124,7 @@ Captured 1 note:
 
 **File input (vault-relative):**
 
-```
+```text
 user> /braindump retro-notes/2026-04-feature-retro.txt
 # resolved as <vault_root>/retro-notes/2026-04-feature-retro.txt
 assistant>
@@ -135,7 +135,7 @@ Captured N notes:
 
 **One chunk fails:**
 
-```
+```text
 assistant>
 Captured 2 notes:
 - notes/2026-04-27-check-lint-score-before-prs.md

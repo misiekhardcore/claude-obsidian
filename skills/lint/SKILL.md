@@ -19,11 +19,13 @@ Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. 
 The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs on an unchanged vault produce byte-identical JSON (excluding `scan_date`).
 
 **Folders scanned:**
+
 - `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/domains/`, `wiki/comparisons/`, `wiki/questions/`, `wiki/solutions/`
 - `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`
 - `wiki/canvases/*.canvas` — first-class; treated identically to `.md` in all 16 checks
 
 **Folders excluded (with rationale):**
+
 - `wiki/meta/` — administrative bookkeeping (lint reports, dashboards). Findings pointing into `wiki/meta/` from `wiki/index.md` are still validated by check #15.
 - `wiki/trails/` — frozen run-snapshots; surfaced for visibility, never counted toward totals, never auto-fixed.
 - `notes/` — transient inbox; only checks #14 (frontmatter gaps) and index drift apply.
@@ -40,6 +42,7 @@ The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs
 The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
 
 When invoking CLI verbs directly (checks #3–#9, #11–#16):
+
 - Inbound links per page: `obsidian backlinks path=<page> format=json` (returns `[{"file": "<path>"}]`; count entries for the inbound-link count) — only needed if the JSON backlinks map is not available.
 - Unresolved links: `obsidian unresolved format=json` (returns `[{"link": "..."}]`)
 
@@ -48,7 +51,8 @@ Work through these in order:
 1. **Orphan pages**. Source: `orphans` array in `lint-data-YYYY-MM-DD.json`. Wiki pages (`.md` and `.canvas`) with no inbound wikilinks. They exist but nothing points to them. `wiki/trails/*.md` and `notes/` are already excluded from the JSON output — trails are designed-orphan (forward-only model), so they would be flagged in perpetuity.
 2. **Dead links**. Source: `dead_links` array in `lint-data-YYYY-MM-DD.json`. Each entry is `{source_page, link_text}` — a wikilink in `source_page` that does not resolve to any existing page. Canvas dead links are merged into the same array; no separate handling. Findings inside `wiki/trails/*.md` are surfaced for visibility but **never auto-fixed** — trails are run-snapshots frozen at write time; the user repairs manually or accepts the drift (same policy as check #16).
 
-    **Anti-pattern note:** URL-as-wikilink occurrences (e.g. `[[https://...]]`) are in the `anti_patterns` array of the JSON. Report these in a dedicated **Anti-patterns** section; do **not** count them toward the dead-link total.
+   **Anti-pattern note:** URL-as-wikilink occurrences (e.g. `[[https://...]]`) are in the `anti_patterns` array of the JSON. Report these in a dedicated **Anti-patterns** section; do **not** count them toward the dead-link total.
+
 3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated.
 4. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
 5. **Missing cross-references**. Entities mentioned in a page but not linked.
@@ -71,17 +75,16 @@ Work through these in order:
 
     Map `type:` → expected section using this fixed table:
 
-    | `type:` | Expected section |
-    |---|---|
-    | concept | `## Concepts` |
-    | source | `## Sources` |
-    | synthesis | `## Plans & Decisions` (or `## Synthesis` if separate) |
-    | decision | `## Plans & Decisions` |
-    | meta | (no section — sits in the Navigation row, not in the body) |
-    | domain | `## Domains` |
+    | `type:`   | Expected section                                           |
+    | --------- | ---------------------------------------------------------- |
+    | concept   | `## Concepts`                                              |
+    | source    | `## Sources`                                               |
+    | synthesis | `## Plans & Decisions` (or `## Synthesis` if separate)     |
+    | decision  | `## Plans & Decisions`                                     |
+    | meta      | (no section — sits in the Navigation row, not in the body) |
+    | domain    | `## Domains`                                               |
 
     Types not listed above are skipped (no flag) — extend the table when a new type acquires a canonical section.
-
     - **Strays** — entries with no preceding H2 (above the first heading) flag as `entry above all sections, expected under <Section>`.
     - **Misplacements** — entries under a non-matching section flag as `entry under <Current> but type=<X> expects <Expected>`.
 
@@ -115,42 +118,54 @@ status: developing
 # Lint Report: YYYY-MM-DD
 
 ## Summary
+
 - Pages scanned: N
 - Issues found: N
 - Auto-fixed: N
 - Needs review: N
 
 ## Orphan Pages
+
 - [[Page Name]]: no inbound links. Suggest: link from [[Related Page]] or delete.
 
 ## Dead Links
+
 - [[Missing Page]]: referenced in [[Source Page]] but does not exist. Suggest: create stub or remove link.
 
 ## Missing Pages
+
 - "concept name": mentioned in [[Page A]], [[Page B]], [[Page C]]. Suggest: create a concept page.
 
 ## Frontmatter Gaps
+
 - [[Page Name]]: missing fields: status, tags
 
 ## Stale Claims
+
 - [[Page Name]]: claim "X" may conflict with newer source [[Newer Source]].
 
 ## Cross-Reference Gaps
+
 - [[Entity Name]] mentioned in [[Page A]] without a wikilink.
 
 ## Backlink Density
+
 - [[Page Name]]: N inbound, M outbound. Heavily cited, weakly linking. Suggest: add `related:` entries on this page to its top citers, or thread it into a domain hub.
 
 ## Hub Promotion Candidates
+
 - `<tag>`: N leaves share this tag, no `wiki/domains/<tag>/_index.md`. Suggest: `/wiki promote <tag>` to scaffold a hub.
 
 ## Hub Stale-Count Drift
+
 - [[domains/<slug>/_index]]: `page_count: N` in frontmatter, M inbound backlinks (drift: ±X%). Suggest: update `page_count:` or re-curate `related:`.
 
 ## Hub Demotion Candidates
+
 - [[domains/<slug>/_index]]: only N leaves linked. Below threshold (5). Suggest: grow the cluster or merge into a sibling hub.
 
 ## Hot Cache Size
+
 - hot.md: N words (spec: 500, delta: +N). Status: OK | WARN | FAIL
   - Suggest: move entries older than 2026-XX-XX to [[log]], trim ## Last Updated to top 3–5 items.
 
@@ -159,13 +174,16 @@ status: developing
 Scope: `notes/` only. Frontmatter gaps and index drift; no orphan/dead-link/stale checks.
 
 ### Frontmatter gaps
+
 - `notes/<filename>.md`: missing fields: <field>, <field>
 
 ### Index drift
+
 - File missing from index: `notes/<filename>.md` (no row in `notes/index.md`)
 - Index row missing file: `notes/index.md` references "<title>" but no file resolves to it
 
 ## Misplaced Index Entries
+
 - `[[<slug>]]`: under `<Current>`, expected `<Expected>` (type=<x>). Suggest: move under `<Expected>`.
 - `[[<slug>]]`: above all sections (stray). Suggest: move under `<Expected>`.
 
@@ -192,12 +210,12 @@ Not counted toward dead-link total. Each entry is `[[https://...]]` used as a wi
 
 Enforce these during lint:
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| Filenames | Title Case with spaces | `Machine Learning.md` |
-| Folders | lowercase with dashes | `wiki/data-models/` |
-| Tags | lowercase, hierarchical | `#domain/architecture` |
-| Wikilinks | match filename exactly | `[[Machine Learning]]` |
+| Element   | Convention              | Example                |
+| --------- | ----------------------- | ---------------------- |
+| Filenames | Title Case with spaces  | `Machine Learning.md`  |
+| Folders   | lowercase with dashes   | `wiki/data-models/`    |
+| Tags      | lowercase, hierarchical | `#domain/architecture` |
+| Wikilinks | match filename exactly  | `[[Machine Learning]]` |
 
 Filenames must be unique across the vault. Wikilinks work without paths only if filenames are unique.
 
@@ -281,8 +299,10 @@ Create or update `wiki/meta/overview.canvas` for a visual domain map. Use `wiki/
       "id": "1",
       "type": "file",
       "file": "wiki/index.md",
-      "x": 0, "y": 0,
-      "width": 300, "height": 140,
+      "x": 0,
+      "y": 0,
+      "width": 300,
+      "height": 140,
       "color": "1"
     }
   ],
@@ -299,17 +319,20 @@ Add one node per domain hub (`wiki/domains/<slug>/_index.md`). Connect hubs that
 Always show the lint report first. Ask: "Should I fix these automatically, or do you want to review each one?"
 
 Safe to auto-fix:
+
 - Adding missing frontmatter fields with placeholder values
 - Creating stub pages for missing entities
 - Adding wikilinks for unlinked mentions
 
 Needs review before fixing:
+
 - Deleting orphan pages (they might be intentionally isolated)
 - Resolving contradictions (requires human judgment)
 - Merging duplicate pages
 - Moving misplaced index entries (check #15). Rationale: low expected volume in a healthy vault makes batch auto-move offer little value over per-entry confirmation, and a misclassification (e.g., a concept intentionally filed under a different section) is harder to undo than to confirm.
 
 Never auto-fix:
+
 - Trail integrity findings (check #16). Trails are frozen-at-write-time run-snapshots; rewriting them post-emission destroys the run-record property. Surface the finding and let the user repair manually or accept the drift.
 
 ---
