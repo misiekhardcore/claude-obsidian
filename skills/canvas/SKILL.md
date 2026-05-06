@@ -1,9 +1,8 @@
 ---
 name: canvas
-description: "Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to canvas files with zones. Integrates with /banana."
+description: Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to canvas files with zones. Integrates with /banana.
 allowed-tools: Bash Read Glob Grep
 ---
-
 # canvas: Visual Reference Layer
 
 The three knowledge capture layers:

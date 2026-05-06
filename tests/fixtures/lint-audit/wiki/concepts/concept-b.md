@@ -1,6 +1,6 @@
 ---
 type: concept
-title: "Concept B"
+title: Concept B
 created: 2026-05-05
 updated: 2026-05-05
 tags:
@@ -10,9 +10,8 @@ status: current
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[concept-a]]"
+  - [[concept-a]]
 ---
-
 # Concept B
 
 This fixture page exercises two lint checks.

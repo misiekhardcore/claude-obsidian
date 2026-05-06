@@ -9,7 +9,6 @@ status: current
 confidence: EXTRACTED
 evidence: []
 ---
-
 # Hot Cache
 
 ## Last Updated

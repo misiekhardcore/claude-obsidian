@@ -3,7 +3,6 @@ name: braindump
 description: Split long-form text into atomic inbox notes. Accepts inline text or file paths. Triage later via /note process.
 allowed-tools: Bash Read Glob Grep
 ---
-
 # braindump: Long-Form → Atomic Notes
 
 Long-form text that shouldn't interrupt flow — planning sessions, retros, design ramblings. `/braindump` splits the stream into atomic thoughts and files each through the standard CAPTURE pipeline. Chunks land in `notes/` indistinguishable from `/note` captures; triage with `/note process`.

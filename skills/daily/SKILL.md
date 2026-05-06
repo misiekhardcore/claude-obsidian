@@ -1,9 +1,8 @@
 ---
 name: daily
-description: "Append a timestamped bullet to today's daily log. No inbox, no triage — one line per call."
+description: Append a timestamped bullet to today's daily log. No inbox, no triage — one line per call.
 allowed-tools: Bash Read Glob
 ---
-
 # daily: Chronological Daily Log
 
 Append a timestamped bullet to `<vault_root>/daily/YYYY-MM-DD.md`. No MATCH/NEW decision, no inbox, no triage. Every invocation adds one bullet. Use `/note` for knowledge fragments worth triaging later; use `/daily` for time-anchored observations, progress notes, and anything that belongs to the day.
@@ -22,9 +21,9 @@ No vault configured — run /wiki init first.
 
 ## Operations
 
-| User says                                                                                                              | Operation |
-| ---------------------------------------------------------------------------------------------------------------------- | --------- |
-| `/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"` | CAPTURE   |
+|User says|Operation|
+|-|-|
+|`/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"`|CAPTURE|
 
 No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis are handled by `/daily-close`.
 

@@ -3,7 +3,6 @@ name: lint
 description: Health check the wiki vault. Finds orphans, dead wikilinks, and frontmatter gaps. Generates canvas maps and Bases dashboards.
 allowed-tools: Bash Read Glob Grep
 ---
-
 # lint: Wiki Health Check
 
 Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. Output a lint report to `wiki/meta/lint-report-YYYY-MM-DD.md`.
@@ -64,14 +63,14 @@ Work through these in order:
 
   Map `type:` → expected section using this fixed table:
 
-  | `type:`   | Expected section                                           |
-  | --------- | ---------------------------------------------------------- |
-  | concept   | `## Concepts`                                              |
-  | source    | `## Sources`                                               |
-  | synthesis | `## Plans & Decisions` (or `## Synthesis` if separate)     |
-  | decision  | `## Plans & Decisions`                                     |
-  | meta      | (no section — sits in the Navigation row, not in the body) |
-  | domain    | `## Domains`                                               |
+  |`type:`|Expected section|
+  |-|-|
+  |concept|`## Concepts`|
+  |source|`## Sources`|
+  |synthesis|`## Plans & Decisions` (or `## Synthesis` if separate)|
+  |decision|`## Plans & Decisions`|
+  |meta|(no section — sits in the Navigation row, not in the body)|
+  |domain|`## Domains`|
 
   Types not listed above are skipped (no flag) — extend the table when a new type acquires a canonical section.
   - **Strays** — entries with no preceding H2 (above the first heading) flag as `entry above all sections, expected under <Section>`.
@@ -87,8 +86,6 @@ Work through these in order:
   - **No minimum link count.** A one-step trail is valid output and must not be flagged.
 
   Auto-fix policy: **never auto-fix**. Trails are run-snapshots; rewriting them post-emission destroys the run-record property. Findings here are advisory — the user repairs the trail manually or accepts the drift.
-
----
 
 ## Manual Review
 
@@ -192,12 +189,12 @@ Source: `anti_patterns` array from `wiki/meta/lint-data-YYYY-MM-DD.json`. Not co
 
 Enforce these during lint:
 
-| Element   | Convention              | Example                |
-| --------- | ----------------------- | ---------------------- |
-| Filenames | Title Case with spaces  | `Machine Learning.md`  |
-| Folders   | lowercase with dashes   | `wiki/data-models/`    |
-| Tags      | lowercase, hierarchical | `#domain/architecture` |
-| Wikilinks | match filename exactly  | `[[Machine Learning]]` |
+|Element|Convention|Example|
+|-|-|-|
+|Filenames|Title Case with spaces|`Machine Learning.md`|
+|Folders|lowercase with dashes|`wiki/data-models/`|
+|Tags|lowercase, hierarchical|`#domain/architecture`|
+|Wikilinks|match filename exactly|`[[Machine Learning]]`|
 
 Filenames must be unique across the vault. Wikilinks work without paths only if filenames are unique.
 

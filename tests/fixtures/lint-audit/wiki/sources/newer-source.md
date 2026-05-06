@@ -1,6 +1,6 @@
 ---
 type: source
-title: "Newer Source"
+title: Newer Source
 created: 2026-04-30
 updated: 2026-04-30
 tags:
@@ -10,9 +10,8 @@ status: current
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[older-claim]]"
+  - [[older-claim]]
 ---
-
 # Newer Source
 
 April 2026 benchmark results for WidgetFoo systems.

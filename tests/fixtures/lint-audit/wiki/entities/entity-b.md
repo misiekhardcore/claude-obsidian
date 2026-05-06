@@ -1,6 +1,6 @@
 ---
 type: entity
-title: "Entity B"
+title: Entity B
 created: 2026-05-05
 updated: 2026-05-05
 tags:
@@ -10,9 +10,8 @@ status: current
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[concept-a]]"
+  - [[concept-a]]
 ---
-
 # Entity B
 
 This fixture entity page is mentioned in [[concept-b]] by plain text ("entity-b") without a wikilink.

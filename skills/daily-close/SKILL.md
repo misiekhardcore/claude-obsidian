@@ -1,9 +1,8 @@
 ---
 name: daily-close
-description: "Synthesize a day's captures into a prose summary appended to the daily file. Reads log, inbox notes, wiki pages, and hot cache."
+description: Synthesize a day's captures into a prose summary appended to the daily file. Reads log, inbox notes, wiki pages, and hot cache.
 allowed-tools: Bash Read Glob
 ---
-
 # daily-close: End-of-Day Synthesis
 
 Synthesize `<vault_root>/daily/YYYY-MM-DD.md` into a polished prose summary with optional follow-ups. Reads the day's captures, any inbox notes and wiki pages dated to that day, plus `wiki/hot.md` and `wiki/index.md` for cross-reference context. Appends a `## Summary` section (and optional `## Follow-ups`) to the daily file. Re-running replaces the prior summary — idempotent.
@@ -116,15 +115,15 @@ Output only the prose and optional section headers/bullets. Do not include the i
 
 ## Failure modes
 
-| Condition             | Abort message                                                        |
-| --------------------- | -------------------------------------------------------------------- |
-| No vault configured   | `No vault configured — run /wiki init first.`                        |
-| Invalid date format   | `Invalid date: <arg>. Expected YYYY-MM-DD.`                          |
-| Future date           | `Cannot close a future date: <date>.`                                |
-| Daily file not found  | `No daily file for YYYY-MM-DD.`                                      |
-| Nothing to synthesize | `Nothing to synthesize for YYYY-MM-DD.`                              |
-| LLM synthesis fails   | `Synthesis failed: <reason>.` — daily file left unchanged            |
-| File write fails      | filesystem error — daily file left in pre-close state (atomic write) |
+|Condition|Abort message|
+|-|-|
+|No vault configured|`No vault configured — run /wiki init first.`|
+|Invalid date format|`Invalid date: <arg>. Expected YYYY-MM-DD.`|
+|Future date|`Cannot close a future date: <date>.`|
+|Daily file not found|`No daily file for YYYY-MM-DD.`|
+|Nothing to synthesize|`Nothing to synthesize for YYYY-MM-DD.`|
+|LLM synthesis fails|`Synthesis failed: <reason>.` — daily file left unchanged|
+|File write fails|filesystem error — daily file left in pre-close state (atomic write)|
 
 ## Examples
 

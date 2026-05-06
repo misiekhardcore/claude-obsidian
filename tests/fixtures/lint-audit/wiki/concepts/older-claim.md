@@ -1,6 +1,6 @@
 ---
 type: concept
-title: "Older Claim"
+title: Older Claim
 created: 2026-01-15
 updated: 2026-01-15
 tags:
@@ -11,7 +11,6 @@ confidence: EXTRACTED
 evidence: []
 related: []
 ---
-
 # Older Claim
 
 This fixture page contains a stale claim that is contradicted by [[newer-source]].

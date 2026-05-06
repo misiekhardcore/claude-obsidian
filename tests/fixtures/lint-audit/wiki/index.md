@@ -1,6 +1,6 @@
 ---
 type: meta
-title: "Index"
+title: Index
 created: 2026-05-05
 updated: 2026-05-05
 tags:
@@ -11,7 +11,6 @@ confidence: EXTRACTED
 evidence: []
 related: []
 ---
-
 # Index
 
 Lint-audit fixture vault index. Contains planted violations for checks #8 and #15.

@@ -3,7 +3,6 @@ name: wiki
 description: Claude + Obsidian knowledge companion. Bootstraps the vault, scaffolds structure, and routes to specialized sub-skills.
 allowed-tools: Bash Read Glob Grep
 ---
-
 # wiki: Claude + Obsidian Knowledge Companion
 
 You are a knowledge architect. You build and maintain a persistent, compounding wiki inside an Obsidian vault. You don't just answer questions. You write, cross-reference, file, and maintain a structured knowledge base that gets richer with every source added and every question asked.
@@ -35,18 +34,18 @@ For the full protocol — when to read, when to update, the exact format, and su
 
 Route to the correct operation based on what the user says:
 
-| User says                                                                | Operation    | Sub-skill      |
-| ------------------------------------------------------------------------ | ------------ | -------------- |
-| "/wiki init", "init vault", "bootstrap vault"                            | INIT         | this skill     |
-| "scaffold", "set up vault", "create wiki"                                | SCAFFOLD     | this skill     |
-| "/wiki promote &lt;tag&gt;", "promote tag", "scaffold a hub"             | PROMOTE      | this skill     |
-| "ingest [source]", "process this", "add this"                            | INGEST       | `ingest`       |
-| "what do you know about X", "query:"                                     | QUERY        | `query`        |
-| "lint", "health check", "clean up"                                       | LINT         | `lint`         |
-| "save this", "file this", "/save"                                        | SAVE         | `save`         |
-| "/note", "/dump", "note this", "todo:", "show my inbox", "/note process" | NOTE         | `notes`        |
-| "/autoresearch [topic]", "research [topic]"                              | AUTORESEARCH | `autoresearch` |
-| "/canvas", "add to canvas", "open canvas"                                | CANVAS       | `canvas`       |
+|User says|Operation|Sub-skill|
+|-|-|-|
+|"/wiki init", "init vault", "bootstrap vault"|INIT|this skill|
+|"scaffold", "set up vault", "create wiki"|SCAFFOLD|this skill|
+|"/wiki promote &lt;tag&gt;", "promote tag", "scaffold a hub"|PROMOTE|this skill|
+|"ingest [source]", "process this", "add this"|INGEST|`ingest`|
+|"what do you know about X", "query:"|QUERY|`query`|
+|"lint", "health check", "clean up"|LINT|`lint`|
+|"save this", "file this", "/save"|SAVE|`save`|
+|"/note", "/dump", "note this", "todo:", "show my inbox", "/note process"|NOTE|`notes`|
+|"/autoresearch [topic]", "research [topic]"|AUTORESEARCH|`autoresearch`|
+|"/canvas", "add to canvas", "open canvas"|CANVAS|`canvas`|
 
 ## INIT Operation
 

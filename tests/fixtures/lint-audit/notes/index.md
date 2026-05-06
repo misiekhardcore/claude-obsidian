@@ -8,7 +8,6 @@ tags:
   - notes
 status: current
 ---
-
 # Notes Index
 
 ## Pending

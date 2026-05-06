@@ -3,7 +3,6 @@ name: notes
 description: Capture quick inbox notes without breaking flow. Verbatim capture with auto-match. Per-project filtering. Lists and triages the inbox.
 allowed-tools: Bash Read Glob Grep
 ---
-
 # notes: Inbox Capture for the Vault
 
 Some thoughts shouldn't interrupt the work to write a real wiki page. A bug in tooling. A follow-up for another project. "This didn't work, revisit later." This skill catches them, verbatim, and files them in `<vault_root>/notes/` without prompts. Triage happens later.
@@ -16,11 +15,11 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 
 ## Operations
 
-| User says                                                                                             | Operation | Handled by |
-| ----------------------------------------------------------------------------------------------------- | --------- | ---------- |
-| `/note <text>`, `/dump <text>`, "note this …", "remember this for later", "add to inbox …", "todo: …" | CAPTURE   | this skill |
-| `/note list`, "show my inbox", "what's in notes"                                                      | LIST      | this skill |
-| `/note process`, "process my notes", "triage the inbox"                                               | PROCESS   | this skill |
+|User says|Operation|Handled by|
+|-|-|-|
+|`/note <text>`, `/dump <text>`, "note this …", "remember this for later", "add to inbox …", "todo: …"|CAPTURE|this skill|
+|`/note list`, "show my inbox", "what's in notes"|LIST|this skill|
+|`/note process`, "process my notes", "triage the inbox"|PROCESS|this skill|
 
 Capture, list, and process do not prompt for tags, types, or confirmations beyond the per-note action prompt in PROCESS.
 

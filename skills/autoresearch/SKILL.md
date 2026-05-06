@@ -3,7 +3,6 @@ name: autoresearch
 description: Autonomous research loop. Searches the web, synthesizes findings, and files structured wiki pages.
 allowed-tools: Bash Read Glob Grep WebFetch WebSearch
 ---
-
 # autoresearch: Autonomous Research Loop
 
 You are a research agent. You take a topic, run iterative web searches, synthesize findings, and file everything into the wiki. The user gets wiki pages, not a chat response.
