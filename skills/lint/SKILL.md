@@ -35,7 +35,7 @@ The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs
 
 The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
 
-When invoking CLI verbs directly (checks #3–#9, #11–#16):
+When invoking CLI verbs directly (checks #6–#9, #11–#16):
 - Inbound links per page: `obsidian backlinks path=<page> format=json` (returns `[{"file": "<path>"}]`; count entries for the inbound-link count) — only needed if the JSON backlinks map is not available.
 - Unresolved links: `obsidian unresolved format=json` (returns `[{"link": "..."}]`)
 
@@ -45,9 +45,6 @@ Work through these in order:
 2. **Dead links**. Source: `dead_links` array in `lint-data-YYYY-MM-DD.json`. Each entry is `{source_page, link_text}` — a wikilink in `source_page` that does not resolve to any existing page. Canvas dead links are merged into the same array; no separate handling. Findings inside `wiki/trails/*.md` are surfaced for visibility but **never auto-fixed** — trails are run-snapshots frozen at write time; the user repairs manually or accepts the drift (same policy as check #16).
 
     **Anti-pattern note:** URL-as-wikilink occurrences (e.g. `[[https://...]]`) are in the `anti_patterns` array of the JSON. Report these in a dedicated **Anti-patterns** section; do **not** count them toward the dead-link total.
-3. **Stale claims**. Assertions on older pages that newer sources have contradicted or updated.
-4. **Missing pages**. Concepts or entities mentioned in multiple pages but lacking their own page.
-5. **Missing cross-references**. Entities mentioned in a page but not linked.
 6. **Frontmatter gaps**. Pages missing required fields (`type`, `status`, `created`, `updated`, `tags`, `confidence`). Additionally, flag missing `evidence:` when `confidence:` is `INFERRED` or `AMBIGUOUS` (per `_shared/frontmatter.md` rule 7 — `evidence:` is required for those confidence levels).
 7. **Empty sections**. Headings with no content underneath.
 8. **Stale index entries**. Items in `wiki/index.md` pointing to renamed or deleted pages.
@@ -94,6 +91,16 @@ Work through these in order:
 
 ---
 
+## Manual Review
+
+The following checks require entity-extraction or semantic contradiction detection that cannot be automated without NLP infrastructure. They are not run by the lint agent. Perform them as a periodic human review (suggested: monthly, or after a burst of ingests from a new domain).
+
+- **Stale claims.** Look for assertions on older pages that newer sources may have contradicted or updated. Focus on pages with `confidence: INFERRED` or `AMBIGUOUS` and compare their claims against recently ingested sources in the same domain.
+- **Missing pages.** Look for concepts or entities mentioned in three or more pages that lack their own wiki page. Use the hot cache and index as a starting point; search for recurring noun phrases that have no `[[wikilink]]` target.
+- **Missing cross-references.** Look for entity names mentioned in page prose without a `[[wikilink]]`. Focus on high-traffic entities visible in the backlink density report (check #10).
+
+---
+
 ## Lint Report Format
 
 Create at `wiki/meta/lint-report-YYYY-MM-DD.md`:
@@ -122,17 +129,8 @@ status: developing
 ## Dead Links
 - [[Missing Page]]: referenced in [[Source Page]] but does not exist. Suggest: create stub or remove link.
 
-## Missing Pages
-- "concept name": mentioned in [[Page A]], [[Page B]], [[Page C]]. Suggest: create a concept page.
-
 ## Frontmatter Gaps
 - [[Page Name]]: missing fields: status, tags
-
-## Stale Claims
-- [[Page Name]]: claim "X" may conflict with newer source [[Newer Source]].
-
-## Cross-Reference Gaps
-- [[Entity Name]] mentioned in [[Page A]] without a wikilink.
 
 ## Backlink Density
 - [[Page Name]]: N inbound, M outbound. Heavily cited, weakly linking. Suggest: add `related:` entries on this page to its top citers, or thread it into a domain hub.
