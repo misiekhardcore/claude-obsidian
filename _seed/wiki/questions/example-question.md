@@ -3,8 +3,8 @@ type: question
 title: "What is a wiki question page for?"
 question: "What is a wiki question page for?"
 answer_quality: solid
-created: { { today } }
-updated: { { today } }
+created: "{{today}}"
+updated: "{{today}}"
 tags:
   - question
   - example

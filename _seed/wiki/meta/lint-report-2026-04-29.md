@@ -31,14 +31,14 @@ None.
 - **Pages affected:** All 8 wiki pages
 - **Problem:** Frontmatter fields use `{{today}}` template variable syntax, but variables were not expanded. This creates ambiguous dates.
 - **Affected pages:**
-  - [[hot]]: `created: {{today}}`, `updated: {{today}}`
-  - [[index]]: `created: {{today}}`, `updated: {{today}}`
-  - [[log]]: `created: {{today}}`, `updated: {{today}}`, `## {{today}}`
-  - [[overview]]: `created: {{today}}`, `updated: {{today}}`
-  - [[example-concept]]: `created: {{today}}`, `updated: {{today}}`
-  - [[example-entity]]: `created: {{today}}`, `updated: {{today}}`
-  - [[example-question]]: `created: {{today}}`, `updated: {{today}}`
-  - [[example-source]]: `date_published: {{today}}`, `created: {{today}}`, `updated: {{today}}`
+  - [[hot]]: `created: "{{today}}"`, `updated: "{{today}}"`
+  - [[index]]: `created: "{{today}}"`, `updated: "{{today}}"`
+  - [[log]]: `created: "{{today}}"`, `updated: "{{today}}"`, `## {{today}}`
+  - [[overview]]: `created: "{{today}}"`, `updated: "{{today}}"`
+  - [[example-concept]]: `created: "{{today}}"`, `updated: "{{today}}"`
+  - [[example-entity]]: `created: "{{today}}"`, `updated: "{{today}}"`
+  - [[example-question]]: `created: "{{today}}"`, `updated: "{{today}}"`
+  - [[example-source]]: `date_published: "{{today}}"`, `created: "{{today}}"`, `updated: "{{today}}"`
 - **Suggested fix:** Replace all `{{today}}` with `2026-04-29` in frontmatter and content. This should happen automatically during vault initialization but appears to have been skipped.
 
 ### 2. Overview Page Incomplete (Seed Status)
