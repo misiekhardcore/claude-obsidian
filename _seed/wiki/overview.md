@@ -1,8 +1,8 @@
 ---
 type: meta
 title: "Wiki Overview"
-created: { { today } }
-updated: { { today } }
+created: "{{today}}"
+updated: "{{today}}"
 tags:
   - meta
   - overview

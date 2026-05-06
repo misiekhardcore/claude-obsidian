@@ -5,8 +5,8 @@ complexity: intermediate
 domain: "knowledge-management"
 aliases:
   - "concept stub"
-created: { { today } }
-updated: { { today } }
+created: "{{today}}"
+updated: "{{today}}"
 tags:
   - concept
   - example

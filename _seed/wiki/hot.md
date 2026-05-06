@@ -1,8 +1,8 @@
 ---
 type: meta
 title: "Hot Cache"
-created: { { today } }
-updated: { { today } }
+created: "{{today}}"
+updated: "{{today}}"
 tags:
   - meta
   - hot
