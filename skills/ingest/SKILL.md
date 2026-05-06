@@ -1,6 +1,6 @@
 ---
 name: ingest
-description: "Ingest sources into the Obsidian wiki vault. Reads a source, extracts entities and concepts, creates or updates wiki pages, cross-references, and logs the operation. Supports files, URLs, and batch mode. Triggers on: ingest, process this source, add this to the wiki, read and file this, batch ingest, ingest all of these, ingest this url."
+description: Ingest sources into the wiki vault. Extracts entities and concepts, creates or updates wiki pages, and cross-references them. Supports files and URLs.
 allowed-tools: Bash Read Glob Grep WebFetch
 ---
 

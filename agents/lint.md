@@ -1,10 +1,9 @@
 ---
 name: lint
 description: >
-  Comprehensive wiki health check agent. Scans for orphan pages, dead links, stale claims,
-  missing cross-references, frontmatter gaps, and empty sections. Generates a structured
-  lint report. Dispatched when the user says "lint the wiki", "health check", "wiki audit",
-  or "clean up".
+  Comprehensive wiki health check agent. Scans for orphan pages, dead links, frontmatter
+  gaps, and empty sections. Generates a structured lint report. Dispatched when the user
+  says "lint the wiki", "health check", "wiki audit", or "clean up".
   <example>Context: User says "lint the wiki" after 15 ingests
   assistant: "I'll dispatch the lint agent for a full health check."
   </example>
@@ -48,9 +47,6 @@ After reading the JSON, perform the checks that require reading page content or 
 
 - **Check #1 (orphans):** use `orphans` from JSON.
 - **Check #2 (dead links):** use `dead_links` from JSON. Canvas dead links are already merged in.
-- **Check #3 (stale claims):** requires reading pages — do this yourself.
-- **Check #4 (missing pages):** requires reading pages — do this yourself.
-- **Check #5 (missing cross-references):** requires reading pages — do this yourself.
 - **Check #6 (frontmatter gaps):** read each in-scope page; use `scope.scanned_dirs` from JSON for the exact directory list.
 - **Check #7 (empty sections):** requires reading pages.
 - **Check #8 (stale index entries):** use `obsidian read path=wiki/index.md` then validate each link.

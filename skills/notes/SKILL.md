@@ -1,14 +1,6 @@
 ---
 name: notes
-description: >
-  Capture quick inbox notes into the vault without breaking flow. Verbatim
-  capture, silent auto-match append on overlap, silent file creation on no
-  match. Per-project filtering via source_project. Listing and processing
-  flows for triaging the inbox later. Triggers on: "/note", "/dump",
-  "note this", "remember this for later", "add to inbox", "todo:",
-  "show my inbox", "/note list", "what's in notes",
-  "/note process", "process my notes", "process the inbox",
-  "triage the inbox".
+description: Capture quick inbox notes without breaking flow. Verbatim capture with auto-match. Per-project filtering. Lists and triages the inbox.
 allowed-tools: Bash Read Glob Grep
 ---
 

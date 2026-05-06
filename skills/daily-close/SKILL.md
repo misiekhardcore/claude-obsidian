@@ -1,11 +1,6 @@
 ---
 name: daily-close
-description: >
-  Synthesize a day's full capture record into a polished prose summary with
-  optional follow-ups, appended to the daily file. Reads the daily log,
-  date-matched inbox notes, date-matched wiki pages, hot cache, and index.
-  Synthesis only — does not triage or clear the inbox.
-  Triggers on: "/daily-close", "close today", "wrap up today", "synthesize today".
+description: "Synthesize a day's captures into a prose summary appended to the daily file. Reads log, inbox notes, wiki pages, and hot cache."
 allowed-tools: Bash Read Glob
 ---
 

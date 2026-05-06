@@ -1,10 +1,6 @@
 ---
 name: daily
-description: >
-  Append a timestamped bullet to today's daily log in the vault. Each call
-  adds one line to <vault_root>/daily/YYYY-MM-DD.md — no inbox, no triage.
-  Triggers on: "/daily", "daily note this", "log to today", "log this",
-  "add to today's log", "daily log:".
+description: "Append a timestamped bullet to today's daily log. No inbox, no triage — one line per call."
 allowed-tools: Bash Read Glob
 ---
 
