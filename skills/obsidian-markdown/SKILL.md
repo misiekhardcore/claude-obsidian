@@ -1,6 +1,6 @@
 ---
 name: obsidian-markdown
-description: "Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, and math. Reference when creating any wiki page."
+description: Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, and math. Reference when creating any wiki page.
 allowed-tools: Read Write Edit
 ---
 
