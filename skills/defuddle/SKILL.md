@@ -3,14 +3,11 @@ name: defuddle
 description: Strip clutter from web pages before ingesting. Removes ads, navigation, and boilerplate — leaving clean markdown that saves 40-60% tokens.
 allowed-tools: Read Bash
 ---
-
 # defuddle: Web Page Cleaner
 
 Defuddle extracts the meaningful content from a web page and drops everything else: ads, cookie banners, nav bars, related articles, footers, social sharing buttons. What remains is the article body as clean markdown.
 
 Use this before any URL ingestion. It is optional but strongly recommended. It cuts token usage by 40-60% on typical web articles and produces cleaner wiki pages.
-
----
 
 ## Install
 
@@ -19,8 +16,6 @@ npm install -g defuddle-cli
 ```
 
 Verify: `defuddle --version`
-
----
 
 ## Usage
 
@@ -53,8 +48,6 @@ SLUG="article-slug-$(date +%Y-%m-%d)"
 defuddle page.html
 ```
 
----
-
 ## When to Use
 
 **Use defuddle when:**
@@ -69,8 +62,6 @@ defuddle page.html
 - The page is a dashboard, app, or structured data (defuddle expects article-style content)
 - defuddle is not installed and the article is short enough to process raw
 
----
-
 ## Fallback
 
 If defuddle is not installed, check:
@@ -80,8 +71,6 @@ which defuddle 2>/dev/null || echo "not installed"
 ```
 
 If not installed: use WebFetch directly. The content will be less clean but still workable.
-
----
 
 ## Integration with /ingest
 

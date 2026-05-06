@@ -12,8 +12,6 @@ Synthesize `<vault_root>/daily/YYYY-MM-DD.md` into a polished prose summary with
 
 This skill reads the daily file, dated inbox notes, dated wiki pages, `wiki/hot.md`, and `wiki/index.md`, then writes the synthesized result back to the daily file. All operations go through the `obsidian` CLI: `read` for reads, `properties path=<file>` for date-matched frontmatter scans, and `create overwrite=true` for the atomic synthesis write. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, multiline `content=` escapes, and the `overwrite` flag semantics.
 
----
-
 ## Vault path
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with:
@@ -21,8 +19,6 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 ```text
 No vault configured — run /wiki init first.
 ```
-
----
 
 ## Steps
 
@@ -82,8 +78,6 @@ No vault configured — run /wiki init first.
 
    Do **not** print the synthesis prose, the input context, the reasoning, or any other output. One line only.
 
----
-
 ## Prompt template (step 6)
 
 ```text
@@ -120,8 +114,6 @@ Write a prose summary (1–3 paragraphs) of the day's key insights, decisions, a
 Output only the prose and optional section headers/bullets. Do not include the input summaries.
 ```
 
----
-
 ## Failure modes
 
 | Condition             | Abort message                                                        |
@@ -133,8 +125,6 @@ Output only the prose and optional section headers/bullets. Do not include the i
 | Nothing to synthesize | `Nothing to synthesize for YYYY-MM-DD.`                              |
 | LLM synthesis fails   | `Synthesis failed: <reason>.` — daily file left unchanged            |
 | File write fails      | filesystem error — daily file left in pre-close state (atomic write) |
-
----
 
 ## Examples
 

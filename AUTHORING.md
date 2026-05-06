@@ -2,8 +2,6 @@
 
 Conventions for adding skills and shared protocols to this plugin.
 
----
-
 ## Directory Layout
 
 ```text
@@ -20,8 +18,6 @@ hooks/            Claude Code hooks (hooks.json + shell scripts)
 _templates/       This directory — authoring guidance and Obsidian Templater templates
 ```
 
----
-
 ## When to use `_shared/`
 
 Promote a document to `_shared/` only when **three or more skills** need to read it. If only one or two skills reference a doc, keep it under `skills/<name>/references/`.
@@ -32,8 +28,6 @@ Current shared docs:
 - `_shared/frontmatter.md` — universal YAML field schema, status/confidence values, typed relationship YAML shape
 - `_shared/hot-cache-protocol.md` — when to read/write `wiki/hot.md` and what to put in it
 - `_shared/cli.md` — empirical Obsidian CLI contract (exit codes, error patterns, escape hatches)
-
----
 
 ## Vault Operations: CLI Wrapper
 
@@ -54,8 +48,6 @@ A PreToolUse Bash hook (`hooks/obsidian-cli-rewrite.sh`) transparently rewrites 
 
 For error handling, exit-code semantics, and escape hatches (commands, eval), see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
 
----
-
 ## How skills reference `_shared/` files
 
 Use `${CLAUDE_PLUGIN_ROOT}/_shared/<file>` in skill prose and instructions. This is a runtime path that Claude Code resolves at load time. Do not hardcode absolute paths.
@@ -65,8 +57,6 @@ See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md` for the directory map.
 ```
 
 Skills should read `_shared/` files on demand, not preload them at skill start.
-
----
 
 ## Promotion rubric
 

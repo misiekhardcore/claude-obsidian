@@ -1,8 +1,8 @@
 ---
 type: concept
-title: "<% tp.file.title %>"
+title: <% tp.file.title %>
 complexity: intermediate
-domain: ""
+domain: 
 aliases: []
 created: <% tp.date.now("YYYY-MM-DD") %>
 updated: <% tp.date.now("YYYY-MM-DD") %>
@@ -12,7 +12,6 @@ status: seed
 related: []
 sources: []
 ---
-
 # <% tp.file.title %>
 
 ## Definition

@@ -3,14 +3,11 @@ name: ingest
 description: Ingest sources into the wiki vault. Extracts entities and concepts, creates or updates wiki pages, and cross-references them. Supports files and URLs.
 allowed-tools: Bash Read Glob Grep WebFetch
 ---
-
 # ingest: Source Ingestion
 
 Read the source. Write the wiki. Cross-reference everything. A single source typically touches 8-15 wiki pages.
 
 **Syntax standard**: Write all Obsidian Markdown using proper Obsidian Flavored Markdown. Wikilinks as `[[Note Name]]`, callouts as `> [!type] Title`, embeds as `![[file]]`, properties as YAML frontmatter. If the kepano/obsidian-skills plugin is installed, prefer its canonical obsidian-markdown skill for Obsidian syntax reference. Otherwise, follow the guidance in this skill.
-
----
 
 ## Delta Tracking
 
@@ -53,15 +50,11 @@ Before ingesting any file, check `.raw/.manifest.json` to avoid re-processing un
 
 Skip delta checking if the user says "force ingest" or "re-ingest".
 
----
-
 ## Vault I/O
 
 All vault reads and writes go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
 
 `.raw/.manifest.json` is one of the documented bypasses: mutate it via `jq + mv` (no JSON-mutate verb).
-
----
 
 ## URL Ingestion
 
@@ -80,8 +73,6 @@ Steps:
    ---
    ```
 5. Proceed with **Single Source Ingest** starting at step 2 (file is now in `.raw/`).
-
----
 
 ## Image / Vision Ingestion
 
@@ -109,8 +100,6 @@ Steps:
 5. Proceed with **Single Source Ingest** on the saved description file.
 
 Use cases: whiteboard photos, screenshots, diagrams, infographics, document scans.
-
----
 
 ## Single Source Ingest
 
@@ -143,8 +132,6 @@ Steps:
 
 10. **Check for contradictions.** If new info conflicts with existing pages, add `> [!contradiction]` callouts on both pages.
 
----
-
 ## Batch Ingest
 
 Trigger: user drops multiple files or says "ingest all of these."
@@ -159,8 +146,6 @@ Steps:
 
 Batch ingest is less interactive. For 30+ sources, expect significant processing time. Check in with the user after every 10 sources.
 
----
-
 ## Context Window Discipline
 
 Token budget matters. Follow these rules during ingest:
@@ -171,8 +156,6 @@ Token budget matters. Follow these rules during ingest:
 - Use PATCH for surgical edits. Never re-read an entire file just to update one field.
 - Keep wiki pages short. 100-300 lines max. If a page grows beyond 300 lines, split it.
 - Use search (`/search/simple/`) to find specific content without reading full pages.
-
----
 
 ## Contradictions
 
@@ -193,8 +176,6 @@ On the new source summary, reference it:
 ```
 
 Do not silently overwrite old claims. Flag and let the user decide.
-
----
 
 ## What Not to Do
 

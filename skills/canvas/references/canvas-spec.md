@@ -6,8 +6,6 @@ This reference aligns with the [JSON Canvas 1.0 open specification](https://json
 
 **ID format**: The JSON Canvas 1.0 spec recommends 16-character lowercase hexadecimal IDs (e.g., `"a1b2c3d4e5f67890"`). Obsidian itself generates IDs in this format. The descriptive ID examples in this reference (`"text-title-4821"`, `"img-cover-7823"`) are an alternative naming convention that this plugin uses for human readability. Both are valid JSON Canvas. Use whichever fits your workflow.
 
----
-
 ## Coordinate System
 
 ```text
@@ -25,8 +23,6 @@ y  │  (-920, 0)          (0, 0) ← origin
 - **y increases downward.** Negative y = above center.
 - Node `x` and `y` are the **top-left corner** of the node, not the center.
 - Obsidian pans to fit all nodes on first open.
-
----
 
 ## Node Types
 
@@ -51,8 +47,6 @@ Renders markdown content as a styled card.
 - Minimum readable size: width ≥ 200, height ≥ 60.
 - `color` is optional. Omit for default (no color).
 
----
-
 ### File node
 
 Renders an image, PDF, markdown note, or other vault file inline.
@@ -74,8 +68,6 @@ Renders an image, PDF, markdown note, or other vault file inline.
 - For `.md` files: renders as a preview card.
 - For `.pdf` files: renders the first page as preview.
 - No `color` field for file nodes: color is ignored.
-
----
 
 ### Group node (Zone)
 
@@ -105,8 +97,6 @@ A labeled rectangular region. Does not clip or contain nodes. It's a visual guid
   - `"repeat"`: tiles the image
 - Groups do not affect auto-layout: they are purely visual containers.
 
----
-
 ### Link node
 
 Renders a web URL as an embedded preview card.
@@ -125,8 +115,6 @@ Renders a web URL as an embedded preview card.
 
 - `url`: must be a valid `https://` URL.
 - Obsidian fetches the Open Graph preview (title, description, thumbnail).
-
----
 
 ## Edges
 
@@ -157,22 +145,18 @@ Connections between nodes. Usually empty for mood boards.
 
 Most edges represent directed relationships, so the asymmetric defaults (`fromEnd: "none"`, `toEnd: "arrow"`) produce a single arrow pointing from source to target without specifying anything explicitly.
 
----
-
 ## Color Reference
 
-| Code  | Color           | Hex (approx) | Use case          |
-| ----- | --------------- | ------------ | ----------------- |
-| `"1"` | Red / Tomato    | #e03e3e      | Warnings, archive |
-| `"2"` | Orange          | #d09035      | Active work       |
-| `"3"` | Yellow / Gold   | #d0a023      | WIP, notes        |
-| `"4"` | Green / Teal    | #448361      | Content, sources  |
-| `"5"` | Blue / Cyan     | #3ea7d3      | Navigation, info  |
-| `"6"` | Purple / Violet | #9063d2      | Title, identity   |
+|Code|Color|Hex (approx)|Use case|
+|-|-|-|-|
+|`"1"`|Red / Tomato|#e03e3e|Warnings, archive|
+|`"2"`|Orange|#d09035|Active work|
+|`"3"`|Yellow / Gold|#d0a023|WIP, notes|
+|`"4"`|Green / Teal|#448361|Content, sources|
+|`"5"`|Blue / Cyan|#3ea7d3|Navigation, info|
+|`"6"`|Purple / Violet|#9063d2|Title, identity|
 
 Omit `color` entirely for the default (no border color, transparent label).
-
----
 
 ## Image Sizing Guidelines
 
@@ -184,18 +168,16 @@ python3 -c "from PIL import Image; img=Image.open('path.png'); print(img.width, 
 identify -format '%w %h' path.png
 ```
 
-| Aspect ratio     | Condition     | Canvas width | Canvas height |
-| ---------------- | ------------- | ------------ | ------------- |
-| 16:9 (wide)      | ratio 1.6–2.0 | 420          | 236           |
-| 2:1 (ultra wide) | ratio > 2.0   | 440          | 220           |
-| 4:3              | ratio 1.2–1.6 | 380          | 285           |
-| 1:1 (square)     | ratio 0.9–1.1 | 280          | 280           |
-| 3:4              | ratio 0.6–0.9 | 240          | 320           |
-| 9:16 (portrait)  | ratio < 0.6   | 200          | 356           |
-| PDF              | any           | 400          | 520           |
-| Unknown          | fallback      | 320          | 240           |
-
----
+|Aspect ratio|Condition|Canvas width|Canvas height|
+|-|-|-|-|
+|16:9 (wide)|ratio 1.6–2.0|420|236|
+|2:1 (ultra wide)|ratio > 2.0|440|220|
+|4:3|ratio 1.2–1.6|380|285|
+|1:1 (square)|ratio 0.9–1.1|280|280|
+|3:4|ratio 0.6–0.9|240|320|
+|9:16 (portrait)|ratio < 0.6|200|356|
+|PDF|any|400|520|
+|Unknown|fallback|320|240|
 
 ## Auto-Positioning Pseudocode
 
@@ -230,8 +212,6 @@ function place_node(canvas, zone_label, new_w, new_h):
   row_y = min(n.y for n in inside)  # align to top of existing row
   return (next_x, row_y)
 ```
-
----
 
 ## Full Example: Two-Zone Canvas
 
@@ -299,8 +279,6 @@ function place_node(canvas, zone_label, new_w, new_h):
   "edges": []
 }
 ```
-
----
 
 ## Common Mistakes
 

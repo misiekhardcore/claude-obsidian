@@ -76,22 +76,22 @@ All skills live in `skills/<name>/SKILL.md` and are auto-discovered by Claude Co
 
 ## Available Skills
 
-| Skill               | Trigger phrases                                                                                                    |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `wiki`              | `/wiki`, set up wiki, scaffold vault, check setup                                                                  |
-| `ingest`            | ingest, ingest this url, ingest this image, batch ingest                                                           |
-| `query`             | query, what do you know about, query quick:, query deep:                                                           |
-| `lint`              | lint the wiki, health check, find orphans, dead links                                                              |
-| `save`              | `/save`, file this conversation, save insight                                                                      |
-| `notes`             | `/note`, `/dump`, note this, todo:, show my inbox, `/note process`                                                 |
-| `daily`             | `/daily`, daily note this, log to today, log this, add to today's log                                              |
-| `daily-close`       | `/daily-close`, close today, wrap up today, synthesize today                                                       |
-| `braindump`         | `/braindump`, brain dump this, dump the following thoughts, dump these thoughts, braindump:, split this into notes |
-| `autoresearch`      | autoresearch, autonomous research loop                                                                             |
-| `canvas`            | `/canvas`, add to canvas, create canvas                                                                            |
-| `defuddle`          | clean this url, defuddle, strip clutter                                                                            |
-| `obsidian-markdown` | obsidian syntax, wikilink, callout, embed                                                                          |
-| `obsidian-bases`    | obsidian bases, .base file, dynamic table                                                                          |
+|Skill|Trigger phrases|
+|-|-|
+|`wiki`|`/wiki`, set up wiki, scaffold vault, check setup|
+|`ingest`|ingest, ingest this url, ingest this image, batch ingest|
+|`query`|query, what do you know about, query quick:, query deep:|
+|`lint`|lint the wiki, health check, find orphans, dead links|
+|`save`|`/save`, file this conversation, save insight|
+|`notes`|`/note`, `/dump`, note this, todo:, show my inbox, `/note process`|
+|`daily`|`/daily`, daily note this, log to today, log this, add to today's log|
+|`daily-close`|`/daily-close`, close today, wrap up today, synthesize today|
+|`braindump`|`/braindump`, brain dump this, dump the following thoughts, dump these thoughts, braindump:, split this into notes|
+|`autoresearch`|autoresearch, autonomous research loop|
+|`canvas`|`/canvas`, add to canvas, create canvas|
+|`defuddle`|clean this url, defuddle, strip clutter|
+|`obsidian-markdown`|obsidian syntax, wikilink, callout, embed|
+|`obsidian-bases`|obsidian bases, .base file, dynamic table|
 
 ## Bootstrap
 

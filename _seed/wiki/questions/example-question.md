@@ -1,22 +1,21 @@
 ---
 type: question
-title: "What is a wiki question page for?"
-question: "What is a wiki question page for?"
+title: What is a wiki question page for?
+question: What is a wiki question page for?
 answer_quality: solid
-created: "{{today}}"
-updated: "{{today}}"
+created: {{today}}
+updated: {{today}}
 tags:
   - question
   - example
 status: developing
 confidence: INFERRED
 evidence:
-  - "[[example-source]]"
+  - [[example-source]]
 related:
-  - "[[example-concept]]"
-  - "[[example-entity]]"
+  - [[example-concept]]
+  - [[example-entity]]
 ---
-
 # What is a wiki question page for?
 
 **Question:** What is a wiki question page for?

@@ -1,23 +1,22 @@
 ---
 type: entity
-title: "Example Entity"
+title: Example Entity
 entity_type: person
-role: "Illustrative example"
-first_mentioned: "[[example-source]]"
-created: "{{today}}"
-updated: "{{today}}"
+role: Illustrative example
+first_mentioned: [[example-source]]
+created: {{today}}
+updated: {{today}}
 tags:
   - entity
   - example
 status: seed
 confidence: INFERRED
 evidence:
-  - "[[example-source]]"
+  - [[example-source]]
 related:
-  - "[[example-concept]]"
-  - "[[example-question]]"
+  - [[example-concept]]
+  - [[example-question]]
 ---
-
 # Example Entity
 
 ## Overview

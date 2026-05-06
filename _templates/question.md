@@ -1,7 +1,7 @@
 ---
 type: question
-title: "<% tp.file.title %>"
-question: ""
+title: <% tp.file.title %>
+question: 
 answer_quality: draft
 created: <% tp.date.now("YYYY-MM-DD") %>
 updated: <% tp.date.now("YYYY-MM-DD") %>
@@ -11,7 +11,6 @@ status: developing
 related: []
 sources: []
 ---
-
 # <% tp.file.title %>
 
 **Question:** [restate the original query]

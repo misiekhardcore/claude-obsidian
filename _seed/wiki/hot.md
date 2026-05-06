@@ -1,8 +1,8 @@
 ---
 type: meta
-title: "Hot Cache"
-created: "{{today}}"
-updated: "{{today}}"
+title: Hot Cache
+created: {{today}}
+updated: {{today}}
 tags:
   - meta
   - hot
@@ -10,11 +10,10 @@ status: evergreen
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[index]]"
-  - "[[log]]"
-  - "[[overview]]"
+  - [[index]]
+  - [[log]]
+  - [[overview]]
 ---
-
 # Recent Context
 
 > **Demo content** — this file is overwritten at the end of every wiki operation. It shows what a populated hot cache looks like. Delete this notice once your first real ingest has run and replaced this content.
@@ -48,10 +47,10 @@ The **index** ([[index]]) is the master catalog; the **log** ([[log]]) is the ch
 
 ## Schema Quick Reference
 
-| Page type | Directory       | confidence default | evidence required? |
-| --------- | --------------- | ------------------ | ------------------ |
-| source    | wiki/sources/   | EXTRACTED          | No                 |
-| concept   | wiki/concepts/  | INFERRED           | Yes                |
-| entity    | wiki/entities/  | INFERRED           | Yes                |
-| question  | wiki/questions/ | INFERRED           | Yes                |
-| meta      | wiki/           | EXTRACTED          | No                 |
+|Page type|Directory|confidence default|evidence required?|
+|-|-|-|-|
+|source|wiki/sources/|EXTRACTED|No|
+|concept|wiki/concepts/|INFERRED|Yes|
+|entity|wiki/entities/|INFERRED|Yes|
+|question|wiki/questions/|INFERRED|Yes|
+|meta|wiki/|EXTRACTED|No|

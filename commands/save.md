@@ -1,7 +1,6 @@
 ---
 description: Save the current conversation or a specific insight into the wiki vault as a structured note.
 ---
-
 Read the `save` skill. Then run the save workflow for this conversation.
 
 Usage:

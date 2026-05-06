@@ -7,16 +7,15 @@
   },
   "scripts": {
     "prepare": "husky",
-    "format": "dprint fmt && markdownlint-cli2 --fix \"**/*.md\"",
-    "lint": "dprint check && markdownlint-cli2 \"**/*.md\""
+    "format": "bin/minify-md -i -r ."
   },
   "devDependencies": {
-    "dprint": "^0.54",
     "husky": "^9.1",
-    "lint-staged": "^15.5",
-    "markdownlint-cli2": "^0.18"
+    "lint-staged": "^15.5"
   },
   "lint-staged": {
-    "*.md": ["dprint fmt", "markdownlint-cli2 --fix"]
+    "*.md": [
+      "bin/minify-md -i -r"
+    ]
   }
 }

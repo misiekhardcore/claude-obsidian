@@ -1,8 +1,8 @@
 ---
 type: meta
-title: "Wiki Overview"
-created: "{{today}}"
-updated: "{{today}}"
+title: Wiki Overview
+created: {{today}}
+updated: {{today}}
 tags:
   - meta
   - overview
@@ -10,10 +10,9 @@ status: seed
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[index]]"
-  - "[[hot]]"
+  - [[index]]
+  - [[hot]]
 ---
-
 # Wiki Overview
 
 Executive summary of this knowledge base: what it covers, how it is organized, and what is most useful.
@@ -28,12 +27,12 @@ Executive summary of this knowledge base: what it covers, how it is organized, a
 
 ## Status
 
-| Metric         | Value     |
-| -------------- | --------- |
-| Created        | {{today}} |
-| Total pages    | —         |
-| Domains        | —         |
-| Open questions | —         |
+|Metric|Value|
+|-|-|
+|Created|{{today}}|
+|Total pages|—|
+|Domains|—|
+|Open questions|—|
 
 ## Start Here
 

@@ -3,7 +3,6 @@ name: obsidian-bases
 description: Create and edit Obsidian Bases (.base files) — dynamic tables, cards, lists, filters, and formulas over vault notes.
 allowed-tools: Bash Read Glob
 ---
-
 # obsidian-bases: Obsidian's Database Layer
 
 Obsidian Bases (launched 2025) turns vault notes into queryable, dynamic views. Tables, cards, lists, maps. Defined in `.base` files. No plugin required; it is a core Obsidian feature.
@@ -20,8 +19,6 @@ This skill creates and edits `.base` files inside the vault. All reads and write
 - Replace an existing base: `obsidian create path=... overwrite=true content=...` (read first, modify in memory, write atomically)
 
 See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, multiline `content=` escapes, and the `overwrite` flag.
-
----
 
 ## File Format
 
@@ -57,8 +54,6 @@ views:
       - updated
       - formula.age_days
 ```
-
----
 
 ## Filters
 
@@ -100,13 +95,11 @@ filters:
 
 ### Useful filter functions
 
-| Function                 | Example               |
-| ------------------------ | --------------------- |
-| `file.hasTag("x")`       | Notes with tag `x`    |
-| `file.inFolder("path/")` | Notes in folder       |
-| `file.hasLink("Note")`   | Notes linking to Note |
-
----
+|Function|Example|
+|-|-|
+|`file.hasTag("x")`|Notes with tag `x`|
+|`file.inFolder("path/")`|Notes in folder|
+|`file.hasLink("Note")`|Notes linking to Note|
 
 ## Properties
 
@@ -115,8 +108,6 @@ Three types:
 - **Note properties**: from frontmatter: `status`, `type`, `updated`
 - **File properties**: metadata: `file.name`, `file.mtime`, `file.size`, `file.ctime`, `file.tags`, `file.folder`
 - **Formula properties**: computed: `formula.age_days`
-
----
 
 ## Formulas
 
@@ -153,8 +144,6 @@ age: '(now() - file.ctime).round(0)'
 # CORRECT
 days_left: 'if(due_date, (date(due_date) - today()).days, "")'
 ```
-
----
 
 ## View Types
 
@@ -197,8 +186,6 @@ views:
       - file.name
       - status
 ```
-
----
 
 ## Wiki Vault Templates
 
@@ -273,8 +260,6 @@ views:
       direction: ASC
 ```
 
----
-
 ## Embedding in Notes
 
 ```markdown
@@ -282,8 +267,6 @@ views:
 
 ![[MyBase.base#View Name]]
 ```
-
----
 
 ## Where to Save
 
@@ -293,15 +276,11 @@ Store `.base` files in `wiki/meta/` for vault dashboards:
 - `wiki/meta/entities.base`: entity tracker
 - `wiki/meta/sources.base`: ingestion log
 
----
-
 ## YAML Quoting Rules
 
 - Formulas with double quotes → wrap in single quotes: `'if(done, "Yes", "No")'`
 - Strings with colons or special chars → wrap in double quotes: `"Status: Active"`
 - Unquoted strings with `:` break YAML parsing
-
----
 
 ## What Not to Do
 

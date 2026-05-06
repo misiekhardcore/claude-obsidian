@@ -16,8 +16,6 @@ This skill reads templates and existing pages, creates a new note, prepends entr
 
 See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, the `overwrite` flag, and multiline `content=` escaping.
 
----
-
 ## Note Type Decision
 
 Determine the best type from the conversation content:
@@ -31,8 +29,6 @@ Determine the best type from the conversation content:
 | session   | wiki/meta/      | Full session summary: captures everything discussed               |
 
 If the user specifies a type, use that. If not, pick the best fit based on the content. When in doubt, use `synthesis`.
-
----
 
 ## Save Workflow
 
@@ -80,8 +76,6 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
 9. **Rewrite** `wiki/hot.md` (use the `overwrite` flag). Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 10. **Confirm**: "Saved as [[Note Title]] in wiki/[folder]/."
 
----
-
 ## Frontmatter Template
 
 ```yaml
@@ -118,8 +112,6 @@ status: active
 
 Do **not** write a `domain:` field on any leaf you save. Hub membership is forward-only — the `wiki/domains/<slug>/_index.md` hub is responsible for linking out to its leaves; the leaf does not declare which hub it belongs to. The leaf's tags are enough for `/lint` and `/wiki promote` to discover it later. If a relevant hub already exists, append the new leaf to that hub's `related:` list as a separate operation; do not encode the relationship on the leaf.
 
----
-
 ## Writing Style
 
 - Declarative, present tense. Write the knowledge, not the conversation.
@@ -128,8 +120,6 @@ Do **not** write a `domain:` field on any leaf you save. Hub membership is forwa
 - Include all relevant context. Future sessions should be able to read this page cold.
 - Link every mentioned concept, entity, or wiki page with wikilinks.
 - Cite sources where applicable: `(Source: [[Page]])`.
-
----
 
 ## What to Save vs. Skip
 

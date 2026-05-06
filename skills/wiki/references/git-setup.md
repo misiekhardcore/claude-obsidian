@@ -2,8 +2,6 @@
 
 Initialize git in the vault to get full history and protect against bad writes.
 
----
-
 ## Initialize
 
 ```bash
@@ -12,8 +10,6 @@ git init
 git add -A
 git commit -m "Initial vault scaffold"
 ```
-
----
 
 ## .gitignore
 
@@ -28,8 +24,6 @@ The root `.gitignore` in this repo already covers the right exclusions:
 ```
 
 `workspace.json` changes constantly as you move panes around. Excluding it keeps the diff clean.
-
----
 
 ## Remote (Optional)
 

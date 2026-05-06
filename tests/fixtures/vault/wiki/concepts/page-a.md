@@ -1,12 +1,11 @@
 ---
 type: concept
-title: "Page A"
+title: Page A
 created: 2026-04-26
 updated: 2026-04-26
 related:
-  - "[[page-b]]"
+  - [[page-b]]
 ---
-
 # Page A
 
 Fixture page that exercises wikilink resolution.

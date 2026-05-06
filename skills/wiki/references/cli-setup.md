@@ -2,15 +2,11 @@
 
 The claude-obsidian plugin uses the **Obsidian CLI** to read and write vault notes directly. The CLI ships with Obsidian 1.12.7+, requires no plugins, and survives Obsidian restarts.
 
----
-
 ## Prerequisites
 
 - **Obsidian 1.12.7 or later** (2026 or later). Check your version: **Obsidian > About**.
 - **Obsidian must be running** with your vault open. The CLI is a desktop-app IPC channel; it communicates via the running process.
 - The Obsidian binary must be on your `PATH` (or invoked via Flatpak — see below).
-
----
 
 ## Step 1: Verify the CLI is Available
 
@@ -42,8 +38,6 @@ alias obsidian='flatpak run md.obsidian.Obsidian --cli'
 
 **macOS / Windows:** Reinstall Obsidian from https://obsidian.md/download and ensure it's in `PATH`.
 
----
-
 ## Step 2: Register Your Vault
 
 The Obsidian CLI needs to know your vault's location. Open Obsidian and do this **once per vault**:
@@ -63,8 +57,6 @@ obsidian list vaults
 
 Your vault should appear in the list.
 
----
-
 ## Step 3: Sanity Check
 
 With Obsidian still running and the vault open, test the CLI:
@@ -80,8 +72,6 @@ If you get **`Vault not found.`**, double-check:
 1. Obsidian is still running
 2. The vault path in the register step was an absolute path (not relative)
 3. The vault name you passed matches the registered vault name exactly
-
----
 
 ## Common Operations
 
@@ -109,8 +99,6 @@ obsidian tags
 
 For a complete reference of all commands and options, see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
 
----
-
 ## When the CLI is Unavailable
 
 If Obsidian is closed or the CLI is not installed:
@@ -123,8 +111,6 @@ If Obsidian is closed or the CLI is not installed:
 2. Verify `obsidian version` returns a version string (not empty, not "command not found")
 3. Confirm your vault is registered: `obsidian list vaults`
 4. Re-run your vault operation
-
----
 
 ## Examples
 
@@ -197,8 +183,6 @@ obsidian deadends
 obsidian unresolved format=json
 obsidian backlinks path=wiki/index.md format=json
 ```
-
----
 
 ## See Also
 

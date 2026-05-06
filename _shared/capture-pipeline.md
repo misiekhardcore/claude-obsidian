@@ -2,8 +2,6 @@
 
 Stable contract for all capture surfaces: `/note`, `/daily`, `/braindump` (sub-issue D), and rich inputs (sub-issue E). Section headings are **stable anchors** — do not reorder. Future splits patch individual sections in place.
 
----
-
 ## 1. Vault path resolution
 
 Resolve `<vault_root>` by delegating to `scripts/resolve-vault.sh`, which is the canonical implementation used by `wiki`.
@@ -28,8 +26,6 @@ No vault configured — run /wiki init first.
 ```
 
 Do not continue.
-
----
 
 ## 2. Frontmatter schema (note + daily)
 
@@ -71,8 +67,6 @@ updated: YYYY-MM-DD
 - `date` — calendar date this file covers; equals `created`.
 - No `title`, `topic`, `tags`, `source_project`, or `status` — daily files are chronological logs, not knowledge objects.
 
----
-
 ## 3. Slug rule (title-driven)
 
 Slugs are computed by the `slug.sh` script — do not slugify inline:
@@ -86,8 +80,6 @@ See `scripts/slug.sh` header for the full contract. Exit 1 means both inputs slu
 The script outputs a lowercase, hyphenated slug (max 40 chars, truncated at the last `-`). This is the canonical slug rule; callers must not duplicate the logic.
 
 Note files use slug in the filename: `<vault_root>/notes/YYYY-MM-DD-<slug>.md`. Daily files do not use a slug — their filename is the date: `<vault_root>/daily/YYYY-MM-DD.md`.
-
----
 
 ## 4. MATCH/NEW heuristic (incl. prompt template)
 
@@ -142,13 +134,9 @@ If the new content broadens the note's scope, rewrite `title:` to cover the unio
 3. Path: `<vault_root>/notes/YYYY-MM-DD-<slug>.md`. If it exists for today, append `-2`, `-3`, …
 4. Frontmatter from §2 note shape; body is the verbatim text.
 
----
-
 ## 5. Attachment handling (image input + URL redirect)
 
 Image-input handling — validation, vision-LLM invocation, move mechanics, embed syntax, frontmatter, and error handling — is documented in [`_shared/image-capture.md`](${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md).
-
----
 
 ## 6. Index patching (notes/index.md)
 
@@ -165,8 +153,6 @@ Patch in place after every CAPTURE — never rewrite from scratch.
 Row format: `- [ ] YYYY-MM-DD [source_project] title` (pending) or `- [~] YYYY-MM-DD [source_project] title` (deferred).
 
 `notes/index.md` canonical template lives at `_seed/notes/index.md`. Two static sections: `## Pending` and `## Deferred`. Updated on every CAPTURE and PROCESS action. Mirror the patch-in-place pattern used by `/save` and `/ingest`.
-
----
 
 ## 7. Daily page append shape
 

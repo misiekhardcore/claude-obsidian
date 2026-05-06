@@ -8,8 +8,6 @@ allowed-tools: Bash Read Glob Grep
 
 Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. Output a lint report to `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
----
-
 ## Scan Scope
 
 The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs on an unchanged vault produce byte-identical JSON (excluding `scan_date`).
@@ -30,8 +28,6 @@ The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs
 **File extensions scanned for wikilinks (sources):** `.md`, `.canvas`
 
 **File extensions valid as wikilink targets (resolver pool):** `.md`, `.canvas`, `.base`, `.png`, `.jpg`, `.jpeg`, `.svg`, `.pdf`
-
----
 
 ## Lint Checks
 
@@ -101,8 +97,6 @@ The following checks require entity-extraction or semantic contradiction detecti
 - **Stale claims.** Look for assertions on older pages that newer sources may have contradicted or updated. Focus on pages with `confidence: INFERRED` or `AMBIGUOUS` and compare their claims against recently ingested sources in the same domain.
 - **Missing pages.** Look for concepts or entities mentioned in three or more pages that lack their own wiki page. Use the hot cache and index as a starting point; search for recurring noun phrases that have no `[[wikilink]]` target.
 - **Missing cross-references.** Look for entity names mentioned in page prose without a `[[wikilink]]`. Focus on high-traffic entities visible in the backlink density report (check #10).
-
----
 
 ## Lint Report Format
 
@@ -194,8 +188,6 @@ Source: `anti_patterns` array from `wiki/meta/lint-data-YYYY-MM-DD.json`. Not co
 - `[[Source Page]]`: URL-as-wikilink `[[https://example.com]]`. Suggest: convert to a plain `[text](url)` Markdown link.
 ```
 
----
-
 ## Naming Conventions
 
 Enforce these during lint:
@@ -209,8 +201,6 @@ Enforce these during lint:
 
 Filenames must be unique across the vault. Wikilinks work without paths only if filenames are unique.
 
----
-
 ## Writing Style Check
 
 During lint, flag pages that violate the style guide:
@@ -219,8 +209,6 @@ During lint, flag pages that violate the style guide:
 - Missing source citations where claims are made
 - Uncertainty not flagged with `> [!gap]`
 - Contradictions not flagged with `> [!contradiction]`
-
----
 
 ## Bases Dashboard
 
@@ -276,8 +264,6 @@ views:
 
 **Embedding:** add `![[dashboard.base]]` (or `![[dashboard.base#Recent Activity]]` for a single view) inside any wiki page to surface the dashboard.
 
----
-
 ## Canvas Map
 
 Create or update `wiki/meta/overview.canvas` for a visual domain map. Use `wiki/index.md` as the central node:
@@ -302,8 +288,6 @@ Create or update `wiki/meta/overview.canvas` for a visual domain map. Use `wiki/
 
 Add one node per domain hub (`wiki/domains/<slug>/_index.md`). Connect hubs that have significant cross-references. Colors map to the CSS scheme: 1=blue, 2=purple, 3=yellow, 4=orange, 5=green, 6=red.
 
----
-
 ## Before Auto-Fixing
 
 Always show the lint report first. Ask: "Should I fix these automatically, or do you want to review each one?"
@@ -325,8 +309,6 @@ Never auto-fix:
 
 - Trail integrity findings (check #16). Trails are frozen-at-write-time run-snapshots; rewriting them post-emission destroys the run-record property. Surface the finding and let the user repair manually or accept the drift.
 
----
-
 ## After Lint
 
 If the lint run applied any auto-fixes that modified wiki pages (new stubs, added frontmatter, added wikilinks), update `wiki/hot.md` before closing the session. Note which pages were touched under `## Recent Changes` and summarize the lint outcome under `## Last Updated`.
@@ -334,8 +316,6 @@ If the lint run applied any auto-fixes that modified wiki pages (new stubs, adde
 For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 
 If the lint report is advisory only (no auto-fixes applied), skip the hot.md update — reports live at `wiki/meta/lint-report-*.md` and do not count as wiki content changes.
-
----
 
 ## Report Rotation
 

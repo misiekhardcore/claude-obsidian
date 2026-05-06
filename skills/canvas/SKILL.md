@@ -14,8 +14,6 @@ The three knowledge capture layers:
 
 A canvas is a JSON file Obsidian renders as an infinite visual board. This skill reads and writes canvas JSON directly. Read `references/canvas-spec.md` for the full format reference before making any edits. This spec aligns with the [JSON Canvas open standard](https://jsoncanvas.org/). If the kepano/obsidian-skills plugin is installed, its json-canvas skill is the authoritative canvas spec reference. Otherwise, use the guidance below.
 
----
-
 ## Default Canvas
 
 `wiki/canvases/main.canvas`
@@ -50,8 +48,6 @@ If it does not exist, create it:
 }
 ```
 
----
-
 ## Operations
 
 ### open / status (`/canvas` with no args)
@@ -61,16 +57,12 @@ If it does not exist, create it:
 3. If no: create it with the starter structure above. Report: "Created main.canvas with a General zone."
 4. Tell user: "Open `wiki/canvases/main.canvas` in Obsidian to view."
 
----
-
 ### new (`/canvas new [name]`)
 
 1. Slugify the name: lowercase, spaces → hyphens, strip special chars.
 2. Create `wiki/canvases/[slug].canvas` with the starter structure, title updated to `# [Name]`.
 3. Append a row to the `wiki/meta/dashboard.md` "## Canvases" section. Do not modify `wiki/index.md`. It uses a fixed section schema (Domains, Entities, Concepts, Sources, Questions, Comparisons).
 4. Report: "Created wiki/canvases/[slug].canvas"
-
----
 
 ### add image (`/canvas add image [path or url]`)
 
@@ -90,8 +82,6 @@ Create `_attachments/images/canvas/` if it doesn't exist.
 
 Report: "Added [filename] to [zone] zone at position ([x], [y])."
 
----
-
 ### add text (`/canvas add text [content]`)
 
 Create a text node:
@@ -109,8 +99,6 @@ Create a text node:
 
 Position using auto-layout. Write and report.
 
----
-
 ### add pdf (`/canvas add pdf [path]`)
 
 Same as add image. Obsidian renders PDFs natively as file nodes.
@@ -118,8 +106,6 @@ Same as add image. Obsidian renders PDFs natively as file nodes.
 - Copy to `_attachments/pdfs/canvas/` if outside vault.
 - Fixed size: width=400, height=520.
 - Report page count if you can determine it.
-
----
 
 ### add note (`/canvas add note [wiki-page]`)
 
@@ -139,8 +125,6 @@ Same as add image. Obsidian renders PDFs natively as file nodes.
   "width": 300, "height": 100
 }
 ```
-
----
 
 ### zone (`/canvas zone [name] [color]`)
 
@@ -165,8 +149,6 @@ Valid colors: `"1"`=red `"2"`=orange `"3"`=yellow `"4"`=green `"5"`=cyan `"6"`=p
 
 Write and report.
 
----
-
 ### list (`/canvas list`)
 
 1. `glob wiki/canvases/*.canvas`
@@ -177,8 +159,6 @@ Write and report.
 wiki/canvases/main.canvas      . 14 nodes (8 images, 3 text, 2 file, 1 group)
 wiki/canvases/design-ideas.canvas. 42 nodes (30 images, 4 text, 8 groups)
 ```
-
----
 
 ### from banana (`/canvas from banana`) (if the banana-claude plugin is installed)
 
@@ -192,8 +172,6 @@ wiki/canvases/design-ideas.canvas. 42 nodes (30 images, 4 text, 8 groups)
 3. If still none: show the 5 most recently modified images.
 4. Present list: "Found N recent images: [list]. Add to canvas? Which zone? (zone name / 'new [name]' / 'skip')"
 5. On confirmation: add each using the add image logic.
-
----
 
 ## Auto-Positioning Algorithm
 
@@ -236,8 +214,6 @@ def next_position(canvas_nodes, target_zone_label, new_w, new_h):
     return next_x, current_row_y
 ```
 
----
-
 ## ID Generation
 
 Read the canvas, collect all existing IDs. Never reuse one.
@@ -250,15 +226,11 @@ Examples: `img-cover-1744032823`, `text-note-1744032845`, `zone-branding-1744032
 
 If a collision is detected (ID already exists in the canvas), append `-2`, `-3`, etc.
 
----
-
 ## Session Log (optional hook)
 
 If `wiki/canvases/.recent-images.txt` exists, append any new image path written to `_attachments/images/` during this session (one path per line, keep last 20).
 
 `/canvas from banana` reads this file first, making it instant without filesystem search.
-
----
 
 ## Banana Integration (if the banana-claude plugin is installed)
 
@@ -267,8 +239,6 @@ After any `/banana` run in the same session, if the user says "add to canvas" or
 When `/banana` finishes generating images, suggest:
 
 > "Add generated images to canvas? Run `/canvas from banana`"
-
----
 
 ## Summary
 

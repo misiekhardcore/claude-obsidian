@@ -3,25 +3,22 @@ name: obsidian-markdown
 description: Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, and math. Reference when creating any wiki page.
 allowed-tools: Read Write Edit
 ---
-
 # obsidian-markdown: Obsidian Flavored Markdown
 
 Reference this skill when writing any wiki page. Obsidian extends standard Markdown with wikilinks, embeds, callouts, and properties. Getting syntax wrong causes broken links, invisible callouts, or malformed frontmatter.
 
 **Cross-reference**: If the kepano/obsidian-skills plugin is installed, prefer its canonical obsidian-markdown skill for authoritative Obsidian syntax reference. Otherwise, use the reference below. See also [github.com/kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
 
----
-
 ## Wikilinks
 
 Internal links use double brackets. The filename without extension.
 
-| Syntax                        | What it does                        |
-| ----------------------------- | ----------------------------------- |
-| `[[Note Name]]`               | Basic link                          |
-| `[[Note Name\|Display Text]]` | Aliased link (shows "Display Text") |
-| `[[Note Name#Heading]]`       | Link to a specific heading          |
-| `[[Note Name#^block-id]]`     | Link to a specific block            |
+|Syntax|What it does|
+|-|-|
+|`[[Note Name]]`|Basic link|
+|`[[Note Name\|Display Text]]`|Aliased link (shows "Display Text")|
+|`[[Note Name#Heading]]`|Link to a specific heading|
+|`[[Note Name#^block-id]]`|Link to a specific block|
 
 Rules:
 
@@ -29,22 +26,18 @@ Rules:
 - No path needed: Obsidian resolves by filename uniqueness.
 - If two files have the same name, use `[[Folder/Note Name]]` to disambiguate.
 
----
-
 ## Embeds
 
 Embeds use `!` before the wikilink. They display the content inline.
 
-| Syntax                   | What it does                            |
-| ------------------------ | --------------------------------------- |
-| `![[Note Name]]`         | Embed a full note                       |
-| `![[Note Name#Heading]]` | Embed a section                         |
-| `![[image.png]]`         | Embed an image                          |
-| `![[image.png\|300]]`    | Embed image with width 300px            |
-| `![[document.pdf]]`      | Embed a PDF (Obsidian renders natively) |
-| `![[audio.mp3]]`         | Embed audio                             |
-
----
+|Syntax|What it does|
+|-|-|
+|`![[Note Name]]`|Embed a full note|
+|`![[Note Name#Heading]]`|Embed a section|
+|`![[image.png]]`|Embed an image|
+|`![[image.png\|300]]`|Embed image with width 300px|
+|`![[document.pdf]]`|Embed a PDF (Obsidian renders natively)|
+|`![[audio.mp3]]`|Embed audio|
 
 ## Callouts
 
@@ -62,24 +55,22 @@ Callouts are blockquotes with a type keyword. They render as styled alert boxes.
 
 ### All callout types
 
-| Type            | Aliases                | Use for                                   |
-| --------------- | ---------------------- | ----------------------------------------- |
-| `note`          | :                      | General notes                             |
-| `abstract`      | `summary`, `tldr`      | Summaries                                 |
-| `info`          | :                      | Information                               |
-| `todo`          | :                      | Action items                              |
-| `tip`           | `hint`, `important`    | Tips and highlights                       |
-| `success`       | `check`, `done`        | Positive outcomes                         |
-| `question`      | `help`, `faq`          | Open questions                            |
-| `warning`       | `caution`, `attention` | Warnings                                  |
-| `failure`       | `fail`, `missing`      | Errors or failures                        |
-| `danger`        | `error`                | Critical issues                           |
-| `bug`           | :                      | Known bugs                                |
-| `example`       | :                      | Examples                                  |
-| `quote`         | `cite`                 | Quotations                                |
-| `contradiction` | :                      | Conflicting information (wiki convention) |
-
----
+|Type|Aliases|Use for|
+|-|-|-|
+|`note`|:|General notes|
+|`abstract`|`summary`, `tldr`|Summaries|
+|`info`|:|Information|
+|`todo`|:|Action items|
+|`tip`|`hint`, `important`|Tips and highlights|
+|`success`|`check`, `done`|Positive outcomes|
+|`question`|`help`, `faq`|Open questions|
+|`warning`|`caution`, `attention`|Warnings|
+|`failure`|`fail`, `missing`|Errors or failures|
+|`danger`|`error`|Critical issues|
+|`bug`|:|Known bugs|
+|`example`|:|Examples|
+|`quote`|`cite`|Quotations|
+|`contradiction`|:|Conflicting information (wiki convention)|
 
 ## Properties (Frontmatter)
 
@@ -110,8 +101,6 @@ Rules:
 - Wikilinks in YAML must be quoted: `"[[Page]]"`.
 - `tags` field: Obsidian reads this as the tag list, searchable in vault.
 
----
-
 ## Tags
 
 Two valid forms:
@@ -130,21 +119,17 @@ tags:
 
 Do not use `#` inside frontmatter tag lists. Just the tag name.
 
----
-
 ## Text Formatting
 
 Standard Markdown plus Obsidian extensions:
 
-| Syntax              | Result                                |
-| ------------------- | ------------------------------------- |
-| `**bold**`          | Bold                                  |
-| `*italic*`          | Italic                                |
-| `~~strikethrough~~` | Strikethrough                         |
-| `==highlight==`     | Highlighted text (yellow in Obsidian) |
-| `` `inline code` `` | Inline code                           |
-
----
+|Syntax|Result|
+|-|-|
+|`**bold**`|Bold|
+|`*italic*`|Italic|
+|`~~strikethrough~~`|Strikethrough|
+|`==highlight==`|Highlighted text (yellow in Obsidian)|
+|`` `inline code` ``|Inline code|
 
 ## Math
 
@@ -164,8 +149,6 @@ $$
 $$
 ```
 
----
-
 ## Code Blocks
 
 Standard fenced code blocks. Obsidian highlights all common languages:
@@ -176,8 +159,6 @@ def hello():
     return "world"
 ```
 ````
-
----
 
 ## Tables
 
@@ -191,8 +172,6 @@ Standard Markdown tables:
 ```
 
 Obsidian renders tables natively. No plugin needed.
-
----
 
 ## Mermaid Diagrams
 
@@ -210,8 +189,6 @@ graph TD
 
 Supported: `graph`, `sequenceDiagram`, `gantt`, `classDiagram`, `pie`, `flowchart`.
 
----
-
 ## Footnotes
 
 ```markdown
@@ -219,8 +196,6 @@ This sentence has a footnote.[^1]
 
 [^1]: The footnote text goes here.
 ```
-
----
 
 ## What NOT to Do
 

@@ -2,16 +2,12 @@
 
 Read after `_shared/image-capture.md` when images are present in a `/daily` capture.
 
----
-
 ## Vision-LLM output contract
 
 For `/daily`, the vision-LLM call must return:
 
 - `description` — concise description of image content (≤140 chars preferred)
 - `vision-slug` — ≤40 chars, slug-format; used as the attachment filename stem
-
----
 
 ## Bullet and embed shape
 
@@ -24,8 +20,6 @@ The bullet under `## Captures` uses the LLM description, with embeds indented tw
 ```
 
 Multiple images: all embeds appear indented under the same bullet, in input order.
-
----
 
 ## Frontmatter
 

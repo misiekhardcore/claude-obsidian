@@ -3,7 +3,6 @@ name: query
 description: Answer questions from the wiki vault. Reads hot cache then index then pages, synthesizes with citations. Files good answers back.
 allowed-tools: Bash Read Glob Grep
 ---
-
 # query: Query the Wiki
 
 The wiki has already done the synthesis work. Read strategically, answer precisely, and file good answers back so the knowledge compounds.
@@ -14,19 +13,15 @@ This skill reads `wiki/hot.md`, `wiki/index.md`, and individual pages under `wik
 
 See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, output formats, and exit-code handling.
 
----
-
 ## Query Modes
 
 Three depths. Choose based on the question complexity.
 
-| Mode         | Trigger                                          | Reads                      | Token cost | Best for                                                    |
-| ------------ | ------------------------------------------------ | -------------------------- | ---------- | ----------------------------------------------------------- |
-| **Quick**    | `query quick: ...` or simple factual Q           | hot.md + index.md only     | ~1,500     | "What is X?", date lookups, quick facts                     |
-| **Standard** | default (no flag)                                | hot.md + index + 3-5 pages | ~3,000     | Most questions                                              |
-| **Deep**     | `query deep: ...` or "thorough", "comprehensive" | Full wiki + optional web   | ~8,000+    | "Compare A vs B across everything", synthesis, gap analysis |
-
----
+|Mode|Trigger|Reads|Token cost|Best for|
+|-|-|-|-|-|
+|**Quick**|`query quick: ...` or simple factual Q|hot.md + index.md only|~1,500|"What is X?", date lookups, quick facts|
+|**Standard**|default (no flag)|hot.md + index + 3-5 pages|~3,000|Most questions|
+|**Deep**|`query deep: ...` or "thorough", "comprehensive"|Full wiki + optional web|~8,000+|"Compare A vs B across everything", synthesis, gap analysis|
 
 ## Quick Mode
 
@@ -38,8 +33,6 @@ Use when the answer is likely in the hot cache or index summary.
 4. If not found, say "Not in quick cache. Run as standard query?"
 
 Do not open individual wiki pages in quick mode. Do not call `obsidian backlinks` in quick mode — backlink-aware ranking belongs to standard and deep modes; quick mode preserves a ~1.5K token budget.
-
----
 
 ## Standard Query Workflow
 
@@ -61,8 +54,6 @@ After candidates are read:
 9. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
 10. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
 
----
-
 ## Deep Mode
 
 Use for synthesis questions, comparisons, or "tell me everything about X."
@@ -76,24 +67,20 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
 7. Synthesize a comprehensive answer with full citations.
 8. Always file the result back as a wiki page. Deep answers are too valuable to lose.
 
----
-
 ## Token Discipline
 
 Read the minimum needed:
 
-| Start with     | Cost (approx)    | When to stop                              |
-| -------------- | ---------------- | ----------------------------------------- |
-| hot.md         | ~500 tokens      | If it has the answer                      |
-| index.md       | ~1000 tokens     | If you can identify 3-5 relevant pages    |
-| 3-5 wiki pages | ~300 tokens each | Usually sufficient                        |
-| 10+ wiki pages | expensive        | Only for synthesis across the entire wiki |
+|Start with|Cost (approx)|When to stop|
+|-|-|-|
+|hot.md|~500 tokens|If it has the answer|
+|index.md|~1000 tokens|If you can identify 3-5 relevant pages|
+|3-5 wiki pages|~300 tokens each|Usually sufficient|
+|10+ wiki pages|expensive|Only for synthesis across the entire wiki|
 
 If hot.md has the answer, respond without reading further.
 
 For the full hot-cache protocol (when it is written, what it contains, and sub-agent rules), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
-
----
 
 ## Index Format Reference
 
@@ -122,8 +109,6 @@ The master index (`wiki/index.md`) looks like:
 ```
 
 Scan the section headers first to determine which sections to read.
-
----
 
 ## Domain Hub Format
 
@@ -166,8 +151,6 @@ Reach a hub via step 3 of the standard flow (`wiki/domains/<cluster-tag>/_index.
 
 Per-folder `<folder>/_index.md` files are not used. Folders like `concepts/`, `entities/`, `sources/`, `solutions/` are flat directories; cross-folder navigation goes through hubs.
 
----
-
 ## Trail Discovery
 
 Trails are run-records emitted by `/autoresearch`. They live under `wiki/trails/Trail: [Topic] (YYYY-MM-DD).md` and answer "in what order, and why each next?" — complementary to hubs ("what notes are about X?"). When the question is about a topic that has been research-ran, the trail is usually the cheapest route to the right reading order.
@@ -189,8 +172,6 @@ Trails are run-records emitted by `/autoresearch`. They live under `wiki/trails/
 **Trail vs. hub** — both are reachable via backlinks, but they answer different questions and the discovery filter (`type: trail` vs. `type: domain`) is the disambiguator. A page can have both kinds of backlinks; read the trail when the user is re-entering a research topic, the hub when the user is exploring a domain.
 
 **Fallback.** If no trail exists for a synthesis page, fall back to the existing backlink/hub traversal in steps 5–6 of the standard flow. No trail is not a gap — `/autoresearch` now emits exactly one trail per run, so the only legitimate absence is a synthesis page produced before this feature shipped.
-
----
 
 ## Filing Answers Back
 
@@ -218,8 +199,6 @@ status: developing
 Then write the answer as the page body. Include citations. Link every mentioned concept or entity.
 
 After filing, add an entry to `wiki/index.md` under Questions and append to `wiki/log.md`.
-
----
 
 ## Gap Handling
 

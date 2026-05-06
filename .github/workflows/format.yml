@@ -5,8 +5,8 @@ on:
     branches: [main]
 
 jobs:
-  lint:
-    name: dprint + markdownlint
+  format:
+    name: format
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -22,5 +22,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run lint
-        run: npm run lint
+      - name: Run format
+        run: npm run format

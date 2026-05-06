@@ -1,16 +1,16 @@
 ---
 type: source
-title: "Example Source"
+title: Example Source
 source_type: article
-author: ""
-date_published: "{{today}}"
-url: ""
+author: 
+date_published: {{today}}
+url: 
 source_reliability: high
 key_claims:
-  - "Source pages capture what was found in a document, not inferences from it"
-  - "Each source gets its own page, linked from any concept or entity it informs"
-created: "{{today}}"
-updated: "{{today}}"
+  - Source pages capture what was found in a document, not inferences from it
+  - Each source gets its own page, linked from any concept or entity it informs
+created: {{today}}
+updated: {{today}}
 tags:
   - source
   - example
@@ -18,11 +18,10 @@ status: seed
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[example-concept]]"
-  - "[[example-entity]]"
-  - "[[example-question]]"
+  - [[example-concept]]
+  - [[example-entity]]
+  - [[example-question]]
 ---
-
 # Example Source
 
 ## Summary

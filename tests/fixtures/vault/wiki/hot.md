@@ -1,10 +1,9 @@
 ---
 type: hot-cache
-title: "Hot cache"
+title: Hot cache
 created: 2026-04-26
 updated: 2026-04-26
 ---
-
 # Hot Cache
 
 ## Last Updated

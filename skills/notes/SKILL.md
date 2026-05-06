@@ -10,13 +10,9 @@ Some thoughts shouldn't interrupt the work to write a real wiki page. A bug in t
 
 The wiki is the polished knowledge base. `notes/` is the inbox. Keep them separate. `/save` files synthesised pages; `/note` files raw thoughts.
 
----
-
 ## Vault path
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Always write to `<vault_root>/notes/` regardless of CWD. If no vault is configured, abort with `No vault configured — run /wiki init first.`
-
----
 
 ## Operations
 
@@ -27,8 +23,6 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 | `/note process`, "process my notes", "triage the inbox"                                               | PROCESS   | this skill |
 
 Capture, list, and process do not prompt for tags, types, or confirmations beyond the per-note action prompt in PROCESS.
-
----
 
 ## CAPTURE Operation
 
@@ -62,8 +56,6 @@ Steps:
 
 Do **not** print the diff, the match reasoning, or attachment details.
 
----
-
 ## LIST Operation
 
 Goal: show pending and deferred notes for triage.
@@ -90,8 +82,6 @@ Steps:
 4. **Filter `--project=<basename>`** — when present, only show notes whose `source_project` matches. Honour the same flag in natural-language form (`"show my inbox for claude-obsidian"`).
 
 `/note list` includes pending + deferred. `/note process` iterates pending only by default; pass `--include-deferred` to walk both.
-
----
 
 ## PROCESS Operation
 
@@ -122,21 +112,15 @@ Steps:
 
 `/save` handoff is the primary off-ramp. Defer is for notes that aren't actionable yet but may be later. Delete is for noise.
 
----
-
 ## Frontmatter schema
 
 See [§2 Frontmatter schema — note shape](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily).
 
 The body is the user's verbatim text. No headings, no metadata in the body. On MATCH-append, the separator is a blank line + `---` + blank line, then the new verbatim chunk.
 
----
-
 ## `notes/index.md`
 
 See [§6 Index patching](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd). Canonical template lives at `_seed/notes/index.md` (copied during `/wiki init`).
-
----
 
 ## Examples
 

@@ -2,7 +2,6 @@
 description: Bootstrap or check the claude-obsidian wiki vault. Use `/wiki init` to seed the vault from the configured path; `/wiki` (no args) runs the scaffold workflow.
 argument-hint: "[init]"
 ---
-
 Read the `wiki` skill.
 
 If the argument is `init`, run the **INIT** operation below. Otherwise, run the **SCAFFOLD** workflow described in the skill.

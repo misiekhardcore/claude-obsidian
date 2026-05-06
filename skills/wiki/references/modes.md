@@ -2,8 +2,6 @@
 
 Six modes cover the most common use cases. Pick the one that fits, or combine them.
 
----
-
 ## Mode A: Website / Sitemap
 
 Use when: "build a sitemap wiki for my website", "map content gaps", "SEO audit wiki"
@@ -48,8 +46,6 @@ updated: YYYY-MM-DD
 
 Key wiki pages to create: `[[Site Overview]]`, `[[Navigation Structure]]`, `[[Content Gaps]]`, `[[Redirect Map]]`, `[[Keyword Clusters]]`
 
----
-
 ## Mode B: GitHub / Repository
 
 Use when: "map my codebase", "architecture wiki for my repo", "understand this project"
@@ -91,8 +87,6 @@ updated: YYYY-MM-DD
 
 Key wiki pages to create: `[[Architecture Overview]]`, `[[Data Flow]]`, `[[Tech Stack]]`, `[[Dependency Graph]]`, `[[Key Decisions]]`
 
----
-
 ## Mode C: Business / Project
 
 Use when: "project wiki", "competitive intelligence", "team knowledge base", "meeting notes"
@@ -130,8 +124,6 @@ updated: YYYY-MM-DD
 ```
 
 Key wiki pages to create: `[[Project Overview]]`, `[[Stakeholder Map]]`, `[[Decision Log]]`, `[[Competitor Landscape]]`
-
----
 
 ## Mode D: Personal / Second Brain
 
@@ -173,8 +165,6 @@ Hot cache note: `_meta/hot-cache.md` is a ~500-word file Claude updates at the e
 
 Key wiki pages to create: `[[North Star]]`, `[[Weekly Review Template]]`, `[[Annual Goals]]`
 
----
-
 ## Mode E: Research
 
 Use when: "research wiki on [topic]", "track papers I'm reading", "build a thesis"
@@ -215,8 +205,6 @@ updated: YYYY-MM-DD
 
 Key wiki pages to create: `[[Research Overview]]`, `[[Key Claims Map]]`, `[[Open Questions]]`, `[[Methodology Comparison]]`
 
----
-
 ## Mode F: Book / Course
 
 Use when: "companion wiki for a book", "course notes wiki", "as I read [title]"
@@ -251,8 +239,6 @@ updated: YYYY-MM-DD
 ```
 
 Key wiki pages to create: `[[Book Overview]]`, `[[Theme Map]]`, `[[Character / Expert Index]]`, `[[My Takeaways]]`
-
----
 
 ## Combining Modes
 

@@ -1,26 +1,25 @@
 ---
 type: concept
-title: "Example Concept"
+title: Example Concept
 complexity: intermediate
-domain: "knowledge-management"
+domain: knowledge-management
 aliases:
-  - "concept stub"
-created: "{{today}}"
-updated: "{{today}}"
+  - concept stub
+created: {{today}}
+updated: {{today}}
 tags:
   - concept
   - example
 status: seed
 confidence: INFERRED
 evidence:
-  - "[[example-source]]"
+  - [[example-source]]
 related:
-  - "[[example-entity]]"
-  - "[[example-question]]"
+  - [[example-entity]]
+  - [[example-question]]
 uses:
-  - "[[example-source]]"
+  - [[example-source]]
 ---
-
 # Example Concept
 
 ## Definition

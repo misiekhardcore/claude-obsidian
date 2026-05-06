@@ -1,10 +1,9 @@
 ---
 type: index
-title: "Index"
+title: Index
 created: 2026-04-26
 updated: 2026-04-26
 ---
-
 # Index
 
 Test fixture index. Links into the concepts namespace.

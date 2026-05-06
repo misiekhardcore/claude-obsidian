@@ -1,7 +1,6 @@
 ---
 description: Run an autonomous research loop on a topic. Searches the web, synthesizes findings, and files everything into the wiki as structured pages.
 ---
-
 Read the `autoresearch` skill. Then run the research loop.
 
 Usage:

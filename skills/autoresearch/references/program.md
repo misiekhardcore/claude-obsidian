@@ -2,8 +2,6 @@
 
 This file configures the autoresearch loop. Edit it to match your domain and research style. The autoresearch skill reads it before every run.
 
----
-
 ## Search Objectives
 
 Default objectives for every research session:
@@ -15,8 +13,6 @@ Default objectives for every research session:
 - Identify open questions and research gaps
 - Prefer sources from the last 2 years unless the topic is foundational
 
----
-
 ## Confidence Scoring
 
 Label every claim with confidence when filing:
@@ -27,16 +23,12 @@ Label every claim with confidence when filing:
 
 Always note the source date for factual claims. Mark claims from sources older than 3 years as potentially stale.
 
----
-
 ## Loop Constraints
 
 - Max search rounds per topic: **3**
 - Max wiki pages created per session: **15**
 - Max sources fetched per round: **5**
 - If max pages is reached before the loop completes: file what you have, note what was skipped in Open Questions
-
----
 
 ## Output Style
 
@@ -45,8 +37,6 @@ Always note the source date for factual claims. Mark claims from sources older t
 - Short pages: under 200 lines. Split if longer.
 - No hedging language ("it seems", "perhaps", "might be")
 - Flag uncertainty explicitly: `> [!gap] This claim needs verification.`
-
----
 
 ## Domain Notes
 
@@ -66,8 +56,6 @@ For medical/health research:
 
 - Prefer: PubMed, Cochrane reviews, peer-reviewed clinical trials
 - Always note: sample size, study type (RCT vs observational), and recency
-
----
 
 ## Exclusions
 

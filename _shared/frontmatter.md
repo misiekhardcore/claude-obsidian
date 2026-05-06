@@ -2,8 +2,6 @@
 
 Every wiki page starts with flat YAML frontmatter. No nested objects. Obsidian's Properties UI requires flat structure.
 
----
-
 ## Universal Fields
 
 Every page, no exceptions:
@@ -47,8 +45,6 @@ sources:
 
 See `${CLAUDE_PLUGIN_ROOT}/skills/wiki/references/maintenance-rules.md` for promotion/demotion criteria. See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md` for confidence tagging semantics and typed-relationship semantics.
 
----
-
 ## Typed Relationship Fields
 
 All optional. Use these alongside `related:` when the semantic is unambiguous. Keep `related:` for general or untyped links (Obsidian graph view uses it).
@@ -73,8 +69,6 @@ implements:
 Allowed relationship types: `supersedes`, `contradicts`, `uses`, `depends_on`, `caused`, `fixed`, `implements`.
 
 Note: `depends_on` uses underscore (not hyphen) for idiomatic YAML key naming.
-
----
 
 ## Type-Specific Additions
 
@@ -161,8 +155,6 @@ owns_folder: false # true | false — `true` only when the hub also owns the dir
 ```
 
 `owns_folder:` defaults to `false` — most hubs curate leaves that live elsewhere in the vault (`concepts/`, `entities/`, `solutions/`, `sources/`).
-
----
 
 ## Rules
 

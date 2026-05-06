@@ -4,8 +4,6 @@ Skill-operational rules for ingest, contradiction handling, quality standards, a
 
 Cross-skill structural conventions (vault directory map, confidence tagging semantics, typed-relationship semantics) live in `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md`. Frontmatter field schemas live in `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 
----
-
 ## Ingest Rules
 
 Follow these steps for every new source ingested into the vault.
@@ -45,8 +43,6 @@ After all pages are written:
 - Concept pages: link to ≥ 2 other pages (sources, related concepts, or entities).
 - Entity pages: link to ≥ 1 source and ≥ 1 related concept or entity.
 
----
-
 ## Contradiction Handling
 
 When a new source makes a claim that contradicts an existing wiki page:
@@ -62,18 +58,16 @@ Do NOT flag as contradictions: different levels of detail, complementary perspec
 
 ### Resolve
 
-| Situation                                                           | Action                                                                                                                                                       |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| New source is newer/authoritative and the old claim is simply wrong | Update the existing page. Add an inline note: `> **Updated [YYYY-MM-DD]:** <new claim>. Prior claim: <old claim>. Source: [[new-source]].`                   |
-| Both claims are defensible but come from different contexts         | Add a `## Perspectives` subsection to the concept page listing both claims with their sources. Do not delete either.                                         |
-| New source supersedes old source entirely                           | Mark the old source page with `status: superseded` and add `superseded_by: "[[new-source]]"` to its frontmatter. Update concept pages to use the new source. |
-| Contradiction requires more research to resolve                     | Add an `open_questions` frontmatter field listing the unresolved question. Create a page in `wiki/questions/` if the question is significant.                |
+|Situation|Action|
+|-|-|
+|New source is newer/authoritative and the old claim is simply wrong|Update the existing page. Add an inline note: `> **Updated [YYYY-MM-DD]:** <new claim>. Prior claim: <old claim>. Source: [[new-source]].`|
+|Both claims are defensible but come from different contexts|Add a `## Perspectives` subsection to the concept page listing both claims with their sources. Do not delete either.|
+|New source supersedes old source entirely|Mark the old source page with `status: superseded` and add `superseded_by: "[[new-source]]"` to its frontmatter. Update concept pages to use the new source.|
+|Contradiction requires more research to resolve|Add an `open_questions` frontmatter field listing the unresolved question. Create a page in `wiki/questions/` if the question is significant.|
 
 ### Log contradictions
 
 Include a `Contradictions resolved:` line in the log entry for the ingest session.
-
----
 
 ## Quality Standards
 
@@ -89,8 +83,6 @@ Pages carry a `status` field. See `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`
 ### Demotion
 
 Demote from `mature` or `current` to `developing` only if a contradiction is found that removes a major section's basis.
-
----
 
 ## Log Format
 
@@ -111,17 +103,17 @@ Every ingest, autoresearch, save, or significant update session writes one log e
 
 ### Field definitions
 
-| Field                   | Required    | Notes                                                                                                                  |
-| ----------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Date                    | Yes         | ISO 8601: `YYYY-MM-DD`                                                                                                 |
-| Operation               | Yes         | `ingest` / `autoresearch` / `compound` / `save` / `query` / `lint`                                                     |
-| Description             | Yes         | Short phrase identifying the source or topic                                                                           |
-| Key metrics             | Conditional | For autoresearch: `Rounds: N \| Searches: N \| Fetches: N`. For ingest: `Sources ingested: N`. Omit for save/compound. |
-| Trigger                 | Yes         | What command or user action started the session                                                                        |
-| Pages created           | Yes         | All new pages; use `[[WikiLinks]]`; write "none" if zero                                                               |
-| Pages updated           | Yes         | All modified existing pages; use `[[WikiLinks]]`; write "none" if zero                                                 |
-| Contradictions resolved | Yes         | Brief description of any resolved contradiction, or "none"                                                             |
-| Key findings            | Yes         | 1–5 numbered findings; each one sentence; most important first                                                         |
+|Field|Required|Notes|
+|-|-|-|
+|Date|Yes|ISO 8601: `YYYY-MM-DD`|
+|Operation|Yes|`ingest` / `autoresearch` / `compound` / `save` / `query` / `lint`|
+|Description|Yes|Short phrase identifying the source or topic|
+|Key metrics|Conditional|For autoresearch: `Rounds: N \|Searches: N \|Fetches: N`. For ingest: `Sources ingested: N`. Omit for save/compound.|
+|Trigger|Yes|What command or user action started the session|
+|Pages created|Yes|All new pages; use `[[WikiLinks]]`; write "none" if zero|
+|Pages updated|Yes|All modified existing pages; use `[[WikiLinks]]`; write "none" if zero|
+|Contradictions resolved|Yes|Brief description of any resolved contradiction, or "none"|
+|Key findings|Yes|1–5 numbered findings; each one sentence; most important first|
 
 ### Example
 

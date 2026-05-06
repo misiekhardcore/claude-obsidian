@@ -12,8 +12,6 @@ The wiki is the product. Chat is just the interface.
 
 The key difference from RAG: the wiki is a persistent artifact. Cross-references are already there. Contradictions have been flagged. Synthesis already reflects everything read. Knowledge compounds like interest.
 
----
-
 ## Architecture
 
 For the directory map, page-type table, and folder semantics, see `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md`. That file is the single source of truth — do not duplicate it here.
@@ -27,15 +25,11 @@ Two top-level peers of `wiki/`:
 
 Dot-prefixed folders (`.raw/`) are hidden in Obsidian's file explorer and graph view. Use this for source documents.
 
----
-
 ## Hot Cache
 
 `wiki/hot.md` is a ~500-word summary of the most recent context. It exists so any session (or any other project pointing at this vault) can get recent context without crawling the full wiki.
 
 For the full protocol — when to read, when to update, the exact format, and sub-agent discipline — see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`. That document is the single source of truth; do not duplicate its rules here.
-
----
 
 ## Operations
 
@@ -53,8 +47,6 @@ Route to the correct operation based on what the user says:
 | "/note", "/dump", "note this", "todo:", "show my inbox", "/note process" | NOTE         | `notes`        |
 | "/autoresearch [topic]", "research [topic]"                              | AUTORESEARCH | `autoresearch` |
 | "/canvas", "add to canvas", "open canvas"                                | CANVAS       | `canvas`       |
-
----
 
 ## INIT Operation
 
@@ -77,23 +69,17 @@ bash "${CLAUDE_PLUGIN_ROOT}/bin/wiki-init.sh" "${user_config.vault_path}"
 
 Re-running is safe: every step guards existing files.
 
----
-
 ## SCAFFOLD Operation
 
 Trigger: user describes what the vault is for.
 
 Read `references/operation-scaffold.md` for the 12-step procedure and the vault `CLAUDE.md` template. The reference is the single source of truth for SCAFFOLD; this skill body only routes to it.
 
----
-
 ## PROMOTE Operation
 
 Trigger: `/wiki promote <tag>`, "promote tag", "scaffold a hub for X".
 
 Read `references/operation-promote.md` for the 10-step procedure, frontmatter shape, body template, idempotency guard, and forward-only contract. The reference is the single source of truth for PROMOTE; this skill body only routes to it.
-
----
 
 ## Cross-Project Referencing
 
@@ -121,8 +107,6 @@ Do NOT read the wiki for:
 ```
 
 This keeps token usage low. Hot cache costs ~500 tokens. Index costs ~1000 tokens. Individual pages cost 100-300 tokens each.
-
----
 
 ## Summary
 

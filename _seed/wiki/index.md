@@ -1,8 +1,8 @@
 ---
 type: meta
-title: "Wiki Index"
-created: "{{today}}"
-updated: "{{today}}"
+title: Wiki Index
+created: {{today}}
+updated: {{today}}
 tags:
   - meta
   - index
@@ -10,11 +10,10 @@ status: evergreen
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[hot]]"
-  - "[[log]]"
-  - "[[overview]]"
+  - [[hot]]
+  - [[log]]
+  - [[overview]]
 ---
-
 # Wiki Index
 
 Master catalog of all pages in this knowledge base.
@@ -25,12 +24,12 @@ Master catalog of all pages in this knowledge base.
 
 ## Core Types
 
-| Type     | Directory       | Purpose                     |
-| -------- | --------------- | --------------------------- |
-| concept  | wiki/concepts/  | Patterns, techniques, ideas |
-| entity   | wiki/entities/  | Named real-world things     |
-| source   | wiki/sources/   | Ingested source records     |
-| question | wiki/questions/ | Open and answered questions |
+|Type|Directory|Purpose|
+|-|-|-|
+|concept|wiki/concepts/|Patterns, techniques, ideas|
+|entity|wiki/entities/|Named real-world things|
+|source|wiki/sources/|Ingested source records|
+|question|wiki/questions/|Open and answered questions|
 
 ## Navigation
 

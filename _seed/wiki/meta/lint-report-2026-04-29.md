@@ -1,12 +1,11 @@
 ---
 type: meta
-title: "Lint Report 2026-04-29"
+title: Lint Report 2026-04-29
 created: 2026-04-29
 updated: 2026-04-29
 tags: [meta, lint]
 status: developing
 ---
-
 # Lint Report: 2026-04-29
 
 ## Summary
@@ -16,13 +15,9 @@ status: developing
 - Auto-fixed: 0
 - Needs review: 6
 
----
-
 ## Critical Issues
 
 None.
-
----
 
 ## Warnings (should fix)
 
@@ -57,8 +52,6 @@ None.
 - **Problem:** The `## Domains` section has a placeholder comment but no actual domain pages are listed. The index is the master catalog but is incomplete.
 - **Suggested fix:** Populate domains as you create them. Alternatively, add a note that "Domains will be added as the vault grows."
 
----
-
 ## Suggestions (worth considering)
 
 ### 1. Unresolved Wikilinks Outside Wiki Folder
@@ -86,8 +79,6 @@ None.
 - **Status:** OK — properly has required frontmatter and structure
 - **Note:** No note captures have been recorded yet (no files in `notes/` except index.md). This is expected for a freshly initialized vault.
 
----
-
 ## Detailed Checks
 
 ### Orphan Pages
@@ -110,17 +101,17 @@ None.
 ### Frontmatter Completeness
 
 - **Result:** All pages have required fields:
-  - `type` ✓
-  - `title` ✓
-  - `created` ✓ (value: `{{today}}` — needs expansion)
-  - `updated` ✓ (value: `{{today}}` — needs expansion)
-  - `tags` ✓
-  - `status` ✓
+  - `type`
+  - `title`
+  - `created`  (value: `{{today}}` — needs expansion)
+  - `updated`  (value: `{{today}}` — needs expansion)
+  - `tags`
+  - `status`
 - **Additional fields present:**
-  - Concept pages: `complexity`, `domain`, `aliases`, `confidence`, `evidence`, `related`, `uses` ✓
-  - Entity pages: `entity_type`, `role`, `first_mentioned`, `confidence`, `evidence`, `related` ✓
-  - Source pages: `source_type`, `author`, `date_published`, `url`, `source_reliability`, `key_claims`, `confidence`, `evidence`, `related` ✓
-  - Question pages: `question`, `answer_quality`, `confidence`, `evidence`, `related` ✓
+  - Concept pages: `complexity`, `domain`, `aliases`, `confidence`, `evidence`, `related`, `uses`
+  - Entity pages: `entity_type`, `role`, `first_mentioned`, `confidence`, `evidence`, `related`
+  - Source pages: `source_type`, `author`, `date_published`, `url`, `source_reliability`, `key_claims`, `confidence`, `evidence`, `related`
+  - Question pages: `question`, `answer_quality`, `confidence`, `evidence`, `related`
 
 ### Empty Sections
 
@@ -131,31 +122,27 @@ None.
 - **File:** `wiki/hot.md`
 - **Word count:** 367 words
 - **Spec limit:** 500 words
-- **Status:** ✓ OK (delta: -133 words)
+- **Status:**  OK (delta: -133 words)
 - **Note:** Well within acceptable range. No action needed.
 
 ### Notes Inbox Frontmatter & Index Drift
 
 - **File:** `notes/index.md`
-- **Frontmatter check:** ✓ Has required fields (type, title, created, updated, tags, status)
-- **Index drift check:** ✓ No note captures exist yet (no files to index)
+- **Frontmatter check:**  Has required fields (type, title, created, updated, tags, status)
+- **Index drift check:**  No note captures exist yet (no files to index)
 - **Status:** OK
-
----
 
 ## Stale Claims & Contradictions
 
 - **Result:** Not applicable — all pages are freshly generated stubs. No actual claims to check for staleness.
 
----
-
 ## Cross-Reference & Naming Convention Checks
 
 ### Naming Conventions
 
-- **Result:** All page filenames follow Title Case convention ✓
-- **Wikilinks:** All match filenames exactly ✓
-- **Folder structure:** Uses lowercase with dashes ✓
+- **Result:** All page filenames follow Title Case convention
+- **Wikilinks:** All match filenames exactly
+- **Folder structure:** Uses lowercase with dashes
   - `wiki/concepts/`
   - `wiki/entities/`
   - `wiki/questions/`
@@ -163,12 +150,10 @@ None.
 
 ### Writing Style
 
-- **Result:** All pages use declarative present tense ✓
+- **Result:** All pages use declarative present tense
 - **Example:** "A source page is the ingest record..." not "A source page basically is..."
 - **Uncertainty flagging:** N/A (no uncertainty in stub pages)
 - **Contradiction flagging:** N/A (no contradictions in single-source examples)
-
----
 
 ## Recommendations
 
@@ -186,15 +171,11 @@ None.
 
 5. **Notes inbox:** Remains empty until first capture — this is expected behavior
 
----
-
 ## Next Steps
 
 1. **Before next ingest:** Fix template variable expansion in all 8 wiki pages
 2. **After first ingest:** Re-run lint to check for dead links and missing cross-references
 3. **Monthly:** Review seed pages ([[overview]], example pages) and upgrade status or delete stubs
-
----
 
 ## Metadata
 

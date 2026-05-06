@@ -2,7 +2,6 @@
 description: Capture a quick inbox note (or list/process the inbox) without breaking flow.
 argument-hint: "[list|process|<verbatim text>]"
 ---
-
 Read the `notes` skill. Then dispatch based on the argument:
 
 - `/note <text>` — capture mode. Pass the verbatim text to the skill's CAPTURE operation. Do not rewrite, summarise, or tag.

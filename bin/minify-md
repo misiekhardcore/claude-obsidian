@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""Minify markdown skill files to reduce token count.
+
+Transforms applied (outside code blocks):
+  - Frontmatter: remove unnecessary quotes from scalar values
+  - Frontmatter: unquote and compact {{placeholders}} and [[wikilinks]]
+  - Body: compact {{ spaced }} → {{compact}} and [[ spaced ]] → [[compact]]
+  - Tables: strip cell padding whitespace
+  - Horizontal rules: strip decorative --- / *** / ___ lines
+  - Blank lines: collapse 3+ consecutive to 2
+  - Lines: strip trailing whitespace
+  - Emoji: remove unicode emoji characters
+
+Usage:
+  skill-minify file.md              # print minified to stdout
+  skill-minify -i file.md ...       # modify in-place, print stats
+  cat file.md | skill-minify        # stdin → stdout
+"""
+
+import re
+import sys
+from pathlib import Path
+
+# Characters that force quoting in YAML plain scalars
+_UNSAFE_START = re.compile(r'^[\{\[\`\>\|\'\"&!%@?,]|^-(?= )|^:(?= |$)')
+# Sequences that force quoting anywhere in a plain scalar
+_UNSAFE_INLINE = re.compile(r': | #|:\s*$')
+
+_EMOJI = re.compile(
+    r'[\U0001F300-\U0001FAFF'   # misc symbols, emoticons, transport, supplemental
+    r'☀-➿'            # misc symbols, dingbats
+    r'︀-️'            # variation selectors
+    r'‍'                   # zero-width joiner (used in emoji sequences)
+    r'⃣'                   # combining enclosing keycap
+    r']+',
+    flags=re.UNICODE,
+)
+
+_FENCE = re.compile(r'^(`{3,}|~{3,})')
+
+# {{ spaced placeholder }} or { { spaced } } → {{compact}}
+_TMPL = re.compile(r'\{\s*\{\s*(.*?)\s*\}\s*\}')
+# [[ spaced wikilink ]] → [[compact]]
+_WIKI = re.compile(r'\[\s*\[\s*(.*?)\s*\]\s*\]')
+
+
+def _compact_tokens(text: str) -> str:
+    text = _TMPL.sub(lambda m: '{{' + m.group(1) + '}}', text)
+    text = _WIKI.sub(lambda m: '[[' + m.group(1) + ']]', text)
+    return text
+
+
+def _can_unquote(value: str) -> bool:
+    if not value:
+        return True
+    # Always safe to unquote compact placeholders/wikilinks
+    if re.fullmatch(r'\{\{[^}]*\}\}', value) or re.fullmatch(r'\[\[[^\]]*\]\]', value):
+        return True
+    if _UNSAFE_START.match(value):
+        return False
+    if _UNSAFE_INLINE.search(value):
+        return False
+    return True
+
+
+def _unquote_frontmatter(fm: str) -> str:
+    result = []
+    for line in fm.splitlines(keepends=True):
+        line = _compact_tokens(line)
+        # key: "value"
+        m = re.match(r'^(\s*[\w-]+\s*:\s*)(["\'])(.*)\2(\s*\n?)$', line, re.DOTALL)
+        if m:
+            prefix, inner, tail = m.group(1), m.group(3), m.group(4)
+            inner = _compact_tokens(inner)
+            if _can_unquote(inner):
+                line = prefix + inner + tail
+        else:
+            # - "list item value"
+            m = re.match(r'^(\s*-\s*)(["\'])(.*)\2(\s*\n?)$', line, re.DOTALL)
+            if m:
+                prefix, inner, tail = m.group(1), m.group(3), m.group(4)
+                inner = _compact_tokens(inner)
+                if _can_unquote(inner):
+                    line = prefix + inner + tail
+        result.append(line)
+    return ''.join(result)
+
+
+def _compress_table_row(line: str) -> str:
+    m = re.match(r'^(\s*)(\|.*\|)\s*$', line)
+    if not m:
+        return line
+    indent, row = m.group(1), m.group(2)
+    cells = row[1:-1].split('|')  # strip outer pipes, split on inner
+    is_sep = all(re.fullmatch(r'\s*:?-+:?\s*', c) for c in cells)
+    if is_sep:
+        cells = [re.sub(r'-+', '-', re.sub(r'\s', '', c)) for c in cells]
+    else:
+        cells = [c.strip() for c in cells]
+    return indent + '|' + '|'.join(cells) + '|'
+
+
+def minify(content: str) -> str:
+    # --- split off frontmatter ---
+    fm_match = re.match(r'^(---\n)(.*?)(^---\n)', content, re.DOTALL | re.MULTILINE)
+    if fm_match:
+        fm_open  = fm_match.group(1)
+        fm_body  = _unquote_frontmatter(fm_match.group(2))
+        fm_close = fm_match.group(3)
+        body     = content[fm_match.end():]
+    else:
+        fm_open = fm_body = fm_close = ''
+        body = content
+
+    # --- process body lines ---
+    out = []
+    in_fence = False
+    for line in body.splitlines():
+        stripped = line.strip()
+        if _FENCE.match(stripped):
+            in_fence = not in_fence
+            out.append(line.rstrip())
+            continue
+
+        if in_fence:
+            out.append(line.rstrip())  # preserve code block content, just strip trailing ws
+            continue
+
+        line = line.rstrip()
+
+        if re.fullmatch(r'\s*([*\-_])(\s*\1){2,}\s*', line):
+            continue
+
+        if re.match(r'\s*\|', line):
+            line = _compress_table_row(line)
+
+        line = _compact_tokens(line)
+        line = _EMOJI.sub('', line)
+
+        out.append(line)
+
+    body = '\n'.join(out)
+    body = re.sub(r'\n{3,}', '\n\n', body)
+    body = body.strip('\n') + '\n'
+
+    return fm_open + fm_body + fm_close + body
+
+
+def _stats(original: str, result: str, path: str = '') -> str:
+    delta = len(original) - len(result)
+    pct   = delta / len(original) * 100 if original else 0
+    label = f'{path}: ' if path else ''
+    return f'{label}{len(original)} → {len(result)} bytes ({pct:.1f}% saved)'
+
+
+def _process_file(p: Path, inplace: bool) -> tuple[int, int]:
+    original = p.read_text('utf-8')
+    result   = minify(original)
+    if inplace:
+        if result != original:
+            p.write_text(result, 'utf-8')
+    else:
+        sys.stdout.write(result)
+    print(_stats(original, result, str(p)), file=sys.stderr)
+    return len(original), len(result)
+
+
+def main() -> None:
+    args = sys.argv[1:]
+    inplace   = '-i' in args
+    recursive = '-r' in args
+    for flag in ('-i', '-r'):
+        if flag in args:
+            args.remove(flag)
+
+    if not args:
+        content = sys.stdin.read()
+        result  = minify(content)
+        sys.stdout.write(result)
+        print(_stats(content, result), file=sys.stderr)
+        return
+
+    files: list[Path] = []
+    for path_str in args:
+        p = Path(path_str)
+        if not p.exists():
+            print(f'skip: {p} not found', file=sys.stderr)
+        elif p.is_dir():
+            if recursive:
+                files.extend(sorted(p.rglob('*.md')))
+            else:
+                print(f'skip: {p} is a directory (use -r to recurse)', file=sys.stderr)
+        else:
+            files.append(p)
+
+    total_orig = total_result = 0
+    for f in files:
+        orig, res = _process_file(f, inplace)
+        total_orig  += orig
+        total_result += res
+
+    if len(files) > 1:
+        delta = total_orig - total_result
+        pct   = delta / total_orig * 100 if total_orig else 0
+        print(f'total: {total_orig} → {total_result} bytes ({pct:.1f}% saved, {len(files)} files)', file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()

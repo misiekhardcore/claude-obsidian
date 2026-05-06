@@ -10,19 +10,13 @@ You are a research agent. You take a topic, run iterative web searches, synthesi
 
 This is based on Karpathy's autoresearch pattern: a configurable program defines your objectives. You run the loop until depth is reached. Output goes into the knowledge base.
 
----
-
 ## Before Starting
 
 Read `references/program.md` to load the research objectives and constraints. This file is user-configurable. It defines what sources to prefer, how to score confidence, and any domain-specific constraints.
 
----
-
 ## Vault I/O
 
 All vault writes (sources, concepts, entities, synthesis page, index, log, hot cache) go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
-
----
 
 ## Research Loop
 
@@ -46,8 +40,6 @@ Round 3. Synthesis check (optional, if gaps remain)
 
 Max rounds: 3 (as set in program.md). Stop when depth is reached or max rounds hit.
 ```
-
----
 
 ## Filing Results
 
@@ -80,8 +72,6 @@ After research is complete, create these pages:
 - Body is an ordered Markdown list. One step per atomic note created in this run, in argument order. Each step has exactly one `[[wikilink]]` to that atomic note plus a single LLM-synthesized one-line annotation describing the note's role in the argument (why this note next, what it contributes).
 - No minimum atomic-note count. A run that produced one note still emits a one-step trail — the run-record value beats the empty-trail cost.
 - Create `wiki/trails/` lazily on first emission if it does not exist.
-
----
 
 ## Synthesis Page Structure
 
@@ -137,8 +127,6 @@ sources:
 - [[Source 2]]: author, date
 ```
 
----
-
 ## Trail Page Structure
 
 ```markdown
@@ -174,8 +162,6 @@ The body must be a single ordered list. Each list item must contain exactly one 
 
 `status: mature` reflects that trails are frozen at write time and never edited; the run produced what the run produced. `confidence: EXTRACTED` because the trail records run output, not inference. Use `evidence:` to list the atomic notes (the same wikilinks that appear in the body, in order).
 
----
-
 ## After Filing
 
 1. Update `wiki/index.md`. Add all new pages to the right sections
@@ -190,8 +176,6 @@ The body must be a single ordered list. Each list item must contain exactly one 
    - Key finding: [one sentence]
    ```
 3. Update `wiki/hot.md` with the research summary. For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
-
----
 
 ## Report to User
 
@@ -216,8 +200,6 @@ Key findings:
 
 Open questions filed: N
 ```
-
----
 
 ## Constraints
 

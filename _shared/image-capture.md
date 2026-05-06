@@ -2,8 +2,6 @@
 
 All capture skills that accept image input follow this contract. Read this file when images are present in the user's argument list. For skill-specific output contracts and integration details, also read your skill's `references/image-capture.md`.
 
----
-
 ## Image validation
 
 Validate ALL image paths before any vision-LLM call or file move:
@@ -20,8 +18,6 @@ Validate ALL image paths before any vision-LLM call or file move:
 
 Abort on any error. No vision-LLM call, no file move occurs in either error case.
 
----
-
 ## Attachment directory
 
 Before moving any images:
@@ -30,8 +26,6 @@ Before moving any images:
 2. Ensure `<vault_root>/_attachments/` exists. Create silently if absent.
 
 For `/braindump`: ensure `_attachments/` **once before the CAPTURE loop** — not per chunk.
-
----
 
 ## Vision-LLM invocation
 
@@ -48,8 +42,6 @@ Vision processing failed: <reason>. Image not moved, note not created.
 
 Never move files if vision processing fails.
 
----
-
 ## Attachment move and naming
 
 Move (not copy) images from their source path to `<vault_root>/_attachments/`. Naming:
@@ -58,8 +50,6 @@ Move (not copy) images from their source path to `<vault_root>/_attachments/`. N
 - **Note — MATCH path:** use the existing note's slug + collision suffix where N continues from the existing attachment count.
 - **Daily:** `<YYYY-MM-DD>-<vision-slug>.<ext>`; collisions: `<YYYY-MM-DD>-<vision-slug>-2.<ext>`, etc.
 - **Braindump unassigned:** `<date>-braindump-unassigned-N.<ext>` (N starts at 1, one per unassigned image).
-
----
 
 ## Embed syntax
 
@@ -72,8 +62,6 @@ Embed images in note body using Obsidian embed syntax:
 - `/note` and `/braindump`: embeds appear at the end of the body, after the vision-LLM description, in input order.
 - `/daily`: embed is indented two spaces on the next line within the bullet (see `daily/references/image-capture.md`).
 
----
-
 ## `attachments:` frontmatter field
 
 For `/note` and `/braindump` notes: add (or extend) an `attachments:` list in frontmatter when images are present:
@@ -83,8 +71,6 @@ attachments: ["filename1.png", "filename2.png"]
 ```
 
 `/daily` does NOT include an `attachments:` field — daily files are append-only logs, not structured knowledge objects.
-
----
 
 ## MATCH path with images
 

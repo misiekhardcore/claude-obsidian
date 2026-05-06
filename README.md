@@ -175,21 +175,15 @@ After cloning, install the formatting toolchain:
 npm install
 ```
 
-This installs prettier, markdownlint-cli2, husky, and lint-staged and wires the pre-commit hook.
+This installs husky, and lint-staged and wires the pre-commit hook.
 
-To format all Markdown files locally:
+To minify all Markdown files locally:
 
 ```bash
 npm run format
 ```
 
-To check formatting without writing (same as CI):
-
-```bash
-npm run lint
-```
-
-The pre-commit hook runs `lint-staged`, which applies prettier and markdownlint auto-fixes to staged `*.md` files before each commit.
+The pre-commit hook runs `lint-staged`, which applies formatting to staged `*.md` files before each commit.
 
 ## More
 

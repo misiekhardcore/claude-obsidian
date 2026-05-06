@@ -2,8 +2,6 @@
 
 Apply during scaffold. This makes the file explorer color-coded by folder type and adds custom callout styles.
 
----
-
 ## CSS Snippet
 
 Create this file at `.obsidian/snippets/vault-colors.css` inside the vault:
@@ -65,39 +63,33 @@ Create this file at `.obsidian/snippets/vault-colors.css` inside the vault:
 }
 ```
 
----
-
 ## Enable the Snippet
 
 Tell the user: Settings > Appearance > CSS Snippets > open folder > paste the file > click the refresh icon > toggle it on.
-
----
 
 ## Graph View Groups
 
 Guide the user to set these in Graph View settings (click the settings icon in the graph view):
 
-| Query                 | Color              |
-| --------------------- | ------------------ |
-| `path:wiki/domains`   | Blue (`#4fc1ff`)   |
-| `path:wiki/entities`  | Purple (`#c586c0`) |
-| `path:wiki/concepts`  | Yellow (`#dcdcaa`) |
-| `path:wiki/sources`   | Orange (`#ce9178`) |
-| `path:wiki/questions` | Green (`#6a9955`)  |
-| `path:.raw`           | Gray (dimmed)      |
-
----
+|Query|Color|
+|-|-|
+|`path:wiki/domains`|Blue (`#4fc1ff`)|
+|`path:wiki/entities`|Purple (`#c586c0`)|
+|`path:wiki/concepts`|Yellow (`#dcdcaa`)|
+|`path:wiki/sources`|Orange (`#ce9178`)|
+|`path:wiki/questions`|Green (`#6a9955`)|
+|`path:.raw`|Gray (dimmed)|
 
 ## Custom Callouts
 
 This vault defines **four custom callout types** beyond Obsidian's built-in set (`note`, `tip`, `warning`, `info`, `todo`, `success`, `question`, `failure`, `danger`, `bug`, `example`, `quote`). They render correctly **only when `vault-colors.css` is enabled**. Without the snippet, they fall back to default callout styling (still readable, just plain).
 
-| Custom callout  | Color                           | Icon                    | Use for                                            |
-| --------------- | ------------------------------- | ----------------------- | -------------------------------------------------- |
-| `contradiction` | reddish-brown (rgb 209,105,105) | `lucide-alert-triangle` | New source conflicts with existing claim           |
-| `gap`           | beige (rgb 220,220,170)         | `lucide-help-circle`    | Topic has no source yet                            |
-| `key-insight`   | bright blue (rgb 79,193,255)    | `lucide-lightbulb`      | Important takeaway worth highlighting              |
-| `stale`         | gray (rgb 128,128,128)          | `lucide-clock`          | Claim may be outdated, source older than threshold |
+|Custom callout|Color|Icon|Use for|
+|-|-|-|-|
+|`contradiction`|reddish-brown (rgb 209,105,105)|`lucide-alert-triangle`|New source conflicts with existing claim|
+|`gap`|beige (rgb 220,220,170)|`lucide-help-circle`|Topic has no source yet|
+|`key-insight`|bright blue (rgb 79,193,255)|`lucide-lightbulb`|Important takeaway worth highlighting|
+|`stale`|gray (rgb 128,128,128)|`lucide-clock`|Claim may be outdated, source older than threshold|
 
 ### Usage
 
@@ -128,8 +120,6 @@ If you don't want custom callouts, replace them with built-ins:
 - `[!gap]` → `[!question] Gap`
 - `[!key-insight]` → `[!tip] Key insight`
 - `[!stale]` → `[!warning] Stale`
-
----
 
 ## Minimal Theme (Recommended)
 

@@ -2,8 +2,6 @@
 
 Read after `_shared/image-capture.md` when images are present in a `/note` capture.
 
----
-
 ## Vision-LLM output contract
 
 For `/note`, the vision-LLM call must return:
@@ -13,15 +11,11 @@ For `/note`, the vision-LLM call must return:
 - `description` — verbatim OCR content + scene description
 - `tags` — array of relevant tags (may be empty)
 
----
-
 ## MATCH/NEW integration
 
 For the §4 MATCH/NEW decision, use the LLM-generated `description` as the `New note text` input. Do not substitute the separate `title`, `topic`, or `tags` fields into the §4 decision prompt — those are used for the note's frontmatter only. Raw image data is not used for matching.
 
 On MATCH path: use the LLM description from the initial call as the appended body content. Do not re-invoke vision-LLM.
-
----
 
 ## Note body shape
 
@@ -33,8 +27,6 @@ The note body is the LLM-generated `description`. Embed lines appear at the end,
 ![[note-slug.png]]
 ![[note-slug-2.png]]
 ```
-
----
 
 ## URL detection (text-only input, no images)
 

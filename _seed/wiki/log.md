@@ -1,8 +1,8 @@
 ---
 type: meta
-title: "Operations Log"
-created: "{{today}}"
-updated: "{{today}}"
+title: Operations Log
+created: {{today}}
+updated: {{today}}
 tags:
   - meta
   - log
@@ -10,10 +10,9 @@ status: evergreen
 confidence: EXTRACTED
 evidence: []
 related:
-  - "[[hot]]"
-  - "[[index]]"
+  - [[hot]]
+  - [[index]]
 ---
-
 # Operations Log
 
 Chronological record of all wiki operations in this vault.
@@ -22,7 +21,5 @@ Chronological record of all wiki operations in this vault.
 
 - Vault initialized via `/wiki init`
 - Seeded starter pages: [[example-concept]], [[example-entity]], [[example-source]], [[example-question]]
-
----
 
 <!-- New entries prepend to this file. Format: ## YYYY-MM-DD then bullet list of actions. -->

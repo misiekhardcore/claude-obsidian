@@ -1,13 +1,13 @@
 ---
 type: comparison
-title: "<% tp.file.title %>"
+title: <% tp.file.title %>
 subjects:
-  - "[[Subject A]]"
-  - "[[Subject B]]"
+  - [[Subject A]]
+  - [[Subject B]]
 dimensions:
-  - "dimension 1"
-  - "dimension 2"
-verdict: "Replace with one-line conclusion."
+  - dimension 1
+  - dimension 2
+verdict: Replace with one-line conclusion.
 created: <% tp.date.now("YYYY-MM-DD") %>
 updated: <% tp.date.now("YYYY-MM-DD") %>
 tags:
@@ -16,7 +16,6 @@ status: seed
 related: []
 sources: []
 ---
-
 # <% tp.file.title %>
 
 ## Overview
@@ -25,10 +24,10 @@ Replace with: why these two things are being compared and what question this ans
 
 ## Comparison
 
-| Dimension | Subject A | Subject B |
-| --------- | --------- | --------- |
-|           |           |           |
-|           |           |           |
+|Dimension|Subject A|Subject B|
+|-|-|-|
+||||
+||||
 
 ## Verdict
 

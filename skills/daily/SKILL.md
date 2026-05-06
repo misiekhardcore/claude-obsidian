@@ -12,8 +12,6 @@ Append a timestamped bullet to `<vault_root>/daily/YYYY-MM-DD.md`. No MATCH/NEW 
 
 Uses `create-or-append` and `frontmatter-set` (see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3.1, §3.2). The local `daily/` directory is not a vault page; create it via `mkdir -p` if missing.
 
----
-
 ## Vault path
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with:
@@ -22,8 +20,6 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 No vault configured — run /wiki init first.
 ```
 
----
-
 ## Operations
 
 | User says                                                                                                              | Operation |
@@ -31,8 +27,6 @@ No vault configured — run /wiki init first.
 | `/daily <text>`, `"daily note this …"`, `"log to today …"`, `"log this …"`, `"add to today's log …"`, `"daily log: …"` | CAPTURE   |
 
 No LIST, no PROCESS. Daily files are an append-only log — triage and synthesis are handled by `/daily-close`.
-
----
 
 ## CAPTURE Operation
 
@@ -82,13 +76,9 @@ Per [§7](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#7-daily-page-append-
 - Multiple calls in the same minute land bullets with the same `HH:MM` prefix in file order — no collision handling, no counter.
 - No MATCH/NEW decision runs — every call adds a new bullet.
 
----
-
 ## Frontmatter schema
 
 See [§2 Frontmatter schema — daily shape](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily).
-
----
 
 ## Examples
 

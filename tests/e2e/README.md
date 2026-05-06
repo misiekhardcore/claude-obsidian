@@ -6,30 +6,30 @@ The same image is used by the GitHub Actions workflow (`.github/workflows/e2e.ym
 
 ## Layout
 
-| File                           | Purpose                                                                                                                          |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `Dockerfile`                   | 5-layer image: Ubuntu 24.04 → Node + Claude Code → Obsidian AppImage → plugin wiring → entrypoints                               |
-| `entrypoint-ci.sh`             | CI fast-tier sequence: scaffold vault → register → boot Xvfb/D-Bus/Obsidian → probe → run `cli-smoke.sh`                         |
-| `entrypoint-local.sh`          | Local full-tier sequence: credentials → vault init → boot → `/wiki init` → ingest → `/daily ×3` → `/daily-close` → assertions    |
-| `test-entrypoint.sh`           | Shared bash helpers sourced by assertion scripts: `pass`/`fail` counters, `assert_exit`, `assert_contains`, `assert_file_exists` |
-| `register-vault.sh`            | Writes `~/.config/obsidian/obsidian.json` with `cli: true` and the vault entry                                                   |
-| `wait-for-obsidian.sh`         | Compound readiness probe (`obsidian version && obsidian read path=wiki/hot.md`), 1s poll, 60s cap                                |
-| `assertions/vault-shape.sh`    | Assert vault dirs + key files exist after `/wiki init` (AC4)                                                                     |
-| `assertions/frontmatter.sh`    | Assert YAML frontmatter has `name`/`description` keys after ingest (AC5)                                                         |
-| `assertions/daily-shape.sh`    | Assert daily file has `## Captures` + ≥3 bullets after `/daily ×3` (AC6)                                                         |
-| `assertions/section-header.sh` | Assert named section header exists + has ≥1 non-blank body line (AC7)                                                            |
-| `fixtures/sample.md`           | Minimal markdown source for the ingest test (~200 bytes, valid frontmatter)                                                      |
+|File|Purpose|
+|-|-|
+|`Dockerfile`|5-layer image: Ubuntu 24.04 → Node + Claude Code → Obsidian AppImage → plugin wiring → entrypoints|
+|`entrypoint-ci.sh`|CI fast-tier sequence: scaffold vault → register → boot Xvfb/D-Bus/Obsidian → probe → run `cli-smoke.sh`|
+|`entrypoint-local.sh`|Local full-tier sequence: credentials → vault init → boot → `/wiki init` → ingest → `/daily ×3` → `/daily-close` → assertions|
+|`test-entrypoint.sh`|Shared bash helpers sourced by assertion scripts: `pass`/`fail` counters, `assert_exit`, `assert_contains`, `assert_file_exists`|
+|`register-vault.sh`|Writes `~/.config/obsidian/obsidian.json` with `cli: true` and the vault entry|
+|`wait-for-obsidian.sh`|Compound readiness probe (`obsidian version && obsidian read path=wiki/hot.md`), 1s poll, 60s cap|
+|`assertions/vault-shape.sh`|Assert vault dirs + key files exist after `/wiki init` (AC4)|
+|`assertions/frontmatter.sh`|Assert YAML frontmatter has `name`/`description` keys after ingest (AC5)|
+|`assertions/daily-shape.sh`|Assert daily file has `## Captures` + ≥3 bullets after `/daily ×3` (AC6)|
+|`assertions/section-header.sh`|Assert named section header exists + has ≥1 non-blank body line (AC7)|
+|`fixtures/sample.md`|Minimal markdown source for the ingest test (~200 bytes, valid frontmatter)|
 
 ## Pinned versions
 
 Bump in the Dockerfile and rebuild — no `latest` tags.
 
-| Component                   | Version               | Source                |
-| --------------------------- | --------------------- | --------------------- |
-| Base OS                     | `ubuntu:24.04`        | `FROM` line           |
-| Node                        | 20 LTS (latest patch) | `NODE_MAJOR=20`       |
-| `@anthropic-ai/claude-code` | 2.1.126               | `CLAUDE_CODE_VERSION` |
-| Obsidian                    | 1.12.7                | `OBSIDIAN_VERSION`    |
+|Component|Version|Source|
+|-|-|-|
+|Base OS|`ubuntu:24.04`|`FROM` line|
+|Node|20 LTS (latest patch)|`NODE_MAJOR=20`|
+|`@anthropic-ai/claude-code`|2.1.126|`CLAUDE_CODE_VERSION`|
+|Obsidian|1.12.7|`OBSIDIAN_VERSION`|
 
 ## Build
 
@@ -124,14 +124,14 @@ obsidian read path=wiki/hot.md
 
 ## Environment variables
 
-| Variable                    | Default                           | Purpose                                                                                      |
-| --------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------- |
-| `ENTRYPOINT_TYPE`           | `ci`                              | Selects the entrypoint script: `ci` or `local`                                               |
-| `PLUGIN_SRC`                | `/opt/plugin-src`                 | Where the plugin tree is mounted in the container                                            |
-| `VAULT_PATH`                | `/tmp/vault`                      | Where the test vault is scaffolded                                                           |
-| `DISPLAY_NUM`               | `:99`                             | Xvfb display number                                                                          |
-| `WAIT_FOR_OBSIDIAN_TIMEOUT` | `60`                              | Readiness probe deadline (seconds)                                                           |
-| `CREDENTIALS`               | `/root/.claude/.credentials.json` | Path the entrypoint validates; the `claude` CLI reads it from the same location (local tier) |
+|Variable|Default|Purpose|
+|-|-|-|
+|`ENTRYPOINT_TYPE`|`ci`|Selects the entrypoint script: `ci` or `local`|
+|`PLUGIN_SRC`|`/opt/plugin-src`|Where the plugin tree is mounted in the container|
+|`VAULT_PATH`|`/tmp/vault`|Where the test vault is scaffolded|
+|`DISPLAY_NUM`|`:99`|Xvfb display number|
+|`WAIT_FOR_OBSIDIAN_TIMEOUT`|`60`|Readiness probe deadline (seconds)|
+|`CREDENTIALS`|`/root/.claude/.credentials.json`|Path the entrypoint validates; the `claude` CLI reads it from the same location (local tier)|
 
 ## Constraints
 

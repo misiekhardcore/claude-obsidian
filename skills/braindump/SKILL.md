@@ -12,19 +12,13 @@ Long-form text that shouldn't interrupt flow — planning sessions, retros, desi
 
 This skill writes inbox notes by re-running the per-chunk CAPTURE flow defined in [`_shared/capture-pipeline.md`](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md). All vault writes (note files, `notes/index.md` patches) flow through the `obsidian` CLI per the pipeline contract. `Read` is retained for non-vault input file ingestion (vault-relative or absolute text/markdown paths passed as arguments).
 
----
-
 ## Image routing
 
 If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/braindump/references/image-capture.md` before parsing input.
 
----
-
 ## Vault path
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with `No vault configured — run /wiki init first.`
-
----
 
 ## Input parsing
 
@@ -38,8 +32,6 @@ Positional argument(s) — inline text and/or file paths:
 6. Path does not resolve:
    - If `<arg>` looks like a supported image input by extension → abort: `Image not found or unreadable: <path>`
    - Otherwise → treat `<arg>` verbatim as inline text. No error.
-
----
 
 ## Split — atomic-thought rubric
 
@@ -55,8 +47,6 @@ Single LLM reasoning step (think step, not a tool call):
 
 Zero chunks (unexpected empty result from the reasoning step) → hard-abort, no retry: `/braindump split returned no chunks. Original text not captured.`
 
----
-
 ## CAPTURE loop
 
 For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append to a note written by chunk K-1). Then:
@@ -67,8 +57,6 @@ For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk 
 4. Record filename + success/failure. On error: append to failure list, continue — never abort the loop.
 
 `source_project` = `basename(cwd)`. Frontmatter: note shape from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily), no braindump provenance.
-
----
 
 ## Confirmation output
 
@@ -91,8 +79,6 @@ Failed: K chunks.            ← "chunk" singular when K=1
 - <one-line reason per failure>
 …
 ```
-
----
 
 ## Examples
 
