@@ -24,10 +24,7 @@ Create this file in the vault root when scaffolding a new project vault (not thi
 ```markdown
 # [WIKI NAME]: LLM Wiki
 
-Mode: [MODE A/B/C/D/E/F]
-Purpose: [ONE SENTENCE]
-Owner: [NAME]
-Created: YYYY-MM-DD
+Mode: [MODE A/B/C/D/E/F] Purpose: [ONE SENTENCE] Owner: [NAME] Created: YYYY-MM-DD
 
 ## Structure
 

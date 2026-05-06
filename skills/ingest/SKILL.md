@@ -183,16 +183,13 @@ When new info contradicts an existing wiki page:
 On the existing page, add:
 
 ```markdown
-> [!contradiction] Conflict with [[New Source]]
-> [[Existing Page]] claims X. [[New Source]] says Y.
-> Needs resolution. Check dates, context, and primary sources.
+> [!contradiction] Conflict with [[New Source]] [[Existing Page]] claims X. [[New Source]] says Y. Needs resolution. Check dates, context, and primary sources.
 ```
 
 On the new source summary, reference it:
 
 ```markdown
-> [!contradiction] Contradicts [[Existing Page]]
-> This source says Y, but existing wiki says X. See [[Existing Page]] for details.
+> [!contradiction] Contradicts [[Existing Page]] This source says Y, but existing wiki says X. See [[Existing Page]] for details.
 ```
 
 Do not silently overwrite old claims. Flag and let the user decide.
