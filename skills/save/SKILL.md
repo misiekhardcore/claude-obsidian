@@ -66,8 +66,7 @@ If the user specifies a type, use that. If not, pick the best fit based on the c
    | `synthesis` | `## Questions`                                                         |
    | `session`   | _(skip — not indexed; chronology lives in `wiki/log.md` and `daily/`)_ |
 
-   **Entry format:** `- [[<slug>|<Display Name>]] — <one-line description>`
-   Omit `|<Display Name>` when the display name matches the slug exactly (after converting hyphens/underscores to spaces and title-casing).
+   **Entry format:** `- [[<slug>|<Display Name>]] — <one-line description>` Omit `|<Display Name>` when the display name matches the slug exactly (after converting hyphens/underscores to spaces and title-casing).
 
    **Pattern:** delegate the read-splice-overwrite to `scripts/index-section-insert.sh`. It reads via `obsidian read`, splices the entry on the line immediately after the matching heading, and writes back via `obsidian create overwrite=true`. If the heading is absent, the script appends `<heading>\n<entry>` at the end of the file.
 

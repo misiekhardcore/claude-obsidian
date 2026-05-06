@@ -5,10 +5,7 @@ type: source
 
 # E2E Sample Fixture
 
-A short document used as the ingest fixture for the claude-obsidian end-to-end harness.
-The ingest skill reads this from `.raw/sample.md`, extracts metadata, and creates
-a corresponding page in `wiki/sources/` with valid frontmatter. `wiki/index.md` is
-updated to reference the new page.
+A short document used as the ingest fixture for the claude-obsidian end-to-end harness. The ingest skill reads this from `.raw/sample.md`, extracts metadata, and creates a corresponding page in `wiki/sources/` with valid frontmatter. `wiki/index.md` is updated to reference the new page.
 
 ## Notes
 

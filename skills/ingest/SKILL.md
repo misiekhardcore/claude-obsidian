@@ -122,13 +122,10 @@ Steps:
 2. **Discuss takeaways with the user — this step is required.** Before writing a single page, ask:
    - "What should I emphasize from this source?"
    - "How granular should I go?"
-   - "Is there existing wiki context I should link against?"
-     **Wait for the user's response before proceeding.** Do not assume defaults and do not skip ahead.
-     **Skip this step only if** the user's original message included "just ingest it" or "auto-ingest".
+   - "Is there existing wiki context I should link against?" **Wait for the user's response before proceeding.** Do not assume defaults and do not skip ahead. **Skip this step only if** the user's original message included "just ingest it" or "auto-ingest".
 3. **Create** source summary in `wiki/sources/`. Use the source frontmatter schema from `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 4. **Create or update** entity pages for every person, org, product, and repo mentioned. One page per entity.
-5. **Create or update** concept pages for significant ideas and frameworks.
-   When checking for existing pages to link against, include canvas files in `wiki/canvases/` — they are first-class wiki pages. The ingest skill itself creates `.md` pages; canvas creation is done by the `canvas` skill.
+5. **Create or update** concept pages for significant ideas and frameworks. When checking for existing pages to link against, include canvas files in `wiki/canvases/` — they are first-class wiki pages. The ingest skill itself creates `.md` pages; canvas creation is done by the `canvas` skill.
 6. **Update** relevant domain hubs at `wiki/domains/<slug>/_index.md` if any new leaves match an existing hub's tag — append the new leaves to the hub's `related:` list and bump the hub's `page_count:`. Do not write a `domain:` field on the leaves.
 7. **Update** `wiki/index.md`. Add entries for all new pages.
 8. **Update** `wiki/hot.md` with this ingest's context.
@@ -179,8 +176,7 @@ Token budget matters. Follow these rules during ingest:
 
 ## Contradictions
 
-> [!note] Custom callout dependency
-> The `[!contradiction]` callout type used below is a **custom callout** defined in `.obsidian/snippets/vault-colors.css` (auto-installed by `/wiki` scaffold). It renders with reddish-brown styling and an alert-triangle icon when the snippet is enabled. If the snippet is missing, Obsidian falls back to default callout styling, so the page still works without the visual flourish. See [[skills/wiki/references/css-snippets.md]] for the four custom callouts (`contradiction`, `gap`, `key-insight`, `stale`).
+> [!note] Custom callout dependency The `[!contradiction]` callout type used below is a **custom callout** defined in `.obsidian/snippets/vault-colors.css` (auto-installed by `/wiki` scaffold). It renders with reddish-brown styling and an alert-triangle icon when the snippet is enabled. If the snippet is missing, Obsidian falls back to default callout styling, so the page still works without the visual flourish. See [[skills/wiki/references/css-snippets.md]] for the four custom callouts (`contradiction`, `gap`, `key-insight`, `stale`).
 
 When new info contradicts an existing wiki page:
 

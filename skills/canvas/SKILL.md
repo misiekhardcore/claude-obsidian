@@ -57,10 +57,8 @@ If it does not exist, create it:
 ### open / status (`/canvas` with no args)
 
 1. Check if `wiki/canvases/main.canvas` exists.
-2. If yes: read it, count nodes by type, list all group node labels (zone names).
-   Report: "Canvas has N nodes: X images, Y text cards, Z wiki pages. Zones: [list]"
-3. If no: create it with the starter structure above.
-   Report: "Created main.canvas with a General zone."
+2. If yes: read it, count nodes by type, list all group node labels (zone names). Report: "Canvas has N nodes: X images, Y text cards, Z wiki pages. Zones: [list]"
+3. If no: create it with the starter structure above. Report: "Created main.canvas with a General zone."
 4. Tell user: "Open `wiki/canvases/main.canvas` in Obsidian to view."
 
 ---
@@ -78,16 +76,13 @@ If it does not exist, create it:
 
 **Resolve the image:**
 
-- If URL (starts with `http`): download with `curl -sL [url] -o _attachments/images/canvas/[filename]`
-  Derive filename from URL path, or use `img-[timestamp].jpg` if unclear.
+- If URL (starts with `http`): download with `curl -sL [url] -o _attachments/images/canvas/[filename]` Derive filename from URL path, or use `img-[timestamp].jpg` if unclear.
 - If local path outside vault: `cp [path] _attachments/images/canvas/`
 - If already vault-relative: use as-is.
 
 Create `_attachments/images/canvas/` if it doesn't exist.
 
-**Detect aspect ratio:**
-Use `python3 -c "from PIL import Image; img=Image.open('[path]'); print(img.width, img.height)"` or `identify -format '%w %h' [path]`.
-See `references/canvas-spec.md` for the full aspect ratio → canvas size table (7 ratios including 4:3, 3:4, ultra-wide). Do not use an inline table here. The spec is the single source of truth for sizing.
+**Detect aspect ratio:** Use `python3 -c "from PIL import Image; img=Image.open('[path]'); print(img.width, img.height)"` or `identify -format '%w %h' [path]`. See `references/canvas-spec.md` for the full aspect ratio → canvas size table (7 ratios including 4:3, 3:4, ultra-wide). Do not use an inline table here. The spec is the single source of truth for sizing.
 
 **Position using auto-layout** (see Auto-Positioning section below).
 
@@ -285,7 +280,4 @@ When `/banana` finishes generating images, suggest:
 
 ## See Also
 
-For standalone visual production (12 templates, 6 layout algorithms, AI generation,
-presentations), see [claude-canvas](https://github.com/AgriciDaniel/claude-canvas).
-This skill handles wiki-scoped visual boards. claude-canvas handles full-featured
-canvas orchestration for any project.
+For standalone visual production (12 templates, 6 layout algorithms, AI generation, presentations), see [claude-canvas](https://github.com/AgriciDaniel/claude-canvas). This skill handles wiki-scoped visual boards. claude-canvas handles full-featured canvas orchestration for any project.

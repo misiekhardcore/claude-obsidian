@@ -1,7 +1,6 @@
 # Obsidian Canvas JSON Specification
 
-Canvas files are JSON with two top-level keys: `nodes` (array) and `edges` (array).
-Obsidian reads and writes them as UTF-8 JSON files with `.canvas` extension.
+Canvas files are JSON with two top-level keys: `nodes` (array) and `edges` (array). Obsidian reads and writes them as UTF-8 JSON files with `.canvas` extension.
 
 This reference aligns with the [JSON Canvas 1.0 open specification](https://jsoncanvas.org/spec/1.0/). All structures support arbitrary additional fields (`[key: string]: any`) for forward compatibility. Obsidian will preserve unknown fields when reading and writing canvas files.
 
@@ -80,8 +79,7 @@ Renders an image, PDF, markdown note, or other vault file inline.
 
 ### Group node (Zone)
 
-A labeled rectangular region. Does not clip or contain nodes. It's a visual guide.
-Nodes placed "inside" a group are just positioned within its bounding box.
+A labeled rectangular region. Does not clip or contain nodes. It's a visual guide. Nodes placed "inside" a group are just positioned within its bounding box.
 
 ```json
 {

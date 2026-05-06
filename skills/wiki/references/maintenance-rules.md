@@ -2,8 +2,7 @@
 
 Skill-operational rules for ingest, contradiction handling, quality standards, and log format. Read this file before any ingest, autoresearch, or significant wiki operation.
 
-Cross-skill structural conventions (vault directory map, confidence tagging semantics, typed-relationship semantics) live in `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md`.
-Frontmatter field schemas live in `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
+Cross-skill structural conventions (vault directory map, confidence tagging semantics, typed-relationship semantics) live in `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md`. Frontmatter field schemas live in `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
 
 ---
 

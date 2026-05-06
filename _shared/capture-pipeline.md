@@ -1,7 +1,6 @@
 # Capture Pipeline
 
-Stable contract for all capture surfaces: `/note`, `/daily`, `/braindump` (sub-issue D), and rich inputs (sub-issue E).
-Section headings are **stable anchors** — do not reorder. Future splits patch individual sections in place.
+Stable contract for all capture surfaces: `/note`, `/daily`, `/braindump` (sub-issue D), and rich inputs (sub-issue E). Section headings are **stable anchors** — do not reorder. Future splits patch individual sections in place.
 
 ---
 

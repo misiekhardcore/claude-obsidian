@@ -122,8 +122,7 @@ Steps:
 3. Wait for the user's single-letter action. Loop on invalid input.
 4. **`s` (save)** — invoke the `save` skill via the Skill tool, passing the note body, the frontmatter, and an explicit note name: `"Save this as: <title>"` so the save skill's step 2 name-prompt is pre-satisfied and the interactive loop is not broken. On success:
    - Delete `<vault_root>/notes/<filename>`.
-   - Remove the corresponding row from `notes/index.md`.
-     On `/save` failure, leave the note untouched and surface the error.
+   - Remove the corresponding row from `notes/index.md`. On `/save` failure, leave the note untouched and surface the error.
 5. **`d` (defer)** — patch the note's frontmatter: `status: deferred`, bump `updated:` to today. Move the row in `notes/index.md` from `## Pending` to `## Deferred`.
 6. **`x` (delete)** — delete the file unconditionally. Remove the corresponding row from `notes/index.md`.
 7. **`q` (quit)** — exit the loop. Remaining notes stay pending.
