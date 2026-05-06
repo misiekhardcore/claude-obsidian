@@ -11,7 +11,7 @@ Read the `notes` skill. Then dispatch based on the argument:
 
 If the argument is empty (`/note` alone), show usage:
 
-```
+```text
 /note <text>           Capture a verbatim note to the inbox
 /note list             Show the inbox
 /note process          Triage the inbox

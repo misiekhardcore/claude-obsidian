@@ -8,7 +8,7 @@ Six modes cover the most common use cases. Pick the one that fits, or combine th
 
 Use when: "build a sitemap wiki for my website", "map content gaps", "SEO audit wiki"
 
-```
+```text
 vault/
 ├── .raw/              # crawl exports, analytics, scraped pages, GSC data
 ├── wiki/
@@ -24,11 +24,12 @@ vault/
 ```
 
 Frontmatter for `wiki/pages/` notes:
+
 ```yaml
 ---
 type: page
 url: "https://example.com/page-slug"
-status: live          # live | redirect | 404 | stub | no-index
+status: live # live | redirect | 404 | stub | no-index
 title: ""
 h1: ""
 meta_description: ""
@@ -53,7 +54,7 @@ Key wiki pages to create: `[[Site Overview]]`, `[[Navigation Structure]]`, `[[Co
 
 Use when: "map my codebase", "architecture wiki for my repo", "understand this project"
 
-```
+```text
 vault/
 ├── .raw/              # README, git log exports, code dumps, issue exports
 ├── wiki/
@@ -69,11 +70,12 @@ vault/
 ```
 
 Frontmatter for `wiki/modules/` notes:
+
 ```yaml
 ---
-type: module           # module | component | decision | dependency | flow
+type: module # module | component | decision | dependency | flow
 path: "src/auth/"
-status: active         # active | deprecated | experimental | planned
+status: active # active | deprecated | experimental | planned
 language: typescript
 purpose: ""
 maintainer: ""
@@ -95,7 +97,7 @@ Key wiki pages to create: `[[Architecture Overview]]`, `[[Data Flow]]`, `[[Tech 
 
 Use when: "project wiki", "competitive intelligence", "team knowledge base", "meeting notes"
 
-```
+```text
 vault/
 ├── .raw/              # meeting transcripts, Slack exports, docs, emails
 ├── wiki/
@@ -111,11 +113,12 @@ vault/
 ```
 
 Frontmatter for `wiki/decisions/` notes:
+
 ```yaml
 ---
-type: decision         # stakeholder | decision | deliverable | intel | meeting | competitor
-status: active         # active | pending | done | blocked | superseded
-priority: 3            # 1 (highest) to 5 (lowest)
+type: decision # stakeholder | decision | deliverable | intel | meeting | competitor
+status: active # active | pending | done | blocked | superseded
+priority: 3 # 1 (highest) to 5 (lowest)
 date: YYYY-MM-DD
 owner: ""
 due_date: ""
@@ -134,7 +137,7 @@ Key wiki pages to create: `[[Project Overview]]`, `[[Stakeholder Map]]`, `[[Deci
 
 Use when: "personal second brain", "track my goals", "journal synthesis", "life wiki"
 
-```
+```text
 vault/
 ├── .raw/              # journal entries, articles, podcast notes, voice transcripts
 ├── wiki/
@@ -151,14 +154,15 @@ vault/
 ```
 
 Frontmatter for `wiki/goals/` notes:
+
 ```yaml
 ---
-type: goal             # goal | concept | person | area | resource | reflection
-status: active         # active | paused | completed | abandoned
-area: career           # health | career | finance | creative | relationships | growth
+type: goal # goal | concept | person | area | resource | reflection
+status: active # active | paused | completed | abandoned
+area: career # health | career | finance | creative | relationships | growth
 priority: 1
 target_date: YYYY-MM-DD
-progress: 0            # 0-100 percent
+progress: 0 # 0-100 percent
 tags: [goal]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
@@ -175,7 +179,7 @@ Key wiki pages to create: `[[North Star]]`, `[[Weekly Review Template]]`, `[[Ann
 
 Use when: "research wiki on [topic]", "track papers I'm reading", "build a thesis"
 
-```
+```text
 vault/
 ├── .raw/              # PDFs, web clips, data files, raw notes
 ├── wiki/
@@ -191,10 +195,11 @@ vault/
 ```
 
 Frontmatter for `wiki/papers/` notes:
+
 ```yaml
 ---
-type: paper            # paper | concept | entity | thesis | gap
-status: summarized     # raw | summarized | synthesized | superseded
+type: paper # paper | concept | entity | thesis | gap
+status: summarized # raw | summarized | synthesized | superseded
 year: 2024
 authors: []
 venue: ""
@@ -216,7 +221,7 @@ Key wiki pages to create: `[[Research Overview]]`, `[[Key Claims Map]]`, `[[Open
 
 Use when: "companion wiki for a book", "course notes wiki", "as I read [title]"
 
-```
+```text
 vault/
 ├── .raw/              # chapter notes, highlights, exercises
 ├── wiki/
@@ -232,10 +237,11 @@ vault/
 ```
 
 Frontmatter for `wiki/concepts/` notes:
+
 ```yaml
 ---
-type: concept          # concept | character | theme | chapter | synthesis
-status: developing     # stub | developing | mature
+type: concept # concept | character | theme | chapter | synthesis
+status: developing # stub | developing | mature
 source_chapters: []
 first_appearance: ""
 tags: [concept]

@@ -1,8 +1,8 @@
 ---
 type: meta
 title: "Operations Log"
-created: {{today}}
-updated: {{today}}
+created: { { today } }
+updated: { { today } }
 tags:
   - meta
   - log

@@ -1,8 +1,8 @@
 ---
 type: meta
 title: "Wiki Index"
-created: {{today}}
-updated: {{today}}
+created: { { today } }
+updated: { { today } }
 tags:
   - meta
   - index
@@ -25,11 +25,11 @@ Master catalog of all pages in this knowledge base.
 
 ## Core Types
 
-| Type | Directory | Purpose |
-|------|-----------|---------|
-| concept | wiki/concepts/ | Patterns, techniques, ideas |
-| entity | wiki/entities/ | Named real-world things |
-| source | wiki/sources/ | Ingested source records |
+| Type     | Directory       | Purpose                     |
+| -------- | --------------- | --------------------------- |
+| concept  | wiki/concepts/  | Patterns, techniques, ideas |
+| entity   | wiki/entities/  | Named real-world things     |
+| source   | wiki/sources/   | Ingested source records     |
 | question | wiki/questions/ | Open and answered questions |
 
 ## Navigation

@@ -21,18 +21,21 @@ obsidian version
 ```
 
 Expected output:
-```
+
+```text
 1.12.7 (installer 1.12.7)
 ```
 
 **If `obsidian: command not found`:**
 
 **Linux (Flatpak):** The Flatpak build sandboxes the binary. Invoke it as:
+
 ```bash
 flatpak run md.obsidian.Obsidian --cli version
 ```
 
 To simplify, create an alias in your shell config:
+
 ```bash
 alias obsidian='flatpak run md.obsidian.Obsidian --cli'
 ```
@@ -53,6 +56,7 @@ The Obsidian CLI needs to know your vault's location. Open Obsidian and do this 
    Expected output: `Vault registered.`
 
 **Verify registration:**
+
 ```bash
 obsidian list vaults
 ```
@@ -72,6 +76,7 @@ obsidian read path=wiki/hot.md
 You should see the contents of `wiki/hot.md` (or an error if the file doesn't exist yet, which is fine).
 
 If you get **`Vault not found.`**, double-check:
+
 1. Obsidian is still running
 2. The vault path in the register step was an absolute path (not relative)
 3. The vault name you passed matches the registered vault name exactly
@@ -113,6 +118,7 @@ If Obsidian is closed or the CLI is not installed:
 **Cron-time vault writes:** The CLI requires Obsidian to be running. For scheduled tasks (e.g., weekly `wiki-lint`), see `bin/wiki-lint-cron.sh` for direct-file fallback behavior.
 
 **Troubleshooting steps:**
+
 1. Start Obsidian and open your vault
 2. Verify `obsidian version` returns a version string (not empty, not "command not found")
 3. Confirm your vault is registered: `obsidian list vaults`

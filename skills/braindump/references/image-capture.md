@@ -20,7 +20,7 @@ The text split and image-to-chunk assignment happen in a **single LLM reasoning 
 
 If this combined step fails due to vision processing error → abort:
 
-```
+```text
 Vision processing failed: <reason>. Image not moved, note not created.
 ```
 
@@ -28,7 +28,7 @@ Do not enter the CAPTURE loop.
 
 Zero chunks returned → hard-abort, no retry:
 
-```
+```text
 /braindump split returned no chunks. Original text not captured.
 ```
 

@@ -6,7 +6,7 @@ Conventions for adding skills and shared protocols to this plugin.
 
 ## Directory Layout
 
-```
+```text
 _shared/          Cross-skill reference docs — read on demand by any skill that needs them
 scripts/          Utility scripts
   obsidian-cli.sh Wrapper for the Obsidian CLI (canonical vault-touch primitive)
@@ -27,6 +27,7 @@ _templates/       This directory — authoring guidance and Obsidian Templater t
 Promote a document to `_shared/` only when **three or more skills** need to read it. If only one or two skills reference a doc, keep it under `skills/<name>/references/`.
 
 Current shared docs:
+
 - `_shared/vault-structure.md` — vault directory map, confidence tagging semantics, typed-relationship semantics
 - `_shared/frontmatter.md` — universal YAML field schema, status/confidence values, typed relationship YAML shape
 - `_shared/hot-cache-protocol.md` — when to read/write `wiki/hot.md` and what to put in it
@@ -70,6 +71,7 @@ Skills should read `_shared/` files on demand, not preload them at skill start.
 ## Promotion rubric
 
 Promote a `skills/<name>/references/` document to `_shared/` when:
+
 1. Three or more skills reference the same content
 2. The content is genuinely cross-cutting (not specific to one skill's operation)
 3. Duplication across skills would create a maintenance risk

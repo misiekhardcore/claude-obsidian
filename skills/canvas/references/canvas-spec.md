@@ -11,7 +11,7 @@ This reference aligns with the [JSON Canvas 1.0 open specification](https://json
 
 ## Coordinate System
 
-```
+```text
         x increases →
    ┌─────────────────────────────────
    │  (-920, -2400)      (0, -2400)
@@ -100,8 +100,8 @@ Nodes placed "inside" a group are just positioned within its bounding box.
 
 - `label`: shown at the top of the group box.
 - `color`: colors the group border and label.
-- `background` *(optional)*: vault-relative path to a background image for the group.
-- `backgroundStyle` *(optional)*: how the background is rendered.
+- `background` _(optional)_: vault-relative path to a background image for the group.
+- `backgroundStyle` _(optional)_: how the background is rendered.
   - `"cover"`: fills the group, cropping if needed (default-ish behavior)
   - `"ratio"`: preserves aspect ratio, fits inside the group
   - `"repeat"`: tiles the image
@@ -151,11 +151,11 @@ Connections between nodes. Usually empty for mood boards.
 **Required fields**: `id`, `fromNode`, `toNode`. Everything else is optional.
 
 - `fromNode` / `toNode`: IDs of the source and target nodes.
-- `fromSide` / `toSide` *(optional)*: `"top"` `"bottom"` `"left"` `"right"`. If omitted, Obsidian auto-calculates the best side based on relative node positions.
-- `fromEnd` *(optional)*: end-cap on the source side. Defaults to `"none"`. Values: `"none"` | `"arrow"`.
-- `toEnd` *(optional)*: end-cap on the target side. **Defaults to `"arrow"`**: note the asymmetric default vs `fromEnd`. Values: `"none"` | `"arrow"`.
-- `label` *(optional)*: text shown on the edge.
-- `color` *(optional)*: same color palette as nodes (`"1"`–`"6"` or hex).
+- `fromSide` / `toSide` _(optional)_: `"top"` `"bottom"` `"left"` `"right"`. If omitted, Obsidian auto-calculates the best side based on relative node positions.
+- `fromEnd` _(optional)_: end-cap on the source side. Defaults to `"none"`. Values: `"none"` | `"arrow"`.
+- `toEnd` _(optional)_: end-cap on the target side. **Defaults to `"arrow"`**: note the asymmetric default vs `fromEnd`. Values: `"none"` | `"arrow"`.
+- `label` _(optional)_: text shown on the edge.
+- `color` _(optional)_: same color palette as nodes (`"1"`–`"6"` or hex).
 
 Most edges represent directed relationships, so the asymmetric defaults (`fromEnd: "none"`, `toEnd: "arrow"`) produce a single arrow pointing from source to target without specifying anything explicitly.
 
@@ -163,14 +163,14 @@ Most edges represent directed relationships, so the asymmetric defaults (`fromEn
 
 ## Color Reference
 
-| Code | Color | Hex (approx) | Use case |
-|------|-------|-------------|----------|
-| `"1"` | Red / Tomato | #e03e3e | Warnings, archive |
-| `"2"` | Orange | #d09035 | Active work |
-| `"3"` | Yellow / Gold | #d0a023 | WIP, notes |
-| `"4"` | Green / Teal | #448361 | Content, sources |
-| `"5"` | Blue / Cyan | #3ea7d3 | Navigation, info |
-| `"6"` | Purple / Violet | #9063d2 | Title, identity |
+| Code  | Color           | Hex (approx) | Use case          |
+| ----- | --------------- | ------------ | ----------------- |
+| `"1"` | Red / Tomato    | #e03e3e      | Warnings, archive |
+| `"2"` | Orange          | #d09035      | Active work       |
+| `"3"` | Yellow / Gold   | #d0a023      | WIP, notes        |
+| `"4"` | Green / Teal    | #448361      | Content, sources  |
+| `"5"` | Blue / Cyan     | #3ea7d3      | Navigation, info  |
+| `"6"` | Purple / Violet | #9063d2      | Title, identity   |
 
 Omit `color` entirely for the default (no border color, transparent label).
 
@@ -186,22 +186,22 @@ python3 -c "from PIL import Image; img=Image.open('path.png'); print(img.width, 
 identify -format '%w %h' path.png
 ```
 
-| Aspect ratio | Condition | Canvas width | Canvas height |
-|-------------|-----------|-------------|--------------|
-| 16:9 (wide) | ratio 1.6–2.0 | 420 | 236 |
-| 2:1 (ultra wide) | ratio > 2.0 | 440 | 220 |
-| 4:3 | ratio 1.2–1.6 | 380 | 285 |
-| 1:1 (square) | ratio 0.9–1.1 | 280 | 280 |
-| 3:4 | ratio 0.6–0.9 | 240 | 320 |
-| 9:16 (portrait) | ratio < 0.6 | 200 | 356 |
-| PDF | any | 400 | 520 |
-| Unknown | fallback | 320 | 240 |
+| Aspect ratio     | Condition     | Canvas width | Canvas height |
+| ---------------- | ------------- | ------------ | ------------- |
+| 16:9 (wide)      | ratio 1.6–2.0 | 420          | 236           |
+| 2:1 (ultra wide) | ratio > 2.0   | 440          | 220           |
+| 4:3              | ratio 1.2–1.6 | 380          | 285           |
+| 1:1 (square)     | ratio 0.9–1.1 | 280          | 280           |
+| 3:4              | ratio 0.6–0.9 | 240          | 320           |
+| 9:16 (portrait)  | ratio < 0.6   | 200          | 356           |
+| PDF              | any           | 400          | 520           |
+| Unknown          | fallback      | 320          | 240           |
 
 ---
 
 ## Auto-Positioning Pseudocode
 
-```
+```text
 function place_node(canvas, zone_label, new_w, new_h):
   zone = find group node where label == zone_label
   padding = 20
@@ -244,37 +244,58 @@ function place_node(canvas, zone_label, new_w, new_h):
       "id": "title-0001",
       "type": "text",
       "text": "# Brand Reference\n\nVisual assets",
-      "x": -920, "y": -2440, "width": 560, "height": 180, "color": "6"
+      "x": -920,
+      "y": -2440,
+      "width": 560,
+      "height": 180,
+      "color": "6"
     },
     {
       "id": "zone-logos",
       "type": "group",
       "label": "Logos & Icons",
-      "x": -920, "y": -2200, "width": 1800, "height": 320, "color": "6"
+      "x": -920,
+      "y": -2200,
+      "width": 1800,
+      "height": 320,
+      "color": "6"
     },
     {
       "id": "img-logo-pro",
       "type": "file",
       "file": "_attachments/images/example.png",
-      "x": -900, "y": -2180, "width": 420, "height": 236
+      "x": -900,
+      "y": -2180,
+      "width": 420,
+      "height": 236
     },
     {
       "id": "img-icon-free",
       "type": "file",
       "file": "_attachments/images/example-icon.png",
-      "x": -440, "y": -2180, "width": 280, "height": 280
+      "x": -440,
+      "y": -2180,
+      "width": 280,
+      "height": 280
     },
     {
       "id": "zone-covers",
       "type": "group",
       "label": "Skill Covers",
-      "x": -920, "y": -1820, "width": 1800, "height": 340, "color": "3"
+      "x": -920,
+      "y": -1820,
+      "width": 1800,
+      "height": 340,
+      "color": "3"
     },
     {
       "id": "img-seo",
       "type": "file",
       "file": "_attachments/images/example-cover.png",
-      "x": -900, "y": -1800, "width": 420, "height": 236
+      "x": -900,
+      "y": -1800,
+      "width": 420,
+      "height": 236
     }
   ],
   "edges": []

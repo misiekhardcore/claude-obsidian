@@ -5,6 +5,7 @@ description: Run an autonomous research loop on a topic. Searches the web, synth
 Read the `autoresearch` skill. Then run the research loop.
 
 Usage:
+
 - `/autoresearch [topic]` — research a specific topic
 - `/autoresearch` — ask "What topic should I research?"
 

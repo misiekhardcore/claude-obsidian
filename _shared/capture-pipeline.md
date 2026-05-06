@@ -24,7 +24,7 @@ VAULT=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") || {
 
 If no vault is configured, the script exits 1 and prints to stderr. Surface that to the user as:
 
-```
+```text
 No vault configured — run /wiki init first.
 ```
 
@@ -100,7 +100,7 @@ List `<vault_root>/notes/*.md` and read **frontmatter only** for each (title, to
 
 ### Decision prompt
 
-```
+```text
 Existing notes (frontmatter only):
 {{for each candidate, render: filename, title, topic, tags}}
 
@@ -126,7 +126,7 @@ Output exactly one of `MATCH: <filename> | <reason>` or `NEW`. Use `MATCH` only 
 
 Append to the existing file:
 
-```
+```text
 <existing body>
 
 ---
@@ -157,7 +157,7 @@ Patch in place after every CAPTURE — never rewrite from scratch.
 
 **NEW:** prepend a row under `## Pending`:
 
-```
+```text
 - [ ] YYYY-MM-DD [<source_project>] <title>
 ```
 
@@ -192,7 +192,7 @@ updated: YYYY-MM-DD
 
 Append one bullet under `## Captures`:
 
-```
+```text
 - HH:MM <verbatim text>
 ```
 

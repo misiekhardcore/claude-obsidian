@@ -19,7 +19,7 @@ Use this when `/lint` reports a **promotion candidate** (a tag-cluster of ≥10 
    title: "<Title Case of tag>"
    owns_folder: false
    subdomain_of: ""
-   page_count: <N>             # length of the related list below
+   page_count: <N> # length of the related list below
    created: YYYY-MM-DD
    updated: YYYY-MM-DD
    tags: [domain, <tag>]
@@ -33,28 +33,35 @@ Use this when `/lint` reports a **promotion candidate** (a tag-cluster of ≥10 
    ---
    ```
 6. **Body template.** Pre-populate stub sections grouped by leaf type so the curator can annotate later:
+
    ```markdown
    # <Title Case of tag>
 
    <one-paragraph stub: replace with hub description>
 
    ## Concepts
+
    - [[<concept-leaf-1>]] — <one-line description>
    - ...
 
    ## Entities
+
    - [[<entity-leaf-1>]] — <one-line description>
    - ...
 
    ## Sources
+
    - [[<source-leaf-1>]] — <one-line description>
    - ...
 
    ## Solutions
+
    - [[<solution-leaf-1>]] — <one-line description>
    - ...
    ```
+
    Empty sections (no leaves of that type) can be omitted. The one-line description should be the leaf's own description if its frontmatter has one, otherwise leave it as `<TODO: describe>` for the human curator.
+
 7. **Update `wiki/index.md`.** Splice an entry under the `## Domains` section via `scripts/index-section-insert.sh` (same helper as `/save` step 7).
 
    **Entry format:** `- [[domains/<tag>/_index|<Title Case>]] — <one-line description>`
@@ -64,9 +71,10 @@ Use this when `/lint` reports a **promotion candidate** (a tag-cluster of ≥10 
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-section-insert.sh" \
      wiki/index.md "## Domains" "$new_entry"
    ```
+
 8. **Update `wiki/hot.md`.** Add the new hub to the `## Recent Changes` list per the hot-cache protocol.
 9. **Update `wiki/log.md`.** Prepend a `## [YYYY-MM-DD] promote | <tag>` entry noting the new hub and the cluster size.
-10. **Confirm.** "Scaffolded [[domains/<tag>/_index]] with N pre-populated leaves. Open it in Obsidian to curate descriptions and section ordering."
+10. **Confirm.** "Scaffolded [[domains/&lt;tag&gt;/_index]] with N pre-populated leaves. Open it in Obsidian to curate descriptions and section ordering."
 
 ## Idempotency
 

@@ -36,7 +36,7 @@ filters:
 
 # Computed properties
 formulas:
-  age_days: '(now() - file.ctime).days.round(0)'
+  age_days: "(now() - file.ctime).days.round(0)"
   status_icon: 'if(status == "mature", "✅", "🔄")'
 
 # Display name overrides for properties panel
@@ -100,17 +100,18 @@ filters:
 
 ### Useful filter functions
 
-| Function | Example |
-|----------|---------|
-| `file.hasTag("x")` | Notes with tag `x` |
-| `file.inFolder("path/")` | Notes in folder |
-| `file.hasLink("Note")` | Notes linking to Note |
+| Function                 | Example               |
+| ------------------------ | --------------------- |
+| `file.hasTag("x")`       | Notes with tag `x`    |
+| `file.inFolder("path/")` | Notes in folder       |
+| `file.hasLink("Note")`   | Notes linking to Note |
 
 ---
 
 ## Properties
 
 Three types:
+
 - **Note properties**: from frontmatter: `status`, `type`, `updated`
 - **File properties**: metadata: `file.name`, `file.mtime`, `file.size`, `file.ctime`, `file.tags`, `file.folder`
 - **Formula properties**: computed: `formula.age_days`
@@ -124,7 +125,7 @@ Defined in `formulas:`. Referenced as `formula.name` in `order:` and `properties
 ```yaml
 formulas:
   # Days since created
-  age_days: '(now() - file.ctime).days.round(0)'
+  age_days: "(now() - file.ctime).days.round(0)"
 
   # Days until a date property
   days_until: 'if(due_date, (date(due_date) - today()).days, "")'
@@ -133,10 +134,11 @@ formulas:
   status_icon: 'if(status == "mature", "✅", if(status == "developing", "🔄", "🌱"))'
 
   # Word count estimate
-  word_est: '(file.size / 5).round(0)'
+  word_est: "(file.size / 5).round(0)"
 ```
 
 **Key rule**: Subtracting two dates returns a `Duration`. Not a number. Always access `.days` first:
+
 ```yaml
 # CORRECT
 age: '(now() - file.ctime).days'
@@ -146,6 +148,7 @@ age: '(now() - file.ctime).round(0)'
 ```
 
 **Always guard nullable properties with `if()`**:
+
 ```yaml
 # CORRECT
 days_left: 'if(due_date, (date(due_date) - today()).days, "")'
@@ -156,6 +159,7 @@ days_left: 'if(due_date, (date(due_date) - today()).days, "")'
 ## View Types
 
 ### Table
+
 ```yaml
 views:
   - type: table
@@ -172,6 +176,7 @@ views:
 ```
 
 ### Cards
+
 ```yaml
 views:
   - type: cards
@@ -183,6 +188,7 @@ views:
 ```
 
 ### List
+
 ```yaml
 views:
   - type: list
@@ -206,7 +212,7 @@ filters:
         - file.inFolder("wiki/meta")
 
 formulas:
-  age: '(now() - file.ctime).days.round(0)'
+  age: "(now() - file.ctime).days.round(0)"
 
 properties:
   formula.age:
@@ -282,6 +288,7 @@ views:
 ## Where to Save
 
 Store `.base` files in `wiki/meta/` for vault dashboards:
+
 - `wiki/meta/dashboard.base`: main content view
 - `wiki/meta/entities.base`: entity tracker
 - `wiki/meta/sources.base`: ingestion log

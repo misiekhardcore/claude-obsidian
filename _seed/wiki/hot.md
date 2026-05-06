@@ -1,8 +1,8 @@
 ---
 type: meta
 title: "Hot Cache"
-created: {{today}}
-updated: {{today}}
+created: { { today } }
+updated: { { today } }
 tags:
   - meta
   - hot
@@ -22,6 +22,7 @@ related:
 > first real ingest has run and replaced this content.
 
 ## Last Updated
+
 {{today}}. Vault initialized with starter pages via `/wiki init`.
 
 ## Key Recent Facts
@@ -58,10 +59,10 @@ executive summary of what this vault covers.
 
 ## Schema Quick Reference
 
-| Page type | Directory | confidence default | evidence required? |
-|-----------|-----------|--------------------|--------------------|
-| source | wiki/sources/ | EXTRACTED | No |
-| concept | wiki/concepts/ | INFERRED | Yes |
-| entity | wiki/entities/ | INFERRED | Yes |
-| question | wiki/questions/ | INFERRED | Yes |
-| meta | wiki/ | EXTRACTED | No |
+| Page type | Directory       | confidence default | evidence required? |
+| --------- | --------------- | ------------------ | ------------------ |
+| source    | wiki/sources/   | EXTRACTED          | No                 |
+| concept   | wiki/concepts/  | INFERRED           | Yes                |
+| entity    | wiki/entities/  | INFERRED           | Yes                |
+| question  | wiki/questions/ | INFERRED           | Yes                |
+| meta      | wiki/           | EXTRACTED          | No                 |

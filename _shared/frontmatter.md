@@ -18,7 +18,7 @@ tags:
   - <domain-tag>
   - <type-tag>
 status: <seed|developing|mature|evergreen>
-confidence: INFERRED     # EXTRACTED | INFERRED | AMBIGUOUS
+confidence: INFERRED # EXTRACTED | INFERRED | AMBIGUOUS
 evidence:
   - "[[source-page]]"
 related:
@@ -29,6 +29,7 @@ sources:
 ```
 
 **status values:**
+
 - `seed`: exists, barely populated
 - `developing`: has real content, not yet complete
 - `current`: complete and useful, actively maintained
@@ -37,6 +38,7 @@ sources:
 - `superseded`: replaced by a newer source; preserved but no longer canonical
 
 **confidence values (Graphify-style):**
+
 - `EXTRACTED`: claims sourced directly from a document; deterministic (conf 1.0)
 - `INFERRED`: claims derived by the LLM from sources; variable confidence
 - `AMBIGUOUS`: conflicting signals present; requires human review before acting on these claims
@@ -53,19 +55,19 @@ All optional. Use these alongside `related:` when the semantic is unambiguous. K
 
 ```yaml
 supersedes:
-  - "[[old-page]]"       # this page replaces the listed page(s)
+  - "[[old-page]]" # this page replaces the listed page(s)
 contradicts:
-  - "[[conflicting]]"    # this page's claims conflict with the listed page(s)
+  - "[[conflicting]]" # this page's claims conflict with the listed page(s)
 uses:
-  - "[[dependency]]"     # this page/concept depends on or applies the listed page(s)
+  - "[[dependency]]" # this page/concept depends on or applies the listed page(s)
 depends_on:
-  - "[[dep]]"            # stronger dependency — can't function without the listed page(s)
+  - "[[dep]]" # stronger dependency — can't function without the listed page(s)
 caused:
-  - "[[effect]]"         # this page describes something that caused the listed outcome(s)
+  - "[[effect]]" # this page describes something that caused the listed outcome(s)
 fixed:
-  - "[[bug-page]]"       # this page describes a fix for the listed issue(s)
+  - "[[bug-page]]" # this page describes a fix for the listed issue(s)
 implements:
-  - "[[spec]]"           # this page is an implementation of the listed spec/pattern(s)
+  - "[[spec]]" # this page is an implementation of the listed spec/pattern(s)
 ```
 
 Allowed relationship types: `supersedes`, `contradicts`, `uses`, `depends_on`, `caused`, `fixed`, `implements`.
@@ -81,11 +83,11 @@ Note: `depends_on` uses underscore (not hyphen) for idiomatic YAML key naming.
 Add these fields after the universal fields:
 
 ```yaml
-source_type: article    # article | video | podcast | paper | book | transcript | data
+source_type: article # article | video | podcast | paper | book | transcript | data
 author: ""
 date_published: YYYY-MM-DD
 url: ""
-source_reliability: high  # high | medium | low — reliability of the source itself
+source_reliability: high # high | medium | low — reliability of the source itself
 key_claims:
   - "First key claim from this source"
   - "Second key claim"
@@ -96,7 +98,7 @@ Note: `confidence` for source pages is always `EXTRACTED` (the source page summa
 ### entity
 
 ```yaml
-entity_type: person     # person | organization | product | repository | place
+entity_type: person # person | organization | product | repository | place
 role: ""
 first_mentioned: "[[Source Title]]"
 ```
@@ -104,7 +106,7 @@ first_mentioned: "[[Source Title]]"
 ### concept
 
 ```yaml
-complexity: intermediate  # basic | intermediate | advanced
+complexity: intermediate # basic | intermediate | advanced
 aliases:
   - "alternative name"
   - "abbreviation"
@@ -129,7 +131,7 @@ verdict: "One-line conclusion."
 
 ```yaml
 question: "The original query as asked."
-answer_quality: solid   # draft | solid | definitive
+answer_quality: solid # draft | solid | definitive
 ```
 
 ### trail
@@ -137,12 +139,13 @@ answer_quality: solid   # draft | solid | definitive
 Trail pages are **autoresearch run-records** — they list the atomic notes from a single `/autoresearch` run in argument order, with a one-line annotation per step explaining its role. One trail per run, frozen at write time. Trails live under `wiki/trails/Trail: [Topic] (YYYY-MM-DD).md` so multiple runs on the same topic produce distinct files (no merge, no overwrite).
 
 ```yaml
-topic: "<slug>"                         # short slug for the research topic, matches the synthesis page
-research_run: YYYY-MM-DD                # the date the autoresearch run produced this trail
-synthesis: "[[Research: Topic]]"        # wikilink to the synthesis page from the same run
+topic: "<slug>" # short slug for the research topic, matches the synthesis page
+research_run: YYYY-MM-DD # the date the autoresearch run produced this trail
+synthesis: "[[Research: Topic]]" # wikilink to the synthesis page from the same run
 ```
 
 Notes:
+
 - `confidence:` for trail pages is `EXTRACTED` — the trail records what the run produced, not an inference.
 - `evidence:` is the list of atomic notes the trail steps through (the same wikilinks that appear in the body, in order).
 - Trails are run-scoped and not edited after emission. Lint check #16 validates trail integrity. Per `skills/lint/SKILL.md`, trails are excluded from the orphan check (designed-orphan: the synthesis page does not link back to the trail under the forward-only model) and trail dead-link findings are surfaced but never auto-fixed (run-snapshot frozen at write time).
@@ -152,9 +155,9 @@ Notes:
 Domain pages are the **hub layer** for cross-folder clusters. They live under `wiki/domains/<slug>/_index.md` and curate leaves via forward-only wikilinks. Leaves do not declare hub membership; the agent traverses leaf→hub via backlinks of `type: domain`.
 
 ```yaml
-subdomain_of: ""        # leave empty for top-level domains
+subdomain_of: "" # leave empty for top-level domains
 page_count: 0
-owns_folder: false      # true | false — `true` only when the hub also owns the directory of leaves under it (rare)
+owns_folder: false # true | false — `true` only when the hub also owns the directory of leaves under it (rare)
 ```
 
 `owns_folder:` defaults to `false` — most hubs curate leaves that live elsewhere in the vault (`concepts/`, `entities/`, `solutions/`, `sources/`).

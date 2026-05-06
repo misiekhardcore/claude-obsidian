@@ -26,9 +26,9 @@ Replace with: why these two things are being compared and what question this ans
 ## Comparison
 
 | Dimension | Subject A | Subject B |
-|-----------|-----------|-----------|
-| | | |
-| | | |
+| --------- | --------- | --------- |
+|           |           |           |
+|           |           |           |
 
 ## Verdict
 

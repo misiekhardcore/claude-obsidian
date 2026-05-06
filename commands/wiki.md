@@ -35,6 +35,7 @@ Surface the script's stdout to the user verbatim.
 Then build the entire wiki structure based on the answer. Don't ask more questions. Scaffold it, show what was created, and ask: "Want to adjust anything before we start?"
 
 Examples of what the user might say:
+
 - "Map the architecture of github.com/org/repo"
 - "Build a sitemap and content analysis for example.com"
 - "Track my SaaS business — product, customers, metrics, roadmap"

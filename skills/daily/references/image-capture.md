@@ -17,7 +17,7 @@ For `/daily`, the vision-LLM call must return:
 
 The bullet under `## Captures` uses the LLM description, with embeds indented two spaces on the next line(s):
 
-```
+```text
 - HH:MM <description>
   ![[<YYYY-MM-DD>-<vision-slug>.png]]
   ![[<YYYY-MM-DD>-<vision-slug>-2.png]]

@@ -7,6 +7,7 @@ allowed-tools: Bash Read Glob Grep
 # canvas: Visual Reference Layer
 
 The three knowledge capture layers:
+
 - `/save` → text synthesis (wiki/questions/, wiki/concepts/)
 - `/autoresearch` → structured knowledge (wiki/sources/, wiki/concepts/)
 - `/canvas` → visual references (wiki/canvases/)
@@ -28,13 +29,21 @@ If it does not exist, create it:
       "id": "title",
       "type": "text",
       "text": "# Visual Reference\n\nDrop images, PDFs, and notes here.",
-      "x": -400, "y": -300, "width": 400, "height": 120, "color": "6"
+      "x": -400,
+      "y": -300,
+      "width": 400,
+      "height": 120,
+      "color": "6"
     },
     {
       "id": "zone-default",
       "type": "group",
       "label": "General",
-      "x": -400, "y": -140, "width": 800, "height": 400, "color": "4"
+      "x": -400,
+      "y": -140,
+      "width": 800,
+      "height": 400,
+      "color": "4"
     }
   ],
   "edges": []
@@ -68,6 +77,7 @@ If it does not exist, create it:
 ### add image (`/canvas add image [path or url]`)
 
 **Resolve the image:**
+
 - If URL (starts with `http`): download with `curl -sL [url] -o _attachments/images/canvas/[filename]`
   Derive filename from URL path, or use `img-[timestamp].jpg` if unclear.
 - If local path outside vault: `cp [path] _attachments/images/canvas/`
@@ -90,6 +100,7 @@ Report: "Added [filename] to [zone] zone at position ([x], [y])."
 ### add text (`/canvas add text [content]`)
 
 Create a text node:
+
 ```json
 {
   "id": "text-[timestamp]",
@@ -108,6 +119,7 @@ Position using auto-layout. Write and report.
 ### add pdf (`/canvas add pdf [path]`)
 
 Same as add image. Obsidian renders PDFs natively as file nodes.
+
 - Copy to `_attachments/pdfs/canvas/` if outside vault.
 - Fixed size: width=400, height=520.
 - Report page count if you can determine it.
@@ -166,7 +178,7 @@ Write and report.
 2. For each canvas: read JSON, count nodes by type.
 3. Report:
 
-```
+```text
 wiki/canvases/main.canvas      . 14 nodes (8 images, 3 text, 2 file, 1 group)
 wiki/canvases/design-ideas.canvas. 42 nodes (30 images, 4 text, 8 groups)
 ```
@@ -258,6 +270,7 @@ If `wiki/canvases/.recent-images.txt` exists, append any new image path written 
 After any `/banana` run in the same session, if the user says "add to canvas" or "put on canvas", treat it as `/canvas from banana`.
 
 When `/banana` finishes generating images, suggest:
+
 > "Add generated images to canvas? Run `/canvas from banana`"
 
 ---
