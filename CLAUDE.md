@@ -105,6 +105,18 @@ When the user opens this plugin for the first time:
    - `never` — same hook behavior as `on-demand`; treat this as a user preference to avoid loading `wiki/hot.md` unless the user explicitly asks for it or the current task clearly requires wiki context.
 4. If the user types `/wiki` (or "set up wiki"), follow the wiki skill's scaffold workflow
 
+## Orchestration via Sub-Agents
+
+Several skills (`ingest`, `braindump`, `lint`, `autoresearch`, `query`) dispatch sub-agent workers to parallelize heavy lifting. These agents live in `agents/` and are invoked by orchestrating skills to avoid context bloat:
+
+- **`ingest`** dispatches `agents/ingest.md` — one agent per source file; agent does all wiki writes (pages, index, domains).
+- **`braindump`** dispatches `agents/capture.md` — one agent per chunk when chunks are independent (parallel); runs inline when order matters (sequential).
+- **`lint`** dispatches `agents/lint.md` — agent runs all 16 checks and drafts the report.
+- **`autoresearch`** dispatches `agents/research-round.md` and `agents/source-synth.md` — agents handle search/fetch loops and synthesis.
+- **`query`** dispatches `agents/gather.md` — agent clusters and reads wiki pages in parallel when candidate list exceeds 5 pages.
+
+Before spawning agents, the orchestrating skill always verifies CWD with `cd "${VAULT_ROOT}" && pwd`. Agents update wiki state (pages, index, hot.md); the orchestrator orchestrates (coalesces results, updates cross-cutting state like log.md). Parallel agents never update `wiki/hot.md` — only the orchestrator does (§ Parallel Worker Discipline in `_shared/hot-cache-protocol.md`).
+
 ## Ingest Rules
 
 Single-source ingests via `/wiki-ingest` require an interactive discussion before writing pages. After reading the source, Claude must ask:

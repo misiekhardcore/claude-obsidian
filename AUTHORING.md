@@ -26,8 +26,10 @@ Current shared docs:
 
 - `_shared/vault-structure.md` — vault directory map, confidence tagging semantics, typed-relationship semantics
 - `_shared/frontmatter.md` — universal YAML field schema, status/confidence values, typed relationship YAML shape
-- `_shared/hot-cache-protocol.md` — when to read/write `wiki/hot.md` and what to put in it
+- `_shared/hot-cache-protocol.md` — when to read/write `wiki/hot.md` and what to put in it; parallel worker discipline
 - `_shared/cli.md` — empirical Obsidian CLI contract (exit codes, error patterns, escape hatches)
+- `_shared/capture-pipeline.md` — stable vault I/O contract for `/note`, `/daily`, `/braindump`; MATCH/NEW heuristic; image handling
+- `_shared/image-capture.md` — image validation, move, embed, frontmatter mechanics (shared across `/note`, `/daily`, `/braindump`)
 
 ## Vault Operations: CLI Wrapper
 
@@ -67,3 +69,25 @@ Promote a `skills/<name>/references/` document to `_shared/` when:
 3. Duplication across skills would create a maintenance risk
 
 Do not promote docs that describe a single skill's internal procedure, even if they are long or detailed.
+
+## Sub-Agents vs. Inline
+
+When a skill needs to process many items (sources, chunks, pages), dispatch sub-agents instead of running inline:
+
+**Use inline** when:
+- Single item (one source, one chunk, one query)
+- Order matters (sequential processing required)
+- Total context fits in the orchestrator
+
+**Use sub-agents** when:
+- Multiple independent items (batch ingest, chunked braindump, large page clusters)
+- Can be parallelized (no cross-item MATCH required, no sequential dependencies)
+- Avoids context bloat on the main thread
+
+**Orchestrator responsibility:**
+- Verify CWD before spawning agents: `cd "${VAULT_ROOT}" && pwd`
+- Collect structured reports from agents
+- Update wiki index, log, hot.md after all agents finish (once, not per-agent)
+- Never write vault state in parallel — let agents handle their own writes; orchestrator only coalesces state
+
+See existing agents (`agents/*.md`) for reference patterns: `capture` (single note), `ingest` (single source), `lint` (full vault scan), `gather` (page cluster read).
