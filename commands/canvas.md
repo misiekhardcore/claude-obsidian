@@ -1,5 +1,6 @@
 ---
 description: Open, create, or update a visual canvas — add images, text, PDFs, wiki pages, and banana-generated assets to Obsidian canvas files.
+argument-hint: "[new|add image|add text|add pdf|add note|zone|list|from banana]"
 ---
 Run the `canvas` skill matching user command:
 

@@ -1,5 +1,6 @@
 ---
 description: Autonomous iterative research loop. Searches the web, dispatches agents to fetch and synthesize sources, and files everything into the wiki as structured pages.
+argument-hint: "[topic]"
 ---
 Run the `autoresearch` skill for the given topic or ask "What topic should I research?"
 
