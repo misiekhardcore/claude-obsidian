@@ -1,7 +1,7 @@
 ---
 name: ingest
 description: Ingest sources into wiki. Extracts entities/concepts, creates/updates pages, cross-references. Supports files and URLs.
-allowed-tools: Bash Read Glob Grep WebFetch Agent
+allowed-tools: Agent Bash Read WebFetch
 ---
 # ingest
 

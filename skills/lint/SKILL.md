@@ -1,7 +1,7 @@
 ---
 name: lint
 description: Wiki health check. Orphans, dead links, gaps. Generates canvas maps and Bases dashboards.
-allowed-tools: Bash Read Glob Grep Agent
+allowed-tools: Agent Bash Read
 ---
 # lint
 

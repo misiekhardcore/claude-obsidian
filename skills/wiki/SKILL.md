@@ -1,7 +1,7 @@
 ---
 name: wiki
 description: Knowledge companion. Bootstraps vault, scaffolds structure, routes to sub-skills.
-allowed-tools: Bash Read Glob Grep
+allowed-tools: Bash Read
 ---
 # wiki
 

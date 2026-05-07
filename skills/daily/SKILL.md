@@ -1,7 +1,7 @@
 ---
 name: daily
 description: Append a timestamped bullet to today's daily log. One line per call.
-allowed-tools: Bash Read Glob
+allowed-tools: Bash Read
 ---
 # daily
 

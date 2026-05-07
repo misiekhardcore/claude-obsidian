@@ -1,7 +1,7 @@
 ---
 name: canvas
 description: Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to canvas files with zones.
-allowed-tools: Bash Read Glob Grep
+allowed-tools: Bash Read
 ---
 # canvas
 

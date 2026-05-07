@@ -1,7 +1,7 @@
 ---
 name: notes
 description: Capture quick inbox notes without breaking flow. Verbatim, auto-match, per-project filtering, list/triage.
-allowed-tools: Bash Read Glob Grep
+allowed-tools: Bash Read
 ---
 # notes
 

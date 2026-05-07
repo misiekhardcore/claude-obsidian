@@ -1,7 +1,7 @@
 ---
 name: obsidian-bases
 description: Obsidian Bases (.base files) — dynamic tables, cards, lists, filters, formulas.
-allowed-tools: Bash Read Glob
+allowed-tools: Bash Read
 ---
 # obsidian-bases
 
