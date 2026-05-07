@@ -1,7 +1,6 @@
 ---
 name: obsidian-markdown
 description: Obsidian Flavored Markdown syntax. Wikilinks, embeds, callouts, properties, tags, math.
-allowed-tools: Read Write Edit
 ---
 # obsidian-markdown
 

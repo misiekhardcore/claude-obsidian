@@ -4,6 +4,7 @@ description: Runs one depth-≥2 research branch. Searches for a gap/angle, fetc
 model: sonnet
 maxTurns: 30
 tools: Bash WebFetch WebSearch
+disallowedTools: Read Write Edit Glob Grep
 ---
 Close one research gap: search, fetch, synthesize sources, report to orchestrator.
 

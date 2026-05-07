@@ -4,6 +4,7 @@ description: Reads vault files and returns structured summary. Read-only. Used b
 model: haiku
 maxTurns: 15
 tools: Bash
+disallowedTools: Write Edit Glob Grep WebFetch WebSearch
 ---
 Read vault files and return structured summary. **No writes.**
 
