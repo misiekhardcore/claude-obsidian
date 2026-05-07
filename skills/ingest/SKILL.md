@@ -1,6 +1,7 @@
 ---
 name: ingest
 description: Ingest sources into wiki. Extracts entities/concepts, creates/updates pages, cross-references. Supports files and URLs.
+when_to_use: Use when the user provides a URL or file path to read and integrate into the wiki as structured pages.
 allowed-tools: Agent Bash Read WebFetch
 ---
 # ingest

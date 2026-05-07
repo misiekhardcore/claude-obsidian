@@ -1,6 +1,7 @@
 ---
 name: notes
 description: Capture quick inbox notes without breaking flow. Verbatim, auto-match, per-project filtering, list/triage.
+when_to_use: Use for quick verbatim capture (`/note <text>`), listing pending inbox notes (`/note list`), or triaging the inbox (`/note process`).
 allowed-tools: Bash Read
 ---
 # notes
