@@ -7,13 +7,15 @@ tools: Read, Write, Glob, Grep, Bash
 ---
 Scan vault and produce comprehensive lint report. Receives: vault path, scope (full or specific folder).
 
-## Step 1 — Run scan script
+## Step 1 — Locate scan data
+
+The orchestrator runs `lint-scan.sh` before dispatching this agent. Read `wiki/meta/lint-data-YYYY-MM-DD.json` (today's date). If today's JSON is missing, run the scan as a fallback:
 
 ```bash
 CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
 ```
 
-Read `wiki/meta/lint-data-YYYY-MM-DD.json` (authoritative source for dead_links, orphans, unresolved_targets, backlinks, anti_patterns, scope). Do NOT run `obsidian deadends`, `orphans`, or per-page `backlinks` — JSON is canonical.
+JSON is authoritative for dead_links, orphans, unresolved_targets, backlinks, anti_patterns, scope. Do NOT run `obsidian deadends`, `orphans`, or per-page `backlinks` — JSON is canonical.
 
 ## Step 2 — Agent-driven checks
 

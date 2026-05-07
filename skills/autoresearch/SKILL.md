@@ -9,7 +9,7 @@ Run iterative web searches on a topic, synthesize findings, and file everything 
 
 ## Before Starting
 
-Read `references/program.md` for research objectives, confidence scoring rules, loop constraints, and domain-specific preferences.
+Read `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` for research objectives, confidence scoring rules, loop constraints, and domain-specific preferences.
 
 ## Vault I/O
 

@@ -32,7 +32,7 @@ sources:
 
 **evidence:** wikilinks supporting claims. Required for `INFERRED` or `AMBIGUOUS`.
 
-See `skills/wiki/references/maintenance-rules.md` for promotion criteria. See `vault-structure.md` for semantics.
+See `_shared/vault-structure.md` for hub structure and semantics.
 
 ## Typed Relationship Fields
 

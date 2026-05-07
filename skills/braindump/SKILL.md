@@ -76,11 +76,15 @@ Dispatch one `agents/capture.md` per independent chunk. Pass each agent:
 - `SOURCE_PROJECT` — `basename(cwd)`
 - `TODAY` — ISO date `YYYY-MM-DD`
 
-Wait for all agents to complete. Collect their `Filed:` / `Error:` lines for the confirmation
-output.
+Wait for all agents to complete. Collect their `Filed:` / `Appended:` / `Error:` lines.
 
-**Note:** parallel agents cannot MATCH-append to each other's notes (they run concurrently). If
-two chunks would logically MATCH the same note, run them inline in order instead.
+**Note:** parallel agents cannot MATCH-append to each other's notes (they run concurrently). If two chunks would logically MATCH the same note, run them inline in order instead.
+
+**After all agents finish:** apply a single consolidated `notes/index.md` patch. For each `Filed:` line, prepend one checkbox row under `## Pending`:
+```
+- [ ] YYYY-MM-DD [<source_project>] <title>
+```
+Agents do not patch the index; the orchestrator owns that write.
 
 `source_project` = `basename(cwd)`. Frontmatter: note shape from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily), no braindump provenance.
 

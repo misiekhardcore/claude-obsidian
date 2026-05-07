@@ -16,9 +16,8 @@ Process one source document fully and integrate into wiki. Receives: source path
 5. Create/update entity pages in `wiki/entities/` for each significant person, org, product, repo.
 6. Create/update concept pages in `wiki/concepts/` for significant ideas/frameworks.
 7. Update relevant domain pages with mentions + wikilinks.
-8. Update `wiki/entities/_index.md` and `wiki/concepts/_index.md`.
-9. Add `> [!contradiction]` callouts where conflicts exist.
-10. Return summary of created/updated pages.
+8. Add `> [!contradiction]` callouts where conflicts exist.
+9. Return summary of created/updated pages.
 
 **Do NOT:** modify `.raw/`, update `wiki/index.md`/`wiki/log.md`/`wiki/hot.md` (orchestrator does), create duplicates.
 

@@ -16,7 +16,7 @@ All vault operations must use the `obsidian` CLI (routed via `scripts/obsidian-c
 |`frontmatter-set`|`path=... key=updated value=...`|`Set frontmatter: <path>`|
 
 **Multiline Content:** Use `\n` for newlines.
-**Bypass:** Use direct FS `Read`/`Write` only for `.raw/`, `_attachments/`, or `.canvas` files (see `cli.md` §7).
+**Bypass:** Use direct FS `Read`/`Write` only for `.raw/`, `_attachments/images/**`, or `.canvas` files (see `cli.md` §6–7).
 
 ## 2. The Slugification Pipeline
 Never hand-craft slugs. Always use the `slug.sh` script to ensure Unicode normalization and separator collapsing.

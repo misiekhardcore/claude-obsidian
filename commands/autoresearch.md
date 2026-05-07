@@ -5,6 +5,6 @@ Run the `autoresearch` skill for the given topic or ask "What topic should I res
 
 Usage: `/autoresearch [topic]` or `/autoresearch`
 
-First, read `skills/autoresearch/references/program.md` for research constraints. Skill dispatches sub-agents to parallelize search/fetch/synthesis. After agents finish, update wiki index/log/hot.md. Report pages created, key findings, trail page path.
+First, read `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` for research constraints. Skill dispatches sub-agents to parallelize search/fetch/synthesis. After agents finish, update wiki index/log/hot.md. Report pages created, key findings, trail page path.
 
 If no vault: "No wiki vault found. Run /wiki first to set one up."

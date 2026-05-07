@@ -282,7 +282,7 @@ Store `.base` files in `wiki/meta/` for vault dashboards:
 
 ## Do NOT
 
-- Use `from:` or `where:` (Dataview syntax, not Bases)
-- Use `sort:` at root; sort per-view via `order:` and `groupBy:`
-- Put `.base` files outside vault
-- Reference `formula.X` in `order:` without defining X in `formulas:`
+- Do not use `from:` or `where:` (Dataview syntax, not Bases)
+- Do not use `sort:` at root; sort per-view via `order:` and `groupBy:`
+- Do not put `.base` files outside vault
+- Do not reference `formula.X` in `order:` without defining X in `formulas:`

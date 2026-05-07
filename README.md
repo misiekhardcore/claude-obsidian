@@ -88,7 +88,7 @@ claude plugin install claude-obsidian@claude-obsidian
 2. Register your vault: `obsidian register vault=/absolute/path/to/vault`
 3. Verify: `obsidian list vaults`
 
-See `skills/wiki/references/cli-setup.md` for troubleshooting and Flatpak setup.
+See `_shared/setup.md` for troubleshooting and Flatpak setup.
 
 ## Skills
 

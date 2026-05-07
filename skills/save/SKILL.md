@@ -41,10 +41,13 @@ type: synthesis|concept|source|decision|session
 title: "Note Title"
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-tags: [ relevant-tag ]
+tags:
+  - relevant-tag
 status: developing
-related: [ "[[Page]]" ]
-sources: [ "[[.raw/source.md]]" ]
+related:
+  - "[[Page]]"
+sources:
+  - "[[.raw/source.md]]"
 ---
 ```
 - **Questions**: add `question: "..."` and `answer_quality: solid`.

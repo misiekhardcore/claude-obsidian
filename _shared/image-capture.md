@@ -45,7 +45,7 @@ Move (not copy) images from their source path to `<vault_root>/_attachments/`. N
 Use `![[filename.png]]` in note body.
 
 - `/note` and `/braindump`: embeds at end, after vision description, in input order
-- `/daily`: indented two spaces within bullet (see `daily/references/image-capture.md`)
+- `/daily`: embed(s) indented two spaces under the `HH:MM <description>` bullet; all images for one capture go under the same bullet in input order
 
 ## `attachments:` frontmatter field
 

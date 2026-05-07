@@ -5,7 +5,7 @@ allowed-tools: Bash Read Glob Grep
 ---
 # canvas
 
-Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite visual boards. Read `references/canvas-spec.md` before editing canvas JSON (follows JSON Canvas 1.0 standard).
+Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite visual boards. Read `${CLAUDE_PLUGIN_ROOT}/_shared/canvas-spec.md` before editing canvas JSON (follows JSON Canvas 1.0 standard).
 
 ## Default Canvas
 
@@ -67,7 +67,7 @@ If it does not exist, create it:
 
 Create `_attachments/images/canvas/` if it doesn't exist.
 
-**Detect aspect ratio with PIL or identify. See `references/canvas-spec.md` for aspect-ratio → size table (single source of truth).
+**Detect aspect ratio with PIL or identify. See `${CLAUDE_PLUGIN_ROOT}/_shared/canvas-spec.md` for aspect-ratio → size table (single source of truth).
 
 **Position using auto-layout** (see Auto-Positioning section below).
 
@@ -168,7 +168,7 @@ wiki/canvases/design-ideas.canvas. 42 nodes (30 images, 4 text, 8 groups)
 
 ## Auto-Positioning Algorithm
 
-Read `references/canvas-spec.md` for coordinate system and pseudocode. Implementation finds zone, collects nodes inside, flows left-to-right with row wrapping.
+Read `${CLAUDE_PLUGIN_ROOT}/_shared/canvas-spec.md` for coordinate system and pseudocode. Implementation finds zone, collects nodes inside, flows left-to-right with row wrapping.
 
 ## ID Generation
 

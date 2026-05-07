@@ -42,10 +42,27 @@ bash "${CLAUDE_PLUGIN_ROOT}/bin/wiki-init.sh" "${user_config.vault_path}"
 `bin/wiki-init.sh` handles vault creation, templates, and Obsidian config.
 
 ### SCAFFOLD
-User describes vault purpose → Follow 12-step procedure in `references/operation-scaffold.md`.
+User describes vault purpose → Execute:
+1. Ask: "What is this vault for?" (one question, then proceed).
+2. Scaffold flat folders under `wiki/`: `concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/`, `questions/`. No per-folder `_index.md`.
+3. Create `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`.
+4. Create `notes/` and copy `_seed/notes/index.md` if missing.
+5. Create `daily/` and copy `_seed/daily/example-daily.md` if directory is missing.
+6. Create `_templates/` files for each note type.
+7. Create `.obsidian/snippets/vault-colors.css` with standard callout styles.
+8. Create vault `CLAUDE.md` pointing agents at the vault.
+9. Initialize git (`git init && git add -A && git commit -m "Initial vault scaffold"`).
+10. Present structure and ask: "Want to adjust anything before we start?"
 
 ### PROMOTE
-`/wiki promote <tag>` → Follow 10-step procedure in `references/operation-promote.md`.
+`/wiki promote <tag>` → Execute:
+1. Resolve tag slug (kebab-case, strip leading `#`).
+2. Collect all leaves with `tags:` containing the resolved tag across `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`.
+3. Bail if fewer than 5 leaves: report count, suggest growing the cluster.
+4. Bail if `wiki/domains/<tag>/_index.md` already exists.
+5. Create hub at `wiki/domains/<tag>/_index.md` with `type: domain` frontmatter and `related:` list of all cluster leaves.
+6. Register hub in `wiki/index.md` under `## Domains`.
+7. Log in `wiki/log.md`.
 
 ## Cross-Project Referencing
 Any project can reference this vault. Add this to other projects' `CLAUDE.md`:
