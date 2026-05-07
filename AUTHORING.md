@@ -44,7 +44,7 @@ Do not promote docs specific to one skill's operation, even if long.
 
 ## Sub-Agents vs. Inline
 
-**Inline:** single item, order matters, fits in orchestrator.  
+**Inline:** single item, order matters, fits in orchestrator.
 **Sub-agents:** multiple independent items, parallelizable, avoids context bloat.
 
 **Orchestrator:** verify CWD (`cd "${VAULT_ROOT}" && pwd`), collect reports, update index/log/hot.md once (never per-agent), never write vault state in parallel.

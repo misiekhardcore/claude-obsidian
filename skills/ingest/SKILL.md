@@ -5,201 +5,55 @@ allowed-tools: Bash Read Glob Grep WebFetch
 ---
 # ingest
 
-Read source. Write wiki. Cross-reference everything. Single source typically touches 8-15 pages. Use obsidian-markdown skill for syntax (or guidance in that skill if kepano plugin unavailable).
+Read source. Write wiki. Cross-reference everything. Single source typically touches 8-15 pages. Use obsidian-markdown skill for syntax.
 
 ## Delta Tracking
-
-Before ingesting any file, check `.raw/.manifest.json` to avoid re-processing unchanged sources.
-
-```bash
-# Check if manifest exists
-[ -f .raw/.manifest.json ] && echo "exists" || echo "no manifest yet"
-```
-
-**Manifest format** (create if missing):
-
-```json
-{
-  "sources": {
-    ".raw/articles/article-slug-2026-04-08.md": {
-      "hash": "abc123",
-      "ingested_at": "2026-04-08",
-      "pages_created": [
-        "wiki/sources/article-slug.md",
-        "wiki/entities/Person.md"
-      ],
-      "pages_updated": ["wiki/index.md"]
-    }
-  }
-}
-```
-
-**Before ingesting a file:**
-
-1. Compute a hash: `md5sum [file] | cut -d' ' -f1` (or `sha256sum` on Linux).
-2. Check if the path exists in `.manifest.json` with the same hash.
-3. If hash matches, skip. Report: "Already ingested (unchanged). Use `force` to re-ingest."
-4. If missing or hash differs, proceed with ingest.
-
-**After ingesting a file:**
-
-1. Record `{hash, ingested_at, pages_created, pages_updated}` in `.manifest.json`.
-2. Write the updated manifest back.
-
-Skip delta checking if the user says "force ingest" or "re-ingest".
+Check `.raw/.manifest.json` before ingesting any file to avoid re-processing.
+- **Pattern**: `md5sum [file] | cut -d' ' -f1` → check hash in manifest → skip if match.
+- **After**: Record `{hash, ingested_at, pages_created, pages_updated}`.
+- **Bypass**: Skip if user says "force ingest" or "re-ingest".
 
 ## Vault I/O
+All vault reads and writes follow `_shared/vault-ops.md`.
+- **Bypass**: `.raw/.manifest.json` is mutated via `jq + mv`.
 
-All vault reads and writes go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
+## Ingestion Flows
 
-`.raw/.manifest.json` is one of the documented bypasses: mutate it via `jq + mv` (no JSON-mutate verb).
+### URL Ingestion
+1. **Fetch**: WebFetch → (Optional) `defuddle [url]` to strip clutter.
+2. **Slug**: Derive via `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "url-last-segment"`.
+3. **Archive**: Save to `.raw/articles/slug-YYYY-MM-DD.md` with frontmatter (`source_url`, `fetched`).
+4. **Process**: Proceed to Single Source Ingest.
 
-## URL Ingestion
+### Image/Vision Ingestion
+1. **Read**: Process image natively.
+2. **Describe**: Extract text (OCR), identify concepts, entities, diagrams.
+3. **Slug**: Derive via `slug.sh` from filename.
+4. **Archive**: Save description to `.raw/images/slug-YYYY-MM-DD.md` with frontmatter (`source_type: image`, `original_file`, `fetched`).
+5. **Attachment**: Copy image to `_attachments/images/slug.ext`.
+6. **Process**: Proceed to Single Source Ingest.
 
-Trigger: user passes a URL starting with `https://`.
+### Single Source Ingest
+1. **Read**: Full source from `.raw/`.
+2. **Collaborate**: Discuss emphasis, granularity, and context with user. **Wait for response** unless "auto-ingest" or "just ingest it" is specified.
+3. **Execute**: Dispatch `agents/ingest.md` with `source_path`, `vault_path`, and `emphasis`.
+4. **Reconcile**:
+   - Update `wiki/index.md` for all `Created` pages.
+   - Update `wiki/hot.md`.
+   - Append to `wiki/log.md` (per `_shared/vault-ops.md`).
 
-Steps:
+### Batch Ingest
+1. **Fan-out**: Dispatch one `agents/ingest.md` per source in parallel.
+2. **Wait**: Collect all reports.
+3. **Cross-reference**: Identify connections across sources.
+4. **Aggregate**: Update index, hot cache, and log **once** at the end.
 
-1. **Fetch** the page using WebFetch.
-2. **Clean** (optional): if `defuddle` is available (`which defuddle 2>/dev/null`), run `defuddle [url]` to strip ads, nav, and clutter. Typically saves 40-60% tokens. Fall back to raw WebFetch output if not installed.
-3. **Derive slug** by passing the URL path's last segment (with the query string stripped) through `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<url-last-segment>"`. The script handles lowercasing, separator collapsing, and trailing `.md` normalization — do not slugify by hand.
-4. **Save** to `.raw/articles/[slug]-[YYYY-MM-DD].md` with a frontmatter header:
-   ```markdown
-   ---
-   source_url: [url]
-   fetched: [YYYY-MM-DD]
-   ---
-   ```
-5. Proceed with **Single Source Ingest** starting at step 2 (file is now in `.raw/`).
+## Token & Quality Discipline
+- **Token**: Read `hot.md` first → `index.md` → 3-5 existing pages max. Use PATCH for edits.
+- **Contradictions**: If new info conflicts, use `[!contradiction]` callout (defined in `.obsidian/snippets/vault-colors.css`).
+  - **Leaf**: Add contradiction callout referencing the new source.
+  - **Source**: Add contradiction callout referencing the existing page.
+  - **Rule**: Do not silently overwrite. Flag and let user decide.
 
-## Image / Vision Ingestion
-
-Trigger: user passes an image file path (`.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`, `.avif`).
-
-Steps:
-
-1. **Read** the image file using the Read tool. Claude can process images natively.
-2. **Describe** the image contents: extract all text (OCR), identify key concepts, entities, diagrams, and data visible in the image.
-3. **Derive slug** from the image filename (basename without extension) via `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<basename>"`. **Save** the description to `.raw/images/[slug]-[YYYY-MM-DD].md`:
-
-   ```markdown
-   ---
-   source_type: image
-   original_file: [original path]
-   fetched: YYYY-MM-DD
-   ---
-
-   # Image: [slug]
-
-   [Full description of image contents, transcribed text, entities visible, etc.]
-   ```
-
-4. Copy the image to `_attachments/images/[slug].[ext]` if it's not already in the vault.
-5. Proceed with **Single Source Ingest** on the saved description file.
-
-Use cases: whiteboard photos, screenshots, diagrams, infographics, document scans.
-
-## Single Source Ingest
-
-Trigger: user drops a file into `.raw/` or pastes content.
-
-Steps:
-
-1. **Read** the source completely. Do not skim.
-2. **Discuss takeaways with the user — this step is required.** Before writing a single page, ask:
-   - "What should I emphasize from this source?"
-   - "How granular should I go?"
-   - "Is there existing wiki context I should link against?" **Wait for the user's response before proceeding.** Do not assume defaults and do not skip ahead. **Skip this step only if** the user's original message included "just ingest it" or "auto-ingest".
-3. **Dispatch** the ingest agent once the discussion is complete (or skipped). Pass the source path, vault path, and any emphasis/granularity decisions from the discussion. The agent handles all wiki writes and returns a structured report.
-
-   Spawn the ingest agent with:
-   - `source_path` — the `.raw/` file path
-   - `vault_path` — `$VAULT_ROOT`
-   - `emphasis` — user's emphasis notes (empty string if auto-ingest)
-
-   ```bash
-   cd "${VAULT_ROOT}" && pwd   # verify CWD before agent spawn
-   ```
-
-   > **Agent:** `agents/ingest.md` — processes the source, creates/updates wiki pages, and
-   > returns a report of pages created/updated. The main thread must **not** write wiki pages
-   > directly when the agent path is taken.
-
-4. **Collect** the agent's report. It returns:
-   ```text
-   Source: [title]
-   Created: [[Page 1]], [[Page 2]]
-   Updated: [[Page 3]], [[Page 4]]
-   Contradictions: [[Page 5]] conflicts with [[Page 6]] on [topic]
-   Key insight: [one sentence]
-   ```
-
-5. **Update** `wiki/index.md`. Add entries for all pages listed in the agent's `Created:` output.
-6. **Update** `wiki/hot.md` with this ingest's context.
-7. **Append** to `wiki/log.md` (new entries at the TOP):
-
-   ```markdown
-   ## [YYYY-MM-DD] ingest | Source Title
-
-   - Source: `.raw/articles/filename.md`
-   - Summary: [[Source Title]]
-   - Pages created: [[Page 1]], [[Page 2]]
-   - Pages updated: [[Page 3]], [[Page 4]]
-   - Key insight: One sentence on what is new.
-   ```
-
-## Batch Ingest
-
-Trigger: user drops multiple files or says "ingest all of these."
-
-Steps:
-
-1. List all files to process. Confirm with user before starting.
-2. **Fan out** — dispatch one `agents/ingest.md` agent per source **in parallel**. Pass each agent:
-   - `source_path` — the `.raw/` file path
-   - `vault_path` — `$VAULT_ROOT`
-   - `emphasis` — empty string (batch ingest is non-interactive)
-
-   Before spawning agents, verify CWD:
-
-   ```bash
-   cd "${VAULT_ROOT}" && pwd   # confirm vault root before agent fan-out
-   ```
-
-3. **Wait** for all agents to finish. Collect each agent's structured report.
-4. **Cross-reference pass** — look for connections between pages the agents created across sources.
-5. **Update** index, hot cache, and log **once** at the end (not per-source), using the aggregate of all agents' `Created:` / `Updated:` lists.
-6. Report: "Processed N sources. Created X pages, updated Y pages. Here are the key connections I found."
-
-Batch ingest is non-interactive. For 30+ sources, expect significant processing time. Check in with the user after every 10 sources by reporting intermediate progress.
-
-## Token Discipline
-
-Read hot.md first (reuse context). Read index.md before creating. Read only 3-5 existing pages max. Use PATCH for edits (no full re-reads). Keep pages 100-300 lines; split if longer. Use search for content discovery.
-
-## Contradictions
-
-> [!note] Custom callout dependency The `[!contradiction]` callout type used below is a **custom callout** defined in `.obsidian/snippets/vault-colors.css` (auto-installed by `/wiki` scaffold). It renders with reddish-brown styling and an alert-triangle icon when the snippet is enabled. If the snippet is missing, Obsidian falls back to default callout styling, so the page still works without the visual flourish. See [[skills/wiki/references/css-snippets.md]] for the four custom callouts (`contradiction`, `gap`, `key-insight`, `stale`).
-
-When new info contradicts an existing wiki page:
-
-On the existing page, add:
-
-```markdown
-> [!contradiction] Conflict with [[New Source]] [[Existing Page]] claims X. [[New Source]] says Y. Needs resolution. Check dates, context, and primary sources.
-```
-
-On the new source summary, reference it:
-
-```markdown
-> [!contradiction] Contradicts [[Existing Page]] This source says Y, but existing wiki says X. See [[Existing Page]] for details.
-```
-
-Do not silently overwrite old claims. Flag and let the user decide.
-
-## Do Not
-
-- Modify `.raw/` (immutable sources)
-- Create duplicates (check index+search first)
-- Skip log entry (record every ingest)
-- Skip hot cache update (keeps future sessions fast)
+## Scope
+- **Do Not**: Modify `.raw/`, create duplicates, skip log/hot-cache updates.

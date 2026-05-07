@@ -8,11 +8,9 @@ allowed-tools: Bash Read Glob Grep
 File conversations into wiki as permanent pages. Determines note type, files it, updates index/log/hot-cache. Wiki compounds; save often.
 
 ## Vault I/O
-
-Reads templates/pages, creates new note, prepends to log/index, overwrites hot.md via `obsidian` CLI. See CLI docs for syntax.
+All operations follow the patterns in `_shared/vault-ops.md`.
 
 ## Note Type Decision
-
 Determine the best type from the conversation content:
 
 |Type|Folder|Use when|
@@ -23,103 +21,41 @@ Determine the best type from the conversation content:
 |decision|wiki/meta/|Architectural, project, or strategic decision that was made|
 |session|wiki/meta/|Full session summary: captures everything discussed|
 
-If the user specifies a type, use that. If not, pick the best fit based on the content. When in doubt, use `synthesis`.
+If the user specifies a type, use that. Default to `synthesis`.
 
-## Save Workflow
-
-1. **Scan** the current conversation. Identify the most valuable content to preserve.
-2. **Ask** (if not already named): "What should I call this note?" Keep the name short and descriptive.
-3. **Determine** note type using the table above.
-4. **Extract** all relevant content from the conversation. Rewrite it in declarative present tense (not "the user asked" but the actual content itself).
-5. **Create** the note. Generate the filename slug via `bash ${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh "<title>"` and use the result as `<slug>` in the path — do not hand-craft the slug, the script normalizes Unicode, trailing `.md`, and runs of separators:
-   ```bash
-   slug=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh" "<title>")
-   obsidian create \
-     path=wiki/<folder>/$slug.md \
-     content="<frontmatter + body, with \n for newlines>"
-   ```
-6. **Collect links**: identify any wiki pages mentioned in the conversation. Include them in `related` in the frontmatter you pass via `content=`.
-7. **Update** `wiki/index.md`. Use a read-splice-overwrite pattern to insert the entry under the correct section heading.
-
-   **Type → section** (deterministic; do not choose freehand):
-
-   |Note type|Target section|
-   |-|-|
-   |`concept`|`## Concepts`|
-   |`source`|`## Sources`|
-   |`decision`|`## Plans & Decisions`|
-   |`synthesis`|`## Questions`|
-   |`session`|_(skip — not indexed; chronology lives in `wiki/log.md` and `daily/`)_|
-
-   **Entry format:** `- [[<slug>|<Display Name>]] — <one-line description>` Omit `|<Display Name>` when the display name matches the slug exactly (after converting hyphens/underscores to spaces and title-casing).
-
-   **Pattern:** delegate the read-splice-overwrite to `scripts/index-section-insert.sh`. It reads via `obsidian read`, splices the entry on the line immediately after the matching heading, and writes back via `obsidian create overwrite=true`. If the heading is absent, the script appends `<heading>\n<entry>` at the end of the file.
-
-   ```bash
-   # section is determined from the type table above
-   new_entry="- [[$slug|$display_name]] — $description"
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-section-insert.sh" \
-     wiki/index.md "$section" "$new_entry"
-   ```
-
-8. **Prepend** the latest entry to `wiki/log.md` (new entry goes at the TOP):
-   ```bash
-   obsidian prepend \
-     file=wiki/log.md \
-     content="## [YYYY-MM-DD] save | Note Title\n- Type: [note type]\n- Location: wiki/[folder]/Note Title.md\n- From: conversation on [brief topic description]\n\n"
-   ```
-9. **Rewrite** `wiki/hot.md` (use the `overwrite` flag). Follow the format in `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
-10. **Confirm**: "Saved as [[Note Title]] in wiki/[folder]/."
+## Save Cycle
+1. **Scan & Extract**: Identify valuable content; rewrite in declarative present tense (not "the user asked").
+2. **Identify**: Confirm Note Title → derive `slug` via `slug.sh` → determine Type.
+3. **Create**: `obsidian create path=wiki/<folder>/slug.md content="frontmatter + body"`
+4. **Index**: Insert entry into `wiki/index.md` using `scripts/index-section-insert.sh` based on Type → Section mapping:
+   - `concept` → `## Concepts`
+   - `source` → `## Sources`
+   - `decision` → `## Plans & Decisions`
+   - `synthesis` → `## Questions`
+5. **Log & Cache**: Prepend to `wiki/log.md` and overwrite `wiki/hot.md` (per `_shared/vault-ops.md`).
 
 ## Frontmatter Template
-
 ```yaml
 ---
-type: <synthesis|concept|source|decision|session>
+type: synthesis|concept|source|decision|session
 title: "Note Title"
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
-tags:
-  - <relevant-tag>
+tags: [ relevant-tag ]
 status: developing
-related:
-  - "[[Any Wiki Page Mentioned]]"
-sources:
-  - "[[.raw/source-if-applicable.md]]"
+related: [ "[[Page]]" ]
+sources: [ "[[.raw/source.md]]" ]
 ---
 ```
-
-For `question` type, add:
-
-```yaml
-question: "The original query as asked."
-answer_quality: solid
-```
-
-For `decision` type, add:
-
-```yaml
-decision_date: YYYY-MM-DD
-status: active
-```
-
-### Forward-only hub membership
-
-Do **not** write a `domain:` field on any leaf you save. Hub membership is forward-only — the `wiki/domains/<slug>/_index.md` hub is responsible for linking out to its leaves; the leaf does not declare which hub it belongs to. The leaf's tags are enough for `/lint` and `/wiki promote` to discover it later. If a relevant hub already exists, append the new leaf to that hub's `related:` list as a separate operation; do not encode the relationship on the leaf.
+- **Questions**: add `question: "..."` and `answer_quality: solid`.
+- **Decisions**: add `decision_date: YYYY-MM-DD` and `status: active`.
+- **Forward-only Hubs**: Do NOT write a `domain:` field on leaves. Hub membership is managed by the hub (`wiki/domains/slug/_index.md`).
 
 ## Writing Style
+- **Declarative present tense.** "X works by Y," not "Claude explained X."
+- **Self-contained.** Future sessions should read the page cold.
+- **Hyperlinked.** Link every concept/entity/wiki page.
 
-- Declarative, present tense. Write the knowledge, not the conversation.
-- Not: "The user asked about X and Claude explained..."
-- Yes: "X works by doing Y. The key insight is Z."
-- Include all relevant context. Future sessions should be able to read this page cold.
-- Link every mentioned concept, entity, or wiki page with wikilinks.
-- Cite sources where applicable: `(Source: [[Page]])`.
-
-## What to Save
-
-Non-obvious synthesis, decisions with rationale, significant analyses, comparisons, research findings.
-
-## What to Skip
-
-Mechanical Q&A, setup steps already documented, temporary debugging, duplicates. Update existing pages instead.
+## Scope
+- **Save**: Non-obvious synthesis, rationale, research findings.
+- **Skip**: Mechanical Q&A, documented setup, temporary debugging. Update existing pages instead.

@@ -36,8 +36,8 @@ _attachments/      Images and PDFs
 - **Manifest:** `.raw/.manifest.json` (delta tracking for ingested sources)
 
 ## Vault I/O
-
 All vault reads and writes go through **Obsidian CLI**, not `Read`/`Write`/`Edit`. A PreToolUse Bash hook routes raw `obsidian <verb> ...` calls through `scripts/obsidian-cli.sh` (resolve vault, preflight, normalize exit codes).
+- **Technical Patterns**: See `_shared/vault-ops.md` for CLI patterns, slugging, and indexing.
 
 ```bash
 obsidian read path=wiki/hot.md
@@ -45,7 +45,6 @@ obsidian create path=wiki/concepts/foo.md content="..."
 obsidian append file=wiki/log.md content="..."
 obsidian prepend file=wiki/index.md content="..."
 ```
-
 `Read` allowed only outside vault (skill refs, external paths). `Write`/`Edit` not used for vault paths.
 
 ## Skills Discovery
@@ -97,16 +96,14 @@ Orchestrators verify CWD before spawning: `cd "${VAULT_ROOT}" && pwd`. Agents wr
 Single-source ingests require interactive discussion (what to emphasize, granularity, existing context to link). Escape: "just ingest it" or "auto-ingest". Exempt: `/autoresearch` (intentionally autonomous).
 
 ## CLI Setup
+Vault I/O via **Obsidian CLI** (shipped with 1.12.7+). See `_shared/setup.md` for installation and registration.
 
-Vault I/O via **Obsidian CLI** (shipped with 1.12.7+). See `skills/wiki/references/cli-setup.md` for install/registration.
-
-## Maintenance
-
-Before major operations, read:
-- `_shared/vault-structure.md` (conventions, page types, tagging, relationships)
-- `_shared/frontmatter.md` (field schema, status/confidence values)
-- `_shared/hot-cache-protocol.md` (hot-cache protocol)
-- `skills/wiki/references/maintenance-rules.md` (ingest, contradictions, quality, logs)
+## Documentation Standards
+All skill and reference docs must follow a **content-dense, declarative structure**:
+- **No procedural lists**: Replace "Step 1... Step 2..." with a "Cycle" or "Pipeline" specification.
+- **No redundant I/O**: Reference `_shared/vault-ops.md` instead of explaining CLI syntax.
+- **Topical centralization**: Consolidate fragmented `references/` folders into `_shared/`.
+- **Declarative logic**: Focus on *what* the outcome is and *which* shared pattern to use, not *how* the tool works.
 
 ## Cross-Project Access
 
