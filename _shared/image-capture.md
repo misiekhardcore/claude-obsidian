@@ -1,6 +1,6 @@
 # Image Capture — Common Mechanics
 
-All capture skills that accept image input follow this contract. Read this file when images are present in the user's argument list. For skill-specific output contracts and integration details, also read your skill's `references/image-capture.md`.
+Common contract for all capture skills accepting images.
 
 ## Image validation
 
@@ -20,27 +20,16 @@ Abort on any error. No vision-LLM call, no file move occurs in either error case
 
 ## Attachment directory
 
-Before moving any images:
+1. Resolve `<vault_root>` per capture-pipeline.md §1
+2. Ensure `<vault_root>/_attachments/` exists; create silently if absent
 
-1. Resolve `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution).
-2. Ensure `<vault_root>/_attachments/` exists. Create silently if absent.
-
-For `/braindump`: ensure `_attachments/` **once before the CAPTURE loop** — not per chunk.
+For `/braindump`: create once before CAPTURE loop, not per chunk.
 
 ## Vision-LLM invocation
 
-Single LLM call including all images + any text argument in the user's input.
+Single call including all images + text in user input. Max one per CAPTURE. MATCH path: reuse initial description.
 
-- Do not call vision-LLM more than once per CAPTURE operation.
-- On MATCH path: use the description from the initial call — do not re-invoke.
-
-On failure:
-
-```text
-Vision processing failed: <reason>. Image not moved, note not created.
-```
-
-Never move files if vision processing fails.
+On failure: `Vision processing failed: <reason>. Image not moved, note not created.` Never move on failure.
 
 ## Attachment move and naming
 
@@ -53,14 +42,10 @@ Move (not copy) images from their source path to `<vault_root>/_attachments/`. N
 
 ## Embed syntax
 
-Embed images in note body using Obsidian embed syntax:
+Use `![[filename.png]]` in note body.
 
-```text
-![[filename.png]]
-```
-
-- `/note` and `/braindump`: embeds appear at the end of the body, after the vision-LLM description, in input order.
-- `/daily`: embed is indented two spaces on the next line within the bullet (see `daily/references/image-capture.md`).
+- `/note` and `/braindump`: embeds at end, after vision description, in input order
+- `/daily`: embed(s) indented two spaces under the `HH:MM <description>` bullet; all images for one capture go under the same bullet in input order
 
 ## `attachments:` frontmatter field
 
@@ -74,10 +59,8 @@ attachments: ["filename1.png", "filename2.png"]
 
 ## MATCH path with images
 
-When MATCH is decided and the input includes images:
-
-1. Use the vision-LLM description from the initial call — do not re-invoke.
-2. Append the new description after the `---` separator (per §4 MATCH shape).
-3. Move images to `_attachments/` with the existing note's slug + collision indices.
-4. Extend the existing `attachments:` frontmatter list with the new filenames.
-5. Apply the normal MATCH title behavior: keep the existing `title:` unless the newly appended content broadens the note's scope, in which case rewrite `title:` to cover the union. A title rewrite does **not** change the existing note slug used for attachment filenames.
+1. Reuse initial vision description (no re-invoke)
+2. Append after `---` separator per capture-pipeline.md §4 MATCH
+3. Move to `_attachments/` with existing slug + collision indices
+4. Extend existing `attachments:` list
+5. Keep `title:` unless new content broadens scope (if so, rewrite to union; slug unchanged)

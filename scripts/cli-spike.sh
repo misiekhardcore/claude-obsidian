@@ -69,6 +69,19 @@ spike_notes() {
   capture notes read malformed      -- vault=$VAULT_NAME read
 }
 
+# Group: property verbs — property:read, property:set, property:remove
+spike_property() {
+  echo "[property]"
+  # Requires a file with frontmatter; reuse a file created by spike_ingest.
+  local prop_path="$SCRATCH/created.md"
+  capture property set   text       -- vault=$VAULT_NAME property:set name=status value=draft path=$prop_path
+  capture property read  text       -- vault=$VAULT_NAME property:read name=status path=$prop_path
+  capture property set   date       -- vault=$VAULT_NAME property:set name=updated value=2026-05-07 type=date path=$prop_path
+  capture property remove ok        -- vault=$VAULT_NAME property:remove name=status path=$prop_path
+  capture property read  missing    -- vault=$VAULT_NAME property:read name=status path=$prop_path
+  capture property list  file       -- vault=$VAULT_NAME properties path=$prop_path
+}
+
 # Group: lint — backlinks, orphans, deadends, unresolved, search, tags, tasks
 spike_lint() {
   echo "[lint]"
@@ -185,6 +198,7 @@ main() {
   spike_notes
   spike_lint
   spike_ingest
+  spike_property
   spike_canvas
   spike_bases
   spike_query_save

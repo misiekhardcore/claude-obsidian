@@ -1,11 +1,11 @@
 ---
 name: daily-close
-description: Synthesize a day's captures into a prose summary appended to the daily file. Reads log, inbox notes, wiki pages, and hot cache.
+description: Synthesize a day's captures into a prose summary. Idempotent; re-run replaces prior summary.
 allowed-tools: Bash Read Glob
 ---
-# daily-close: End-of-Day Synthesis
+# daily-close
 
-Synthesize `<vault_root>/daily/YYYY-MM-DD.md` into a polished prose summary with optional follow-ups. Reads the day's captures, any inbox notes and wiki pages dated to that day, plus `wiki/hot.md` and `wiki/index.md` for cross-reference context. Appends a `## Summary` section (and optional `## Follow-ups`) to the daily file. Re-running replaces the prior summary — idempotent.
+Synthesize `daily/YYYY-MM-DD.md` into prose summary with optional follow-ups. Reads day's captures, dated notes/wiki pages, hot.md, index.md. Appends `## Summary` (and optional `## Follow-ups`). Idempotent.
 
 ## Vault I/O
 
@@ -37,14 +37,34 @@ No vault configured — run /wiki init first.
      - Glob `<vault_root>/wiki/**/*.md` and call `obsidian properties path=wiki/<file>` per candidate. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD`. Exclude `wiki/hot.md` and `wiki/index.md` (they are always read in full in step 5).
    - If both zero bullets AND no matching notes or wiki pages → abort with `Nothing to synthesize for YYYY-MM-DD.` (no LLM call fired).
 
-5. **Gather synthesis input** (frontmatter-first: bodies read only for matched files):
+5. **Gather synthesis input** via a `gather` agent dispatch.
+
+   When there are more than 3 matched files (notes + wiki pages combined), dispatch
+   `agents/gather.md` to perform the read sweep off the main thread:
+
+   ```bash
+   cd "${VAULT_ROOT}" && pwd   # verify CWD before agent dispatch
+   ```
+
+   Pass to the gather agent:
+   - `FILE_LIST` — newline-separated vault-relative paths: all matched pending notes + all matched
+     wiki pages from step 4
+   - `VAULT_ROOT` — `$VAULT_ROOT`
+   - `CONTEXT` — `daily-close dated sweep for <YYYY-MM-DD>`
+   - `MAX_FILES` — 20
+
+   Wait for the gather agent to complete. Collect its structured summary.
+
+   When there are 3 or fewer matched files, read them inline (no agent needed):
    - Full daily file (already read in step 3 — reuse the content).
-   - Each pending note matched in step 4: `obsidian read path=notes/<file>` (frontmatter + body).
-   - Each wiki page matched in step 4: `obsidian read path=wiki/<file>` (frontmatter + body).
+   - Each pending note matched in step 4: `obsidian read path=notes/<file>`
+   - Each wiki page matched in step 4: `obsidian read path=wiki/<file>`
+
+   Always read these two inline (they are not passed to the gather agent):
    - `obsidian read path=wiki/hot.md` in full.
    - `obsidian read path=wiki/index.md` in full.
 
-6. **Call LLM for synthesis** using the prompt template below. If the call fails, abort with `Synthesis failed: <reason>.` and leave the daily file unchanged.
+6. **Call LLM for synthesis** using the prompt template below. Populate `{{pending_notes_content_if_any}}` and `{{wiki_pages_content_if_any}}` from either the gather agent's structured summary or the inline reads — both are equivalent inputs to the synthesis prompt. If the call fails, abort with `Synthesis failed: <reason>.` and leave the daily file unchanged.
 
 7. **Construct the updated file content in memory:**
    - No existing `## Summary` section → append the new section after the last bullet in `## Captures`.

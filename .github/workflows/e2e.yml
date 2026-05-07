@@ -38,8 +38,14 @@ jobs:
           # to log "Loaded main app package" and then SIGTRAPs. Docker Desktop
           # (local dev) ships no host AppArmor so the issue doesn't reproduce
           # there.
+          #
+          # --security-opt seccomp=unconfined: some GHA runner pools (observed
+          # in westus3) enforce a seccomp profile that blocks Electron syscalls
+          # even when AppArmor is unconfined. apparmor=unconfined is sufficient
+          # on northcentralus runners but not on all pools, so we disable both.
           docker run --rm \
             --security-opt apparmor=unconfined \
+            --security-opt seccomp=unconfined \
             -e ENTRYPOINT_TYPE=ci \
             -v "${GITHUB_WORKSPACE}:/opt/plugin-src:ro" \
             claude-obsidian-e2e:latest

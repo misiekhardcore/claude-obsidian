@@ -1,69 +1,52 @@
 # Authoring Guide
 
-Conventions for adding skills and shared protocols to this plugin.
-
 ## Directory Layout
 
 ```text
-_shared/          Cross-skill reference docs — read on demand by any skill that needs them
-scripts/          Utility scripts
-  obsidian-cli.sh Wrapper for the Obsidian CLI (canonical vault-touch primitive)
-  resolve-vault.sh Vault path resolution logic
-skills/<name>/    One directory per skill
-  SKILL.md        The skill entrypoint — loaded when the skill is invoked
-  references/     Skill-local reference docs, not needed by other skills
-agents/           Sub-agent definitions (dispatched by orchestrating skills)
-commands/         Slash-command shims that load a skill
-hooks/            Claude Code hooks (hooks.json + shell scripts)
-_templates/       This directory — authoring guidance and Obsidian Templater templates
+_shared/          Cross-skill reference docs
+scripts/          Utility scripts (obsidian-cli.sh, resolve-vault.sh)
+skills/<name>/    One skill per dir (SKILL.md entrypoint + references/)
+agents/           Sub-agent definitions
+commands/         Slash-command shims
+hooks/            Claude Code hooks (hooks.json + .sh)
+_templates/       Templater templates + authoring guidance
 ```
 
-## When to use `_shared/`
+## `_shared/` Promotion Rubric
 
-Promote a document to `_shared/` only when **three or more skills** need to read it. If only one or two skills reference a doc, keep it under `skills/<name>/references/`.
+Promote a doc to `_shared/` when **≥3 skills** reference it. Otherwise keep under `skills/<name>/references/`.
 
-Current shared docs:
-
-- `_shared/vault-structure.md` — vault directory map, confidence tagging semantics, typed-relationship semantics
-- `_shared/frontmatter.md` — universal YAML field schema, status/confidence values, typed relationship YAML shape
-- `_shared/hot-cache-protocol.md` — when to read/write `wiki/hot.md` and what to put in it
-- `_shared/cli.md` — empirical Obsidian CLI contract (exit codes, error patterns, escape hatches)
+**Current shared docs:**
+- `vault-structure.md` — conventions, tagging, relationships
+- `frontmatter.md` — YAML schema, status/confidence values
+- `hot-cache-protocol.md` — hot-cache read/write, parallel worker discipline
+- `cli.md` — Obsidian CLI contract (exit codes, patterns, escape hatches)
+- `capture-pipeline.md` — vault I/O contract, MATCH/NEW heuristic, image handling
+- `image-capture.md` — image validation, move, embed, frontmatter (shared across note/daily/braindump)
 
 ## Vault Operations: CLI Wrapper
 
-All vault reads and writes must go through `scripts/obsidian-cli.sh`, the canonical vault-touch primitive. The wrapper resolves the vault, pre-flights the Obsidian connection, and normalizes exit codes.
+All vault I/O via `scripts/obsidian-cli.sh`:
 
 ```bash
-# Read a file
 "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" read path=wiki/hot.md
-
-# Create a file
 "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" create path=wiki/concepts/foo.md content="..."
-
-# Append to a file
 "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" append path=wiki/index.md content="- New entry"
 ```
 
-A PreToolUse Bash hook (`hooks/obsidian-cli-rewrite.sh`) transparently rewrites raw `obsidian <verb> ...` invocations to the wrapper, but skills should call the wrapper explicitly for clarity.
+PreToolUse hook transparently rewrites raw `obsidian <verb> ...` calls. For error handling, exit codes, and escape hatches, see `_shared/cli.md`.
 
-For error handling, exit-code semantics, and escape hatches (commands, eval), see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
+## Referencing `_shared/`
 
-## How skills reference `_shared/` files
+Use `${CLAUDE_PLUGIN_ROOT}/_shared/<file>` (runtime resolved). Read on-demand, not preloaded.
 
-Use `${CLAUDE_PLUGIN_ROOT}/_shared/<file>` in skill prose and instructions. This is a runtime path that Claude Code resolves at load time. Do not hardcode absolute paths.
+Do not promote docs specific to one skill's operation, even if long.
 
-```markdown
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md` for the directory map.
-```
+## Sub-Agents vs. Inline
 
-Skills should read `_shared/` files on demand, not preload them at skill start.
+**Inline:** single item, order matters, fits in orchestrator.
+**Sub-agents:** multiple independent items, parallelizable, avoids context bloat.
 
-## Promotion rubric
+**Orchestrator:** verify CWD (`cd "${VAULT_ROOT}" && pwd`), collect reports, update index/log/hot.md once (never per-agent), never write vault state in parallel.
 
-Promote a `skills/<name>/references/` document to `_shared/` when:
-
-1. Three or more skills reference the same content
-2. The content is genuinely cross-cutting (not specific to one skill's operation)
-3. Duplication across skills would create a maintenance risk
-
-Do not promote docs that describe a single skill's internal procedure, even if they are long or detailed.
+See agents/ for patterns: `capture` (single note), `ingest` (single source), `lint` (vault scan), `gather` (page cluster).

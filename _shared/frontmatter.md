@@ -1,10 +1,10 @@
 # Frontmatter Schema
 
-Every wiki page starts with flat YAML frontmatter. No nested objects. Obsidian's Properties UI requires flat structure.
+Flat YAML only. Obsidian Properties UI requires flat structure.
 
 ## Universal Fields
 
-Every page, no exceptions:
+Every page:
 
 ```yaml
 ---
@@ -26,24 +26,13 @@ sources:
 ---
 ```
 
-**status values:**
+**status:** `seed` | `developing` | `current` | `mature` | `evergreen` | `superseded`
 
-- `seed`: exists, barely populated
-- `developing`: has real content, not yet complete
-- `current`: complete and useful, actively maintained
-- `mature`: comprehensive, well-linked, stable
-- `evergreen`: structural pages always up to date by definition
-- `superseded`: replaced by a newer source; preserved but no longer canonical
+**confidence:** `EXTRACTED` (from document) | `INFERRED` (LLM-derived) | `AMBIGUOUS` (conflict present)
 
-**confidence values (Graphify-style):**
+**evidence:** wikilinks supporting claims. Required for `INFERRED` or `AMBIGUOUS`.
 
-- `EXTRACTED`: claims sourced directly from a document; deterministic (conf 1.0)
-- `INFERRED`: claims derived by the LLM from sources; variable confidence
-- `AMBIGUOUS`: conflicting signals present; requires human review before acting on these claims
-
-**evidence:** flat list of wikilinks to source or concept pages that support the claims on this page. Required when `confidence` is `INFERRED` or `AMBIGUOUS`.
-
-See `${CLAUDE_PLUGIN_ROOT}/skills/wiki/references/maintenance-rules.md` for promotion/demotion criteria. See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md` for confidence tagging semantics and typed-relationship semantics.
+See `_shared/vault-structure.md` for hub structure and semantics.
 
 ## Typed Relationship Fields
 
@@ -66,9 +55,7 @@ implements:
   - "[[spec]]" # this page is an implementation of the listed spec/pattern(s)
 ```
 
-Allowed relationship types: `supersedes`, `contradicts`, `uses`, `depends_on`, `caused`, `fixed`, `implements`.
-
-Note: `depends_on` uses underscore (not hyphen) for idiomatic YAML key naming.
+Allowed: `supersedes`, `contradicts`, `uses`, `depends_on`, `caused`, `fixed`, `implements`. Note: `depends_on` uses underscore.
 
 ## Type-Specific Additions
 
@@ -87,7 +74,7 @@ key_claims:
   - "Second key claim"
 ```
 
-Note: `confidence` for source pages is always `EXTRACTED` (the source page summarises what was found in the document, not an inference). `source_reliability` captures how trustworthy the source itself is.
+Note: `confidence` is always `EXTRACTED` for source pages. `source_reliability` is the source's trustworthiness.
 
 ### entity
 
@@ -106,7 +93,7 @@ aliases:
   - "abbreviation"
 ```
 
-Note: concept (and other leaf) pages do NOT declare hub membership via a `domain:` field. Hub membership is forward-only: hubs declare leaves via `related:`; leaves resolve to hubs via backlinks. See `vault-structure.md` Hub Membership.
+Note: concept pages do NOT declare hub membership; forward-only model only. See `vault-structure.md`.
 
 ### comparison
 
@@ -130,31 +117,27 @@ answer_quality: solid # draft | solid | definitive
 
 ### trail
 
-Trail pages are **autoresearch run-records** — they list the atomic notes from a single `/autoresearch` run in argument order, with a one-line annotation per step explaining its role. One trail per run, frozen at write time. Trails live under `wiki/trails/Trail: [Topic] (YYYY-MM-DD).md` so multiple runs on the same topic produce distinct files (no merge, no overwrite).
+Autoresearch run-records: atomic notes in argument order with one-line role annotations. One per run, frozen at write time. Filename: `Trail: [Topic] (YYYY-MM-DD).md` (date-suffix distinguishes multiple runs).
 
 ```yaml
-topic: "<slug>" # short slug for the research topic, matches the synthesis page
-research_run: YYYY-MM-DD # the date the autoresearch run produced this trail
-synthesis: "[[Research: Topic]]" # wikilink to the synthesis page from the same run
+topic: "<slug>"
+research_run: YYYY-MM-DD
+synthesis: "[[Research: Topic]]"
 ```
 
-Notes:
-
-- `confidence:` for trail pages is `EXTRACTED` — the trail records what the run produced, not an inference.
-- `evidence:` is the list of atomic notes the trail steps through (the same wikilinks that appear in the body, in order).
-- Trails are run-scoped and not edited after emission. Lint check #16 validates trail integrity. Per `skills/lint/SKILL.md`, trails are excluded from the orphan check (designed-orphan: the synthesis page does not link back to the trail under the forward-only model) and trail dead-link findings are surfaced but never auto-fixed (run-snapshot frozen at write time).
+Notes: `confidence` is `EXTRACTED`. `evidence` lists atomic notes. Run-scoped; not edited post-emission. Lint #16 validates. Excluded from orphan check; dead-link findings surfaced but not auto-fixed.
 
 ### domain
 
-Domain pages are the **hub layer** for cross-folder clusters. They live under `wiki/domains/<slug>/_index.md` and curate leaves via forward-only wikilinks. Leaves do not declare hub membership; the agent traverses leaf→hub via backlinks of `type: domain`.
+Hub layer for cross-folder clusters. Location: `wiki/domains/<slug>/_index.md`. Forward-only model: leaves don't declare membership.
 
 ```yaml
-subdomain_of: "" # leave empty for top-level domains
+subdomain_of: ""
 page_count: 0
-owns_folder: false # true | false — `true` only when the hub also owns the directory of leaves under it (rare)
+owns_folder: false
 ```
 
-`owns_folder:` defaults to `false` — most hubs curate leaves that live elsewhere in the vault (`concepts/`, `entities/`, `solutions/`, `sources/`).
+`owns_folder` defaults false (most hubs curate leaves elsewhere).
 
 ## Rules
 

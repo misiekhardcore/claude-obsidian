@@ -1,15 +1,15 @@
 ---
 name: daily
-description: Append a timestamped bullet to today's daily log. No inbox, no triage — one line per call.
+description: Append a timestamped bullet to today's daily log. One line per call.
 allowed-tools: Bash Read Glob
 ---
-# daily: Chronological Daily Log
+# daily
 
-Append a timestamped bullet to `<vault_root>/daily/YYYY-MM-DD.md`. No MATCH/NEW decision, no inbox, no triage. Every invocation adds one bullet. Use `/note` for knowledge fragments worth triaging later; use `/daily` for time-anchored observations, progress notes, and anything that belongs to the day.
+Append timestamped bullet to `daily/YYYY-MM-DD.md`. No MATCH/NEW, no inbox, no triage. Use `/note` for knowledge fragments; use `/daily` for time-anchored observations and daily progress.
 
 ## Vault I/O
 
-Uses `create-or-append` and `frontmatter-set` (see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3.1, §3.2). The local `daily/` directory is not a vault page; create it via `mkdir -p` if missing.
+Uses `create-or-append` and `property:set` (see CLI docs). Local `daily/` dir created via `mkdir -p` if missing.
 
 ## Vault path
 
@@ -33,7 +33,7 @@ Steps:
 
 1. **Extract arguments** from the user's message. Everything after the trigger phrase. Scan for image-path tokens (any token that resolves to a path or carries a supported image extension); keep them separate. Join the remaining non-path tokens as the verbatim text segment in original order with single spaces. Do not include image-path tokens in the verbatim text.
 
-2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/daily/references/image-capture.md`. Use those files to determine the image-specific bullet text and attachment handling only. Then continue with steps 3–8 below for the normal daily append flow — resolve `<vault_root>`, compute date/time, ensure daily directory, probe and write the daily file via the CLI, and confirm.
+2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md`. Use that file to determine the image-specific bullet text and attachment handling only. Then continue with steps 3–8 below for the normal daily append flow — resolve `<vault_root>`, compute date/time, ensure daily directory, probe and write the daily file via the CLI, and confirm.
 
 3. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort with `No vault configured — run /wiki init first.` if unresolved.
 
@@ -41,7 +41,7 @@ Steps:
 
 5. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently with `mkdir -p`. (Local directory creation, not a vault page op.)
 
-6. **Append the bullet (atomic, branch-free):** issue exactly one `obsidian create-or-append` call. The wrapper handles both the file-missing and file-exists branches internally — the model never reads, parses, or reconstructs the file body.
+6. **Append the bullet:** issue one `obsidian create-or-append` call. Wrapper handles both branches; model never reads/reconstructs body.
 
    ```bash
    obsidian create-or-append \
@@ -52,13 +52,14 @@ Steps:
 
    The `template` argument is used only when the file is missing; when the file exists, the wrapper appends `content` and ignores `template`. See [§2 frontmatter schema](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) for the daily template shape.
 
-7. **Bump `updated:` (idempotent):** issue one `obsidian frontmatter-set` call. The wrapper rewrites only the YAML scalar; the body — including the bullet just appended — passes through verbatim.
+7. **Bump `updated:`** issue one `obsidian property:set` call. Obsidian updates only that property; body passes verbatim.
 
    ```bash
-   obsidian frontmatter-set \
-     path=daily/YYYY-MM-DD.md \
-     key=updated \
-     value=YYYY-MM-DD
+   obsidian property:set \
+     name=updated \
+     value=YYYY-MM-DD \
+     type=date \
+     path=daily/YYYY-MM-DD.md
    ```
 
 8. **Confirm** with exactly one line:
@@ -66,7 +67,7 @@ Steps:
    Logged to daily/YYYY-MM-DD.md
    ```
 
-Do **not** print the diff, the reasoning, or any other output. One line only.
+One line only. No diff, no reasoning.
 
 ### Idempotency and collision rules
 

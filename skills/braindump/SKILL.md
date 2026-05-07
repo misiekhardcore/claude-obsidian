@@ -3,17 +3,17 @@ name: braindump
 description: Split long-form text into atomic inbox notes. Accepts inline text or file paths. Triage later via /note process.
 allowed-tools: Bash Read Glob Grep
 ---
-# braindump: Long-Form → Atomic Notes
+# braindump
 
-Long-form text that shouldn't interrupt flow — planning sessions, retros, design ramblings. `/braindump` splits the stream into atomic thoughts and files each through the standard CAPTURE pipeline. Chunks land in `notes/` indistinguishable from `/note` captures; triage with `/note process`.
+Split long-form text (planning, retros, design ramblings) into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`.
 
 ## Vault I/O
 
-This skill writes inbox notes by re-running the per-chunk CAPTURE flow defined in [`_shared/capture-pipeline.md`](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md). All vault writes (note files, `notes/index.md` patches) flow through the `obsidian` CLI per the pipeline contract. `Read` is retained for non-vault input file ingestion (vault-relative or absolute text/markdown paths passed as arguments).
+Writes inbox notes via the CAPTURE pipeline in `_shared/capture-pipeline.md`. All vault writes flow through `obsidian` CLI. Read is used for non-vault input file ingestion (text/markdown paths).
 
 ## Image routing
 
-If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/braindump/references/image-capture.md` before parsing input.
+If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` before parsing input.
 
 ## Vault path
 
@@ -34,26 +34,57 @@ Positional argument(s) — inline text and/or file paths:
 
 ## Split — atomic-thought rubric
 
-Single LLM reasoning step (think step, not a tool call):
-
-> **Atomic thought** = one self-contained idea, observation, question, or proposal. Think Zettelkasten: one thought per note.
->
-> **Split when:** topic, claim, or referent shifts in a way that would warrant a separate note.
->
-> **Do not split** mid-claim, mid-example, or mid-argument. **Do not merge** two distinct claims. **Single thought in → single chunk out.**
->
-> **Preserve verbatim:** boundaries are chosen, content is unchanged.
+Atomic thought = one self-contained idea. Split when topic/claim/referent shifts. Do not split mid-argument or merge distinct claims. Preserve content verbatim; only boundaries are chosen.
 
 Zero chunks (unexpected empty result from the reasoning step) → hard-abort, no retry: `/braindump split returned no chunks. Original text not captured.`
 
 ## CAPTURE loop
 
-For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append to a note written by chunk K-1). Then:
+### When to dispatch agents vs. run inline
+
+|Chunks|Input order matters?|Mode|
+|-|-|-|
+|1|n/a|**Inline** — run CAPTURE directly on the main thread.|
+|2–4|yes (sequential argument)|**Inline** — chunks must run in order so K can MATCH-append to K-1.|
+|2–4|no (independent thoughts)|**Agent fan-out** — dispatch one `agents/capture.md` per chunk in parallel.|
+|5+|no|**Agent fan-out** — always parallel for 5+ chunks.|
+|5+|yes|**Inline** — sequential order must be preserved; run in order.|
+
+Order matters for numbered lists, narratives, build-on-each-other arguments. Independent observations/questions/tasks can run parallel.
+
+### Inline CAPTURE (sequential)
+
+For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append
+to a note written by chunk K-1). Then:
 
 1. MATCH/NEW per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template) — skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
 2. MATCH or NEW path per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template); slug via [§3](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven).
 3. Index patch per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
 4. Record filename + success/failure. On error: append to failure list, continue — never abort the loop.
+
+### Agent fan-out (parallel)
+
+When dispatching agents, verify CWD first:
+
+```bash
+cd "${VAULT_ROOT}" && pwd   # confirm vault root before agent fan-out
+```
+
+Dispatch one `agents/capture.md` per independent chunk. Pass each agent:
+- `CHUNK` — the verbatim chunk text
+- `VAULT_ROOT` — `$VAULT_ROOT`
+- `SOURCE_PROJECT` — `basename(cwd)`
+- `TODAY` — ISO date `YYYY-MM-DD`
+
+Wait for all agents to complete. Collect their `Filed:` / `Appended:` / `Error:` lines.
+
+**Note:** parallel agents cannot MATCH-append to each other's notes (they run concurrently). If two chunks would logically MATCH the same note, run them inline in order instead.
+
+**After all agents finish:** apply a single consolidated `notes/index.md` patch. For each `Filed:` line, prepend one checkbox row under `## Pending`:
+```
+- [ ] YYYY-MM-DD [<source_project>] <title>
+```
+Agents do not patch the index; the orchestrator owns that write.
 
 `source_project` = `basename(cwd)`. Frontmatter: note shape from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily), no braindump provenance.
 

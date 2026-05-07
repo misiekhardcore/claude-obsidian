@@ -1,8 +1,8 @@
 # Vault Structure
 
-Cross-skill structural conventions for the claude-obsidian vault: directory layout, page types, confidence tagging semantics, and typed-relationship semantics.
+Cross-skill conventions: directory layout, page types, confidence tagging, typed-relationship semantics.
 
-Read this file when a skill needs to understand vault layout or interpret page metadata. Do not preload — read on demand.
+Read on demand.
 
 ## Directory Map
 
@@ -18,50 +18,32 @@ Read this file when a skill needs to understand vault layout or interpret page m
 |`wiki/trails/`|`trail`|One reading-order record per `/autoresearch` run — lists atomic notes in argument order with one-line annotations. Created lazily on first run; never edited post-emission|`Trail: [Topic] (YYYY-MM-DD)` — date suffix distinguishes multiple runs on the same topic|
 |`wiki/meta/`|`meta`|Index files, log, hot cache, dashboards — structural pages|Short functional names: `index`, `log`, `hot`|
 
-**Examples:**
-
-- `wiki/concepts/LLM Wiki Pattern.md` — a technique (concept)
-- `wiki/entities/Andrej Karpathy.md` — a person (entity)
-- `wiki/sources/llm-wiki-karpathy-gist.md` — the ingest record for a specific source
-- `wiki/solutions/register-vault-with-cli.md` — step-by-step recipe (solution)
-- `wiki/domains/knowledge-management/_index.md` — a domain hub curating concepts/entities/sources across folders
-
-> Per-folder `<folder>/_index.md` files are **not** part of this layout. Curation lives only in `wiki/domains/<slug>/_index.md`. Folders like `concepts/`, `entities/`, `solutions/`, `sources/` are flat directories of leaves; navigation crosses them via domain hubs and backlinks.
+Per-folder `_index.md` files are NOT part of this layout. Curation is `wiki/domains/<slug>/_index.md` only. Other folders are flat leaf directories.
 
 ## Hub Membership
 
-Domain hubs link to leaves; **leaves do not declare hub membership**. There is no `domain:` field on a leaf. To resolve a leaf to its containing hub, the agent runs `obsidian backlinks path=<leaf> format=json` and filters the result for entries whose frontmatter has `type: domain`.
+Forward-only model. No `domain:` field on leaves.
 
-|Direction|How it is encoded|
+|Direction|Encoding|
 |-|-|
-|Hub → leaf|`related:` wikilink in `wiki/domains/<slug>/_index.md` (forward link)|
-|Leaf → hub|Backlink resolution (`obsidian backlinks` filtered by `type: domain`); never a frontmatter field|
+|Hub → leaf|`related:` in `wiki/domains/<slug>/_index.md`|
+|Leaf → hub|Backlink resolution (`obsidian backlinks` filtered by `type: domain`)|
 
-This forward-only model keeps hub membership in one file per cluster (the hub itself), avoids the dual-write problem, and lets a leaf belong to multiple hubs without per-leaf frontmatter churn.
-
-Below the threshold for a hub (≈10 leaves), no hub exists; queries fall back to grep + tags + backlinks. See `${CLAUDE_PLUGIN_ROOT}/skills/lint/SKILL.md` for the hub promotion / demotion thresholds.
+Benefits: single source of truth (hub), no dual-write, leaves can belong to multiple hubs. Below ~10 leaves, no hub; queries fall back to grep + tags. See `skills/lint/SKILL.md` for thresholds.
 
 ## Confidence Tagging
 
-Every page carries a `confidence:` field with one of three values:
+|Value|Meaning|
+|-|-|
+|`EXTRACTED`|Claims from document (source pages, literal quotes)|
+|`INFERRED`|LLM-derived (most concept/entity pages)|
+|`AMBIGUOUS`|Conflicting signals; needs human review|
 
-|Value|Meaning|When to use|
-|-|-|-|
-|`EXTRACTED`|Claims sourced directly from a document|Source pages; entity/concept claims that are literally quoted|
-|`INFERRED`|Claims derived by the LLM from sources|Most concept and entity pages|
-|`AMBIGUOUS`|Conflicting signals; needs human review|Pages where sources contradict and resolution is unclear|
+`AMBIGUOUS` pages must list conflicts in `open_questions` or `## Perspectives`.
 
-`AMBIGUOUS` pages must also list the open conflict in the `open_questions` field or in a `## Perspectives` section.
+`evidence:` is required for `INFERRED` and `AMBIGUOUS` pages.
 
-The `evidence:` field is a flat list of source wikilinks supporting the page's claims. Required for `INFERRED` and `AMBIGUOUS` pages.
-
-**Default assignments by page type:**
-
-- `source` pages → `EXTRACTED` (the page summarises what was directly found in the document)
-- `concept` pages → `INFERRED` (LLM synthesis from one or more sources)
-- `entity` pages → `INFERRED` (unless the entity's details are verbatim-quoted)
-- `meta` pages (index, log, hot) → `EXTRACTED` (mechanically generated, not inferred)
-- `trail` pages → `EXTRACTED` (records what the autoresearch run produced; no inference)
+**Default by type:** source→`EXTRACTED`, concept→`INFERRED`, entity→`INFERRED`, meta→`EXTRACTED`, trail→`EXTRACTED`.
 
 ## Typed Relationships
 

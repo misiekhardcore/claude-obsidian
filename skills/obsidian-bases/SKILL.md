@@ -1,13 +1,11 @@
 ---
 name: obsidian-bases
-description: Create and edit Obsidian Bases (.base files) — dynamic tables, cards, lists, filters, and formulas over vault notes.
+description: Obsidian Bases (.base files) — dynamic tables, cards, lists, filters, formulas.
 allowed-tools: Bash Read Glob
 ---
-# obsidian-bases: Obsidian's Database Layer
+# obsidian-bases
 
-Obsidian Bases (launched 2025) turns vault notes into queryable, dynamic views. Tables, cards, lists, maps. Defined in `.base` files. No plugin required; it is a core Obsidian feature.
-
-**Authoritative reference**: If the kepano/obsidian-skills plugin is installed, prefer its canonical obsidian-bases skill. Otherwise, use the reference below. Official docs: https://help.obsidian.md/bases/syntax
+Obsidian Bases: turn vault notes into queryable views (tables, cards, lists, maps). Core feature; no plugin needed. Prefer kepano/obsidian-skills if installed. Docs: https://help.obsidian.md/bases/syntax
 
 ## Vault I/O
 
@@ -282,9 +280,9 @@ Store `.base` files in `wiki/meta/` for vault dashboards:
 - Strings with colons or special chars → wrap in double quotes: `"Status: Active"`
 - Unquoted strings with `:` break YAML parsing
 
-## What Not to Do
+## Do NOT
 
-- Do not use `from:` or `where:`: those are Dataview syntax, not Obsidian Bases
-- Do not use `sort:` at the root level: sorting is per-view via `order:` and `groupBy:`
-- Do not put `.base` files outside the vault: they only render inside Obsidian
-- Do not reference `formula.X` in `order:` without defining `X` in `formulas:`
+- Do not use `from:` or `where:` (Dataview syntax, not Bases)
+- Do not use `sort:` at root; sort per-view via `order:` and `groupBy:`
+- Do not put `.base` files outside vault
+- Do not reference `formula.X` in `order:` without defining X in `formulas:`

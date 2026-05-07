@@ -25,7 +25,7 @@ In **Settings → Community Plugins → Browse**, install:
 
 That's it for plugins. The `claude-obsidian` plugin reaches the vault through the **Obsidian CLI** (shipped with Obsidian 1.12.7+) — no community plugins, TLS bypasses, or API keys required. Just keep Obsidian running with this vault open while you work.
 
-See `skills/wiki/references/cli-setup.md` for the one-time CLI registration step (`obsidian register vault=...`) and a sanity check.
+See `_shared/setup.md` for the one-time CLI registration step (`obsidian register vault=...`) and a sanity check.
 
 ## 4. Explore the Starter Content
 

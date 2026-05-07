@@ -153,7 +153,7 @@ if [ -n "$SCRATCH_VAULT_PATH" ] && [ -d "$SCRATCH_VAULT_PATH/$SCRATCH" ]; then
 fi
 
 echo ""
-echo "=== wrapper-only verbs — create-or-append, frontmatter-set ==="
+echo "=== wrapper-only verb — create-or-append ==="
 
 # Per-process scratch keeps parallel runs (and re-runs) from colliding;
 # `obsidian create` creates intermediate directories on first write.
@@ -179,33 +179,23 @@ assert_contains "$body" "- 09:00 first"  "create-or-append — first bullet pres
 assert_contains "$body" "- 09:01 second" "create-or-append — second bullet appended"
 assert_contains "$body" "## Captures"    "create-or-append — heading preserved"
 
-# 4. frontmatter-set replace existing key.
-out=$("$WRAPPER" frontmatter-set "path=$verb_path" key=updated value=2026-05-04); rc=$?
-assert_exit 0 "$rc" "frontmatter-set replace exit"
-case "$out" in "Set frontmatter:"*) pass "frontmatter-set replace output" ;;
-               *)                   fail "frontmatter-set replace — got: $out" ;; esac
+# 4. property:set — replace existing key; body bullets must survive.
+# (Output format is native CLI — not asserted here; add after re-spiking property:set.)
+"$WRAPPER" property:set name=updated value=2026-05-04 type=date "path=$verb_path" >/dev/null; rc=$?
+assert_exit 0 "$rc" "property:set replace exit"
 body=$("$WRAPPER" read "path=$verb_path" 2>/dev/null)
-assert_contains "$body" "updated: 2026-05-04" "frontmatter-set — value rewritten"
-assert_contains "$body" "- 09:00 first"        "frontmatter-set — body bullet preserved (1)"
-assert_contains "$body" "- 09:01 second"       "frontmatter-set — body bullet preserved (2)"
+assert_contains "$body" "updated: 2026-05-04" "property:set — value rewritten"
+assert_contains "$body" "- 09:00 first"        "property:set — body bullet preserved (1)"
+assert_contains "$body" "- 09:01 second"       "property:set — body bullet preserved (2)"
 
-# 5. frontmatter-set insert-if-missing.
-out=$("$WRAPPER" frontmatter-set "path=$verb_path" key=tags value=daily); rc=$?
-assert_exit 0 "$rc" "frontmatter-set insert exit"
+# 5. property:set — insert new key; must land inside frontmatter block.
+"$WRAPPER" property:set name=tags value=daily "path=$verb_path" >/dev/null; rc=$?
+assert_exit 0 "$rc" "property:set insert exit"
 body=$("$WRAPPER" read "path=$verb_path" 2>/dev/null)
-assert_contains "$body" "tags: daily" "frontmatter-set — key inserted"
-# Must land *inside* the frontmatter block, before the closing ---.
+assert_contains "$body" "tags: daily" "property:set — key inserted"
 fm_block=$(printf '%s\n' "$body" | awk 'NR==1 && $0=="---"{p=1; next} p && $0=="---"{exit} p{print}')
-case "$fm_block" in *"tags: daily"*) pass "frontmatter-set — key inserted inside frontmatter block" ;;
-                    *)               fail "frontmatter-set — key landed outside frontmatter block" ;; esac
-
-# 6. frontmatter-set on a file with no frontmatter → exit 1.
-nofm_path="$VERB_SCRATCH/no-frontmatter-$$.md"
-"$WRAPPER" create "path=$nofm_path" content="just a body line" overwrite >/dev/null 2>&1
-out=$("$WRAPPER" frontmatter-set "path=$nofm_path" key=updated value=2026-05-04 2>&1); rc=$?
-assert_exit 1 "$rc" "frontmatter-set malformed (no frontmatter) exit"
-case "$out" in *"no frontmatter block"*) pass "frontmatter-set malformed — error message" ;;
-               *)                         fail "frontmatter-set malformed — expected 'no frontmatter block'; got: $out" ;; esac
+case "$fm_block" in *"tags"*) pass "property:set — key inserted inside frontmatter block" ;;
+                    *)        fail "property:set — key landed outside frontmatter block" ;; esac
 
 # Cleanup verb scratch
 if [ -n "$SCRATCH_VAULT_PATH" ] && [ -d "$SCRATCH_VAULT_PATH/$VERB_SCRATCH" ]; then

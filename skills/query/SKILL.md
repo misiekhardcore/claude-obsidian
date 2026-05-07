@@ -1,17 +1,15 @@
 ---
 name: query
-description: Answer questions from the wiki vault. Reads hot cache then index then pages, synthesizes with citations. Files good answers back.
+description: Answer questions from wiki vault. Reads strategically, synthesizes with citations, files answers back.
 allowed-tools: Bash Read Glob Grep
 ---
-# query: Query the Wiki
+# query
 
-The wiki has already done the synthesis work. Read strategically, answer precisely, and file good answers back so the knowledge compounds.
+Wiki has synthesis work done. Read strategically, answer precisely, file answers back so knowledge compounds.
 
 ## Vault I/O
 
-This skill reads `wiki/hot.md`, `wiki/index.md`, and individual pages under `wiki/<category>/`. All reads go through the `obsidian` CLI.
-
-See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, output formats, and exit-code handling.
+Reads hot.md, index.md, individual pages via `obsidian` CLI. See CLI docs for syntax.
 
 ## Query Modes
 
@@ -62,7 +60,25 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
 2. **Read every relevant domain hub.** List `wiki/domains/*/​_index.md`; read each hub whose tag intersects the question. Hubs are the cheapest path to a curated, pre-ranked answer set.
 3. Identify all relevant leaves across `concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/` — both the leaves linked from the hubs and any extra leaves the hubs missed (use `obsidian search` for completeness).
 4. **Pull backlinks for every candidate.** Run `obsidian backlinks path=<page> format=json` on each candidate to surface canonical pages with high inbound but sparse outbound `related:`, and to find the `type: domain` hubs and `type: trail` reading orders that backlink each candidate. Read any hubs not already covered in step 2. For trails, follow the multi-trail rule in **Trail Discovery** below.
-5. Read every relevant page. No skipping.
+5. **Gather pages via agent dispatch.** When the candidate list has more than 5 pages, group them into logical clusters (by tag, hub, or topic area) and dispatch one `agents/gather.md` per cluster **in parallel** rather than reading all pages on the main thread.
+
+   Before spawning agents, verify CWD:
+
+   ```bash
+   cd "${VAULT_ROOT}" && pwd   # confirm vault root before gather fan-out
+   ```
+
+   Pass each gather agent:
+   - `FILE_LIST` — vault-relative paths for that cluster
+   - `VAULT_ROOT` — `$VAULT_ROOT`
+   - `CONTEXT` — `query deep cluster: <cluster-tag-or-description>`
+   - `MAX_FILES` — 20
+
+   Wait for all gather agents to finish. Collect their structured summaries. Use these summaries
+   as the page-content input for synthesis (step 7).
+
+   When the candidate list has 5 or fewer pages, read them inline — no agent needed.
+
 6. If wiki coverage is thin, offer to supplement with web search.
 7. Synthesize a comprehensive answer with full citations.
 8. Always file the result back as a wiki page. Deep answers are too valuable to lose.

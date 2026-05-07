@@ -3,39 +3,60 @@ name: autoresearch
 description: Autonomous research loop. Searches the web, synthesizes findings, and files structured wiki pages.
 allowed-tools: Bash Read Glob Grep WebFetch WebSearch
 ---
-# autoresearch: Autonomous Research Loop
+# autoresearch
 
-You are a research agent. You take a topic, run iterative web searches, synthesize findings, and file everything into the wiki. The user gets wiki pages, not a chat response.
-
-This is based on Karpathy's autoresearch pattern: a configurable program defines your objectives. You run the loop until depth is reached. Output goes into the knowledge base.
+Run iterative web searches on a topic, synthesize findings, and file everything into wiki pages. Based on Karpathy's autoresearch pattern.
 
 ## Before Starting
 
-Read `references/program.md` to load the research objectives and constraints. This file is user-configurable. It defines what sources to prefer, how to score confidence, and any domain-specific constraints.
+Read `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` for research objectives, confidence scoring rules, loop constraints, and domain-specific preferences.
 
 ## Vault I/O
 
-All vault writes (sources, concepts, entities, synthesis page, index, log, hot cache) go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
+All vault writes go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for syntax and escaping.
+
+## Agent dispatch overview
+
+|Phase|Who runs it|Agent|
+|-|-|-|
+|Round 1 (broad search + fetch)|**Main thread inline**|—|
+|Round 1 source filing|**Parallel fan-out**|`agents/source-synth.md` (one per fetched source)|
+|Round 2 gap-fill branches|**Parallel fan-out**|`agents/research-round.md` (one per gap)|
+|Round 3 synthesis check|**Single dispatch**|`agents/research-round.md`|
+|Synthesis page + trail|**Main thread inline**|—|
+|Index / log / hot.md|**Main thread inline**|—|
+
+Before spawning any agents, verify CWD:
+
+```bash
+cd "${VAULT_ROOT}" && pwd   # confirm vault root before agent fan-out
+```
 
 ## Research Loop
 
 ```text
 Input: topic (from user command)
 
-Round 1. Broad search
+Round 1. Broad search — INLINE (main thread)
 1. Decompose topic into 3-5 distinct search angles
 2. For each angle: run 2-3 WebSearch queries
 3. For top 2-3 results per angle: WebFetch the page
 4. Extract from each: key claims, entities, concepts, open questions
+5. Dispatch one agents/source-synth.md per fetched source IN PARALLEL.
+   Pass: SOURCE_CONTENT, SOURCE_URL, RAW_PATH, VAULT_ROOT, TODAY, RESEARCH_TOPIC.
+   Wait for all source-synth agents to finish. Collect their reports.
 
-Round 2. Gap fill
+Round 2. Gap fill — PARALLEL AGENT FAN-OUT
 5. Identify what's missing or contradicted from Round 1
-6. Run targeted searches for each gap (max 5 queries)
-7. Fetch top results for each gap
+6. For each gap, dispatch one agents/research-round.md IN PARALLEL.
+   Pass: GAP, RESEARCH_TOPIC, EXISTING_SOURCES (URLs fetched in Round 1),
+         MAX_QUERIES=5, MAX_FETCHES=3, VAULT_ROOT, TODAY.
+   Wait for all research-round agents to finish. Collect their reports.
 
-Round 3. Synthesis check (optional, if gaps remain)
-8. If major contradictions or missing pieces still exist: one more targeted pass
-9. Otherwise: proceed to filing
+Round 3. Synthesis check — SINGLE AGENT DISPATCH (optional, if gaps remain)
+7. If major contradictions or missing pieces still exist: dispatch one
+   agents/research-round.md for the remaining gap.
+8. Otherwise: proceed to filing
 
 Max rounds: 3 (as set in program.md). Stop when depth is reached or max rounds hit.
 ```
@@ -178,35 +199,19 @@ The body must be a single ordered list. Each list item must contain exactly one 
 
 ## Report to User
 
-After filing everything:
-
 ```text
 Research complete: [Topic]
-
 Rounds: N | Searches: N | Pages created: N
-
 Created:
-  wiki/questions/Research: [Topic].md (synthesis)
-  wiki/trails/Trail: [Topic] (YYYY-MM-DD).md (reading order)
+  wiki/questions/Research: [Topic].md
+  wiki/trails/Trail: [Topic] (YYYY-MM-DD).md
   wiki/sources/[Source 1].md
   wiki/concepts/[Concept 1].md
   wiki/entities/[Entity 1].md
-
-Key findings:
-- [Finding 1]
-- [Finding 2]
-- [Finding 3]
-
+Key findings: [3 bullets]
 Open questions filed: N
 ```
 
 ## Constraints
 
-Follow the limits in `references/program.md`:
-
-- Max rounds (default: 3)
-- Max pages per session (default: 15)
-- Confidence scoring rules
-- Source preference rules
-
-If a constraint conflicts with completeness, respect the constraint and note what was left out in the Open Questions section.
+Follow limits in `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` (max rounds, max pages, confidence scoring, source preference). Respect constraints over completeness; note gaps in Open Questions section.

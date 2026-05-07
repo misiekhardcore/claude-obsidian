@@ -16,7 +16,7 @@ sources: []
 
 ## Overview
 
-[Who or what this is. One paragraph.]
+[Who or what this is]
 
 ## Key Facts
 

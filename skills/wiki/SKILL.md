@@ -1,122 +1,81 @@
 ---
 name: wiki
-description: Claude + Obsidian knowledge companion. Bootstraps the vault, scaffolds structure, and routes to specialized sub-skills.
+description: Knowledge companion. Bootstraps vault, scaffolds structure, routes to sub-skills.
 allowed-tools: Bash Read Glob Grep
 ---
-# wiki: Claude + Obsidian Knowledge Companion
+# wiki
 
-You are a knowledge architect. You build and maintain a persistent, compounding wiki inside an Obsidian vault. You don't just answer questions. You write, cross-reference, file, and maintain a structured knowledge base that gets richer with every source added and every question asked.
-
-The wiki is the product. Chat is just the interface.
-
-The key difference from RAG: the wiki is a persistent artifact. Cross-references are already there. Contradictions have been flagged. Synthesis already reflects everything read. Knowledge compounds like interest.
+Build and maintain persistent, compounding wiki in Obsidian vault. Wiki is product; chat is interface.
 
 ## Architecture
-
-For the directory map, page-type table, and folder semantics, see `${CLAUDE_PLUGIN_ROOT}/_shared/vault-structure.md`. That file is the single source of truth — do not duplicate it here.
-
-Two top-level peers of `wiki/`:
-
-- `notes/` — verbatim quick-capture inbox owned by the `notes` skill.
-- `daily/` — append-only daily log owned by the `daily` skill.
-
-**Canvas files** (`wiki/canvases/*.canvas`) are first-class wiki documents. They are indexed in `wiki/index.md`, counted toward page totals in lint, scanned for dead wikilinks, and included in backlink calculations. When any skill enumerates wiki pages, `.canvas` files in `wiki/canvases/` are valid pages alongside `.md` files in the concept/entity/source directories. The `canvas` skill owns creation and editing of these files.
-
-Dot-prefixed folders (`.raw/`) are hidden in Obsidian's file explorer and graph view. Use this for source documents.
+- **Truth**: Directory map, page-type table, and semantics in `_shared/vault-structure.md`.
+- **Peers**: `notes/` (inbox), `daily/` (log).
+- **Canvas**: `.canvas` files are first-class documents. `canvas` skill owns them.
+- **Sources**: `.raw/` folders are hidden and immutable.
 
 ## Hot Cache
+`wiki/hot.md`: ~500-word summary of recent context. Protocol in `_shared/hot-cache-protocol.md`.
 
-`wiki/hot.md` is a ~500-word summary of the most recent context. It exists so any session (or any other project pointing at this vault) can get recent context without crawling the full wiki.
+## Operations Routing
+Route user requests to the correct sub-skill:
 
-For the full protocol — when to read, when to update, the exact format, and sub-agent discipline — see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`. That document is the single source of truth; do not duplicate its rules here.
-
-## Operations
-
-Route to the correct operation based on what the user says:
-
-|User says|Operation|Sub-skill|
+|Trigger|Operation|Skill|
 |-|-|-|
-|"/wiki init", "init vault", "bootstrap vault"|INIT|this skill|
-|"scaffold", "set up vault", "create wiki"|SCAFFOLD|this skill|
-|"/wiki promote &lt;tag&gt;", "promote tag", "scaffold a hub"|PROMOTE|this skill|
-|"ingest [source]", "process this", "add this"|INGEST|`ingest`|
+|`/wiki init`, "init vault"|INIT|`wiki`|
+|"scaffold", "create wiki"|SCAFFOLD|`wiki`|
+|`/wiki promote <tag>`, "promote tag"|PROMOTE|`wiki`|
+|"ingest [source]", "process this"|INGEST|`ingest`|
 |"what do you know about X", "query:"|QUERY|`query`|
-|"lint", "health check", "clean up"|LINT|`lint`|
-|"save this", "file this", "/save"|SAVE|`save`|
-|"/note", "/dump", "note this", "todo:", "show my inbox", "/note process"|NOTE|`notes`|
-|"/autoresearch [topic]", "research [topic]"|AUTORESEARCH|`autoresearch`|
-|"/canvas", "add to canvas", "open canvas"|CANVAS|`canvas`|
+|"lint", "health check"|LINT|`lint`|
+|"save this", "/save"|SAVE|`save`|
+|"/note", "todo:", "show inbox"|NOTE|`notes`|
+|"/autoresearch [topic]"|AUTORESEARCH|`autoresearch`|
+|"/canvas", "open canvas"|CANVAS|`canvas`|
 
-## INIT Operation
+## Local Operations
 
-Trigger: `/wiki init`, "init vault", "bootstrap vault".
-
-Goal: seed an empty vault from `${user_config.vault_path}` so the user can open it in Obsidian. One-shot, idempotent; does not scaffold the knowledge base (that is SCAFFOLD).
-
-Delegate to the umbrella script:
-
+### INIT
+Seed empty vault from `${user_config.vault_path}`. Idempotent.
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/bin/wiki-init.sh" "${user_config.vault_path}"
 ```
+`bin/wiki-init.sh` handles vault creation, templates, and Obsidian config.
 
-`bin/wiki-init.sh` handles the full flow:
+### SCAFFOLD
+User describes vault purpose → Execute:
+1. Ask: "What is this vault for?" (one question, then proceed).
+2. Scaffold flat folders under `wiki/`: `concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/`, `questions/`. No per-folder `_index.md`.
+3. Create `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`.
+4. Create `notes/` and copy `_seed/notes/index.md` if missing.
+5. Create `daily/` and copy `_seed/daily/example-daily.md` if directory is missing.
+6. Create `_templates/` files for each note type.
+7. Create `.obsidian/snippets/vault-colors.css` with standard callout styles.
+8. Create vault `CLAUDE.md` pointing agents at the vault.
+9. Initialize git (`git init && git add -A && git commit -m "Initial vault scaffold"`).
+10. Present structure and ask: "Want to adjust anything before we start?"
 
-1. If the vault path argument is empty, prints `Configure vault path first: enable the plugin and enter your vault path when prompted` and exits 0 — no error, no further action.
-2. Calls `bin/setup-vault.sh` to create `.obsidian/`, `.raw/`, `wiki/`, `_templates/` and the Obsidian config files.
-3. Calls `bin/copy-templates.sh` to copy `_templates/*.md` into the vault, skipping files that already exist.
-4. Prints next steps: open Obsidian at the vault path, enable the Bases core plugin, install the Templater community plugin, then run `/wiki` to scaffold the knowledge base.
-
-Re-running is safe: every step guards existing files.
-
-## SCAFFOLD Operation
-
-Trigger: user describes what the vault is for.
-
-Read `references/operation-scaffold.md` for the 12-step procedure and the vault `CLAUDE.md` template. The reference is the single source of truth for SCAFFOLD; this skill body only routes to it.
-
-## PROMOTE Operation
-
-Trigger: `/wiki promote <tag>`, "promote tag", "scaffold a hub for X".
-
-Read `references/operation-promote.md` for the 10-step procedure, frontmatter shape, body template, idempotency guard, and forward-only contract. The reference is the single source of truth for PROMOTE; this skill body only routes to it.
+### PROMOTE
+`/wiki promote <tag>` → Execute:
+1. Resolve tag slug (kebab-case, strip leading `#`).
+2. Collect all leaves with `tags:` containing the resolved tag across `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`.
+3. Bail if fewer than 5 leaves: report count, suggest growing the cluster.
+4. Bail if `wiki/domains/<tag>/_index.md` already exists.
+5. Create hub at `wiki/domains/<tag>/_index.md` with `type: domain` frontmatter and `related:` list of all cluster leaves.
+6. Register hub in `wiki/index.md` under `## Domains`.
+7. Log in `wiki/log.md`.
 
 ## Cross-Project Referencing
-
-This is the force multiplier. Any Claude Code project can reference this vault without duplicating context.
-
-In another project's CLAUDE.md, add:
-
+Any project can reference this vault. Add this to other projects' `CLAUDE.md`:
 ```markdown
 ## Wiki Knowledge Base
-
-Path: ~/path/to/vault
-
-When you need context not already in this project:
-
-1. Read wiki/hot.md first (recent context, ~500 words)
-2. Tag-match the question against leaves; check wiki/domains/<tag>/\_index.md for a curated hub
-3. If no hub matches, read wiki/index.md (master flat registry)
-4. Only then read individual wiki pages
-
-Do NOT read the wiki for:
-
-- General coding questions or language syntax
-- Things already in this project's files or conversation
-- Tasks unrelated to [your domain]
+Path: /path/to/vault
+When needed: (1) read wiki/hot.md, (2) read wiki/index.md, (3) drill into domain pages.
+Do NOT read for general coding questions.
 ```
 
-This keeps token usage low. Hot cache costs ~500 tokens. Index costs ~1000 tokens. Individual pages cost 100-300 tokens each.
-
-## Summary
-
-Your job as the LLM:
-
-1. Set up the vault (once)
-2. Scaffold wiki structure from user's domain description
-3. Route ingest, query, and lint to the correct sub-skill
-4. Maintain hot cache after every operation
-5. Always update `wiki/index.md`, the relevant `wiki/domains/<slug>/_index.md` hubs, log, and hot cache on changes
-6. Always use frontmatter and wikilinks
-7. Never modify .raw/ sources
-
-The human's job: curate sources, ask good questions, think about what it means. Everything else is on you.
+## LLM Responsibilities
+1. Set up vault and scaffold structure.
+2. Route operations to sub-skills.
+3. Maintain hot cache and index/log updates after every operation.
+4. Use frontmatter, wikilinks, and the forward-only hub model.
+5. Never modify `.raw/`.

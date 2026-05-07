@@ -1,181 +1,162 @@
 # CLI Contract
 
-Empirical reference for the Obsidian CLI used by every claude-obsidian skill. All behaviors are verified by `scripts/cli-spike.sh` against a live vault; captures live in `tests/spike-results/`.
+Reference for the Obsidian CLI. All behaviors verified by `scripts/cli-spike.sh` (results in `tests/spike-results/`).
 
-Read this file when a skill needs to invoke vault operations, understand output formats, or handle errors. Do not preload — read on demand.
+Read on demand.
 
 ## 1. Invocation contract
 
-All vault operations go through `scripts/obsidian-cli.sh`, not the raw `obsidian` binary directly. A PreToolUse Bash hook (`hooks/obsidian-cli-rewrite.sh`) rewrites bare `obsidian <verb> ...` Bash invocations to the wrapper transparently, but skills should call the wrapper explicitly.
+All vault operations through `scripts/obsidian-cli.sh` (PreToolUse hook rewrites bare `obsidian` calls transparently).
 
 ```bash
-# Direct wrapper call (preferred in skill code)
 "${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" read path=wiki/hot.md
-
-# Raw form (rewritten to wrapper by the hook)
-obsidian read path=wiki/hot.md
 ```
 
-**vault= is name-only.** The CLI's `vault=` parameter accepts the vault's display name (basename of the vault path), not a path. Passing a path returns `"Vault not found."` The wrapper derives the name via `basename "$VAULT"` automatically — skills never pass `vault=` directly.
+**vault= is name-only** (basename, not path). Wrapper derives it automatically.
 
-**Obsidian must be running with the vault open.** The CLI is a desktop-app IPC channel; it requires the Obsidian process to be active. The SessionStart hook probes `obsidian version` at startup and emits an actionable warning if Obsidian is not reachable (fail-soft: session continues).
+**Obsidian must be running.** CLI is desktop IPC; SessionStart hook probes connectivity.
 
-**All output (including errors) goes to stdout.** stderr is always empty from the upstream CLI. The wrapper inspects stdout's first line to normalize the exit code.
+**All output to stdout** (including errors). Wrapper normalizes exit codes.
 
 ## 2. Exit-code table
 
-The upstream CLI always returns exit 0. The wrapper normalizes:
-
-|Code|Meaning|stdout first-line pattern|
+|Code|Meaning|Pattern|
 |-|-|-|
-|0|Success|Any non-error output, or empty stdout|
-|1|Generic CLI error|`Error: ...`|
+|0|Success|Non-error output or empty stdout|
+|1|CLI error|`Error: ...`|
 |2|Vault not found|`Vault not found.`|
-|3|Pre-flight failed|(wrapper emits to stderr; binary missing or Obsidian not running)|
-|4|Vault resolution failed|(wrapper emits to stderr; `resolve-vault.sh` exited non-zero)|
+|3|Pre-flight failed|Binary missing or Obsidian not running|
+|4|Vault resolution failed|`resolve-vault.sh` exited non-zero|
 
-Hooks that want fail-soft behavior chain `|| exit 0`. Skills that need to act on errors check `$?` after the call.
-
-**Known error patterns detected as exit 1:**
-
-|Error message (stdout)|Trigger|
-|-|-|
-|`Error: File "<path>" not found.`|`read`/`append`/`prepend` against a missing file|
-|`Error: Command "<verb>" not found. ...`|Unknown verb or bad `command id=`|
-|`Error: No active file. Use file=<name> or path=<path> to specify a file.`|Verb called with neither `file=` nor `path=`|
+**Error patterns (exit 1):**
+- `Error: File "<path>" not found.` — missing file
+- `Error: Command "<verb>" not found.` — unknown verb or bad `command id=`
+- `Error: No active file...` — missing `file=` or `path=`
 
 ## 3. Format defaults
 
-Locked by the empirical spike. Skills must not override these without a documented reason.
+Locked by empirical spike. Do not override without documented reason.
 
-|Verb|Output format|Notes|
-|-|-|-|
-|`read`|plain text|File contents verbatim|
-|`create`|`Created: <path>`|Confirmation line; use `overwrite` flag to replace existing|
-|`append`|`Appended to: <path>`|Confirmation line|
-|`prepend`|`Prepended to: <path>`|Confirmation line|
-|`backlinks`|**json**|Override from CLI default (tsv). Array of `{"file": "<path>"}`|
-|`unresolved`|**json**|Array of `{"link": "<link-text>"}`|
-|`search`|json|Array of match objects|
-|`search:context`|plain text|Contextual snippets|
-|`orphans`|plain text|One vault-relative path per line; **no format=json support**|
-|`deadends`|plain text|One vault-relative path per line; **no format=json support**|
-|`tasks`|plain text|Markdown task-list lines; **no format=json support**|
-|`tags`|plain text|One tag per line (with `#` prefix); **no format=json support**|
-|`properties`|plain text|YAML frontmatter block; **no format=json support**|
-|`bases`|plain text|One `.base` path per line|
-|`commands`|plain text|One `plugin:command-id` per line|
-|`outline`|plain text|Heading hierarchy|
-|`create-or-append`|plain text|**Wrapper-only** verb — see §3.1|
-|`frontmatter-set`|plain text|**Wrapper-only** verb — see §3.2|
+|Verb|Output format|
+|-|-|
+|`read`|plain text|
+|`create`|`Created: <path>`|
+|`append`|`Appended to: <path>`|
+|`prepend`|`Prepended to: <path>`|
+|`backlinks`|json: `[{"file": "<path>"}]`|
+|`unresolved`|json: `[{"link": "..."}]`|
+|`search`|json|
+|`search:context`|plain text|
+|`orphans`|plain text (no json support)|
+|`deadends`|plain text (no json support)|
+|`tasks`|plain text (no json support)|
+|`tags`|plain text (no json support)|
+|`properties`|plain text (no json support)|
+|`property:read`|plain text (single value)|
+|`property:set`|plain text|
+|`property:remove`|plain text|
+|`bases`|plain text|
+|`commands`|plain text|
+|`outline`|plain text|
+|`create-or-append`|wrapper-only; see §3.1|
 
-**Multiline `content=`:** `\n` and `\t` escapes in `content=` values round-trip correctly (verified by spike `ingest-create-multiline`). Use `\n` for newlines in `create`, `append`, `prepend`.
+**Multiline `content=`:** `\n` and `\t` round-trip correctly. Use `\n` for newlines.
 
-**`content=` escape asymmetry (verified empirically, 2026-05-02):** The parser recognizes `\n` → newline and `\t` → tab, but does **not** recognize `\\` → literal backslash. As a result, content that must preserve literal backslash sequences (e.g. canvas JSON with `\n` in text fields, Markdown code blocks with shell escape sequences) cannot round-trip through `content=` — every `\n` becomes a real newline regardless of preceding backslashes. For these files, use the `eval` escape hatch instead:
+**`content=` escape asymmetry:** `\\` does NOT produce literal backslash — every `\n` becomes newline regardless. For canvas JSON or code blocks with literal backslashes, use `eval` escape hatch:
 
 ```bash
-# Escape hatch: bypass content= for files with literal backslash sequences
 obsidian eval code="await app.vault.adapter.write('path/to/file', '<full content>');"
-# Requires: content embedded in JS string literal (double-quote escaping applies)
-# Why eval and not create: content= asymmetric escape parser corrupts \n sequences
 ```
 
 ### 3.1 `create-or-append` (wrapper-only)
 
-`create-or-append` collapses the "probe-then-write-or-append" pattern into a single atomic call. It exists so callers (notably `/daily`) never read-modify-overwrite a file at the model layer, which is the root cause of issue #98.
+Atomic "create or append" (prevents read-modify-overwrite races per issue #98).
 
 ```bash
 obsidian create-or-append \
   file=daily/YYYY-MM-DD.md \
-  template="---\ntype: daily\ndate: YYYY-MM-DD\ncreated: YYYY-MM-DD\nupdated: YYYY-MM-DD\n---\n\n## Captures\n" \
+  template="---\ntype: daily\n...\n---\n\n## Captures\n" \
   content="- HH:MM <verbatim text>"
 ```
 
 |Aspect|Behavior|
 |-|-|
-|File missing|Writes `template` via `obsidian create`, then appends `content`.|
-|File exists|Appends `content` only; `template` is ignored.|
-|`template=`|**Required.** No caller in the codebase needs an empty template; YAGNI.|
-|Output (missing → created)|`Created and appended: <path>`|
-|Output (exists → append)|`Appended to: <path>`|
-|Exit|0 success; 1 if any underlying `create` or `append` fails.|
+|File missing|Create via template, then append content|
+|File exists|Append content only; template ignored|
+|`template=`|Required|
+|Output (missing)|`Created and appended: <path>`|
+|Output (exists)|`Appended to: <path>`|
+|Exit|0 success; 1 on error|
 
-The verb does **not** read the file body and does **not** touch frontmatter. Use `frontmatter-set` (§3.2) for frontmatter mutations like bumping `updated:`.
+Does NOT read body or touch frontmatter. Use `property:set` (§3.2) for `updated:` mutations.
 
-### 3.2 `frontmatter-set` (wrapper-only)
+### 3.2 Native property verbs
 
-`frontmatter-set` performs a surgical mutation of a single YAML scalar key in a file's frontmatter block. The body is preserved byte-for-byte — the awk parser inside the wrapper passes the body through unmodified.
+Read, write, or remove a single frontmatter property without touching the file body.
 
 ```bash
-obsidian frontmatter-set \
-  path=daily/YYYY-MM-DD.md \
-  key=updated \
-  value=YYYY-MM-DD
+# Read one property value
+obsidian property:read name=updated path=daily/YYYY-MM-DD.md
+
+# Set (or insert) a property — type= is optional; omit for plain text
+obsidian property:set name=updated value=YYYY-MM-DD type=date path=daily/YYYY-MM-DD.md
+
+# Remove a property
+obsidian property:remove name=draft path=wiki/concepts/foo.md
+
+# List all properties of a file (yaml output by default)
+obsidian properties path=wiki/concepts/foo.md
 ```
 
-|Aspect|Behavior|
-|-|-|
-|Key present|Replace its value on the first occurrence in the frontmatter block.|
-|Key absent|Insert `key: value` on the line before the closing `---`.|
-|Body|Untouched. Bullets, headings, code fences are passed through verbatim.|
-|Output|`Set frontmatter: <path>`|
-|Exit|0 success; 1 if the file is missing, has no opening `---`, or has no closing `---`.|
+|Verb|Required args|Optional args|
+|-|-|-|
+|`property:read`|`name=`|`file=` or `path=`|
+|`property:set`|`name=`, `value=`|`type=text\|list\|number\|checkbox\|date\|datetime`, `file=` or `path=`|
+|`property:remove`|`name=`|`file=` or `path=`|
+|`properties`|—|`file=` or `path=`, `name=`, `total`, `sort=count`, `counts`, `format=yaml\|json\|tsv`|
 
-**Out of scope (errors silently or behaves naively):** multi-line YAML values (folded `>`, literal `|`), quoted strings whose content includes `:`, nested mappings. The verb assumes a flat YAML header per `${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md` §2.
-
-**Internal write path:** `frontmatter-set` writes back via `obsidian create overwrite=true`. This is invoked from inside the wrapper, so the `daily/*.md` antipattern guard in `hooks/obsidian-cli-rewrite.sh` (which only inspects model-issued Bash commands) does not trigger.
+**Re-spike after CLI version bump:** add `property:*` cases to `scripts/cli-spike.sh` and capture results.
 
 ## 4. Escape-hatch policy
 
-In increasing order of risk:
-
-1. **`obsidian-cli.sh command id=<command-id>`** — runs any registered Obsidian command (same IDs as the command palette). Discover with `obsidian-cli.sh commands filter=<prefix>`. Freely allowed. Returns plain text; exit 1 if the command ID is not found.
-
-2. **`obsidian-cli.sh eval code=<js>`** — executes arbitrary JavaScript in Obsidian's renderer process. **Last resort only.** Every call site must carry a one-line comment explaining why neither a structured verb nor `command id=` was sufficient. Reviewer must confirm. Behavior across Obsidian versions is not guaranteed.
-
-3. **Direct `Read`/`Write`/`Edit` on vault paths** — reserved for the documented exceptions in §6. Do not use for ordinary vault operations; file the gap if a CLI verb is missing.
+1. **`command id=<command-id>`** — run registered Obsidian command. Discover with `commands filter=<prefix>`. Exit 1 if not found.
+2. **`eval code=<js>`** — last resort only. Must explain why in comment. Behavior not guaranteed across versions.
+3. **Direct `Read`/`Write`/`Edit` on vault paths** — reserved exceptions in §6 only.
 
 ## 5. Cron-time behavior
 
-The CLI requires Obsidian to be running. Cron invocations from a closed-laptop context therefore fail at the pre-flight step (exit 3).
-
-`bin/wiki-lint-cron.sh` (issue #52) must document a direct-file-op fallback for this case. Until #52 ships, cron vault access is not supported via the wrapper; callers must handle exit 3 explicitly or avoid vault writes in cron context.
+CLI requires Obsidian running; cron context fails at pre-flight (exit 3). See issue #52 for workaround.
 
 ## 6. Documented exceptions
 
-The following paths bypass the CLI intentionally. Each bypass is load-bearing; do not remove without verifying the call sites.
+Intentional CLI bypasses (verify call sites before removing):
 
-|Path / pattern|Why CLI is bypassed|
+|Path|Why|
 |-|-|
-|`.raw/.manifest.json`|Bookkeeping JSON for the raw inbox; not a wiki page. Mutated via `jq + mv` in-place. The CLI has no JSON-mutate verb.|
-|`_attachments/images/**`|Binary writes (canvas, defuddle). The CLI has no binary upload verb.|
-|Cron-time vault writes|Obsidian is closed; CLI is unreachable. See §5 and #52.|
-|`bin/setup-vault.sh`, `bin/seed-demo.sh`|Bootstrap scripts that run before vault registration. The vault is not yet addressable by the CLI.|
+|`.raw/.manifest.json`|JSON mutation via `jq + mv`; no CLI JSON verb|
+|`_attachments/images/**`|Binary writes; no CLI binary verb|
+|Cron writes|Obsidian closed; unreachable (§5)|
+|`bin/setup-vault.sh`, `bin/seed-demo.sh`|Bootstrap before vault registration|
 
 ## 7. Canvas file handling
 
-Canvas files (`.canvas`) are first-class vault documents, but the Obsidian CLI has no canvas-specific verbs. Skills that need to work with canvases use a combination of standard verbs and direct filesystem reads.
+Canvas files (`.canvas`) lack CLI verbs. Mix standard verbs + direct reads:
 
 |Operation|Approach|
 |-|-|
-|List canvas files|`obsidian files dir=wiki/canvases format=json` — returns `[{"path": "wiki/canvases/foo.canvas", ...}]`|
-|Read canvas content|Direct filesystem read (documented bypass — canvas JSON is not Markdown; `obsidian read` returns raw JSON but the `content=` escape asymmetry in §3 does not affect reads)|
-|Extract wikilinks|Parse `.nodes[]?.text` JSON fields for `[[...]]` patterns. `obsidian unresolved` does **not** cover canvas wikilinks — a separate pass using the filesystem resolver pool is required.|
-|Verify canvas dead links|Build a resolver pool from `find $VAULT -name "*.md" -o -name "*.canvas" ...` and test each extracted link against it. Reference implementation: `scripts/lint-scan.sh`.|
-|Write canvas files|Direct filesystem write (documented bypass — canvas JSON `text` fields contain literal `\n` sequences that `content=` would corrupt per §3 escape asymmetry)|
-|Backlinks to a canvas|`obsidian backlinks path=wiki/canvases/foo.canvas format=json` — works identically to `.md` files|
+|List|`obsidian files dir=wiki/canvases format=json`|
+|Read|Direct FS read (bypass due to `content=` asymmetry)|
+|Extract wikilinks|Parse `.nodes[]?.text` for `[[...]]`; `obsidian unresolved` doesn't cover canvas|
+|Verify dead links|Build FS resolver pool; test against it (ref: `scripts/lint-scan.sh`)|
+|Write|Direct FS write (bypass; `content=` would corrupt literal `\n`)|
+|Backlinks|`obsidian backlinks path=wiki/canvases/foo.canvas format=json`|
 
-**`obsidian files` verb** (not in the §3 table; no locked output format):
+**`obsidian files` verb:** `obsidian files dir=<dir> format=json` → array of `{"path": "..."}`. Filter extensions client-side with `jq`.
 
-- `obsidian files dir=<vault-relative-dir> format=json` → `[{"path": "<vault-relative-path>", ...}]`
-- Works for any directory: `wiki/canvases/`, `wiki/meta/`, `notes/`, etc.
-- Extension filtering is not supported by the verb — filter client-side with `jq select(.path | endswith(".canvas"))`
+## 8. Re-spiking after CLI version bump
 
-## 8. Re-spiking after a CLI version bump
-
-After any Obsidian minor-version upgrade, re-run `scripts/cli-spike.sh` and diff `tests/spike-results/` against the committed baseline. Update this file if:
-
-- A new error pattern appears in stdout.
-- A verb previously without `format=json` support gains it (update §3 table).
-- Exit-code behavior changes.
-- A new verb becomes relevant to an existing skill.
+Run `scripts/cli-spike.sh` and diff `tests/spike-results/`. Update this file if:
+- New error patterns in stdout
+- Verb gains `format=json` support (update §3 table)
+- Exit codes change
+- New verb relevant to skills

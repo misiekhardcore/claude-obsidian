@@ -98,13 +98,11 @@ assert_contains "- 17:14 entry one"
 assert_contains "- 17:14 entry two"
 assert_contains "- 17:15 entry three"
 
-# Frontmatter `updated:` bump via frontmatter-set — exercises AC3.
-fm_out=$("$WRAPPER" frontmatter-set "path=$SCRATCH_REL" key=updated "value=$TODAY"); fm_rc=$?
-[ "$fm_rc" -eq 0 ] && pass "frontmatter-set exit 0" || fail "frontmatter-set exit=$fm_rc, output=$fm_out"
-case "$fm_out" in "Set frontmatter:"*) pass "frontmatter-set output shape" ;;
-                  *)                   fail "frontmatter-set — got: $fm_out" ;; esac
+# Frontmatter `updated:` bump via property:set — exercises AC3.
+fm_out=$("$WRAPPER" property:set name=updated "value=$TODAY" type=date "path=$SCRATCH_REL"); fm_rc=$?
+[ "$fm_rc" -eq 0 ] && pass "property:set exit 0" || fail "property:set exit=$fm_rc, output=$fm_out"
 
-# Bullets must still be intact after the frontmatter-set roundtrip.
+# Bullets must still be intact after the property:set roundtrip.
 body_after=$("$WRAPPER" read "path=$SCRATCH_REL" 2>/dev/null) || true
 body=$body_after
 assert_contains "- 17:14 entry one"

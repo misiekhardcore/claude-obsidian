@@ -20,7 +20,7 @@ sources: []
 
 ## Overview
 
-Replace with: why these two things are being compared and what question this answers.
+[Why these are compared; what question this answers]
 
 ## Comparison
 
@@ -31,7 +31,7 @@ Replace with: why these two things are being compared and what question this ans
 
 ## Verdict
 
-Replace with: one clear conclusion — which is better for what use case.
+[Clear conclusion — which is better for what use case]
 
 ## Sources
 

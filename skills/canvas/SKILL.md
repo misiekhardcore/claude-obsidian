@@ -1,17 +1,11 @@
 ---
 name: canvas
-description: Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to canvas files with zones. Integrates with /banana.
+description: Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to canvas files with zones.
 allowed-tools: Bash Read Glob Grep
 ---
-# canvas: Visual Reference Layer
+# canvas
 
-The three knowledge capture layers:
-
-- `/save` → text synthesis (wiki/questions/, wiki/concepts/)
-- `/autoresearch` → structured knowledge (wiki/sources/, wiki/concepts/)
-- `/canvas` → visual references (wiki/canvases/)
-
-A canvas is a JSON file Obsidian renders as an infinite visual board. This skill reads and writes canvas JSON directly. Read `references/canvas-spec.md` for the full format reference before making any edits. This spec aligns with the [JSON Canvas open standard](https://jsoncanvas.org/). If the kepano/obsidian-skills plugin is installed, its json-canvas skill is the authoritative canvas spec reference. Otherwise, use the guidance below.
+Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite visual boards. Read `${CLAUDE_PLUGIN_ROOT}/_shared/canvas-spec.md` before editing canvas JSON (follows JSON Canvas 1.0 standard).
 
 ## Default Canvas
 
@@ -73,7 +67,7 @@ If it does not exist, create it:
 
 Create `_attachments/images/canvas/` if it doesn't exist.
 
-**Detect aspect ratio:** Use `python3 -c "from PIL import Image; img=Image.open('[path]'); print(img.width, img.height)"` or `identify -format '%w %h' [path]`. See `references/canvas-spec.md` for the full aspect ratio → canvas size table (7 ratios including 4:3, 3:4, ultra-wide). Do not use an inline table here. The spec is the single source of truth for sizing.
+**Detect aspect ratio with PIL or identify. See `${CLAUDE_PLUGIN_ROOT}/_shared/canvas-spec.md` for aspect-ratio → size table (single source of truth).
 
 **Position using auto-layout** (see Auto-Positioning section below).
 
@@ -174,44 +168,7 @@ wiki/canvases/design-ideas.canvas. 42 nodes (30 images, 4 text, 8 groups)
 
 ## Auto-Positioning Algorithm
 
-Read `references/canvas-spec.md` for the full coordinate system.
-
-```python
-def next_position(canvas_nodes, target_zone_label, new_w, new_h):
-    # Find zone group node
-    zone = next((n for n in canvas_nodes
-                 if n.get('type') == 'group'
-                 and n.get('label') == target_zone_label), None)
-
-    if zone is None:
-        # No zone: place below all content
-        max_y = max((n['y'] + n.get('height', 0) for n in canvas_nodes), default=-140)
-        return -400, max_y + 60
-
-    zx, zy = zone['x'], zone['y']
-    zw, zh = zone['width'], zone['height']
-
-    # Nodes inside this zone
-    inside = [n for n in canvas_nodes
-              if n.get('type') != 'group'
-              and zx <= n['x'] < zx + zw
-              and zy <= n['y'] < zy + zh]
-
-    if not inside:
-        return zx + 20, zy + 20
-
-    rightmost_x = max(n['x'] + n.get('width', 0) for n in inside)
-    next_x = rightmost_x + 40
-
-    if next_x + new_w > zx + zw:
-        # New row
-        max_row_y = max(n['y'] + n.get('height', 0) for n in inside)
-        return zx + 20, max_row_y + 20
-
-    # Same row: align to the top of all existing nodes in the zone
-    current_row_y = min(n['y'] for n in inside)
-    return next_x, current_row_y
-```
+Read `${CLAUDE_PLUGIN_ROOT}/_shared/canvas-spec.md` for coordinate system and pseudocode. Implementation finds zone, collects nodes inside, flows left-to-right with row wrapping.
 
 ## ID Generation
 
@@ -241,12 +198,8 @@ When `/banana` finishes generating images, suggest:
 
 ## Summary
 
-1. Read canvas-spec.md before editing any canvas JSON.
-2. Always read the canvas file before writing. Parse existing nodes to avoid ID collisions and calculate auto-positions.
-3. Create `_attachments/images/canvas/` for downloaded/copied images.
-4. Update `wiki/index.md` when creating new canvases.
-5. Report position and zone after every add operation.
-
-## See Also
-
-For standalone visual production (12 templates, 6 layout algorithms, AI generation, presentations), see [claude-canvas](https://github.com/AgriciDaniel/claude-canvas). This skill handles wiki-scoped visual boards. claude-canvas handles full-featured canvas orchestration for any project.
+1. Read canvas-spec.md before editing.
+2. Read canvas before writing; parse nodes to avoid collisions.
+3. Create `_attachments/images/canvas/` for images.
+4. Update `wiki/index.md` on new canvases.
+5. Report position and zone after every add.

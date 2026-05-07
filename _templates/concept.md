@@ -16,7 +16,7 @@ sources: []
 
 ## Definition
 
-[What this concept is. Declarative, present tense. One clear paragraph.]
+[Declarative, present tense. One paragraph.]
 
 ## How It Works
 
@@ -24,7 +24,7 @@ sources: []
 
 ## Why It Matters
 
-[Significance in this domain]
+[Significance]
 
 ## Examples
 
