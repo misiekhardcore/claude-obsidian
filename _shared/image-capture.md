@@ -1,6 +1,6 @@
 # Image Capture — Common Mechanics
 
-Common contract for all capture skills accepting images. For skill-specific details, also read `references/image-capture.md`.
+Common contract for all capture skills accepting images.
 
 ## Image validation
 

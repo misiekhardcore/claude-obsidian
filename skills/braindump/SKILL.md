@@ -13,7 +13,7 @@ Writes inbox notes via the CAPTURE pipeline in `_shared/capture-pipeline.md`. Al
 
 ## Image routing
 
-If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/braindump/references/image-capture.md` before parsing input.
+If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` before parsing input.
 
 ## Vault path
 

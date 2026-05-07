@@ -214,4 +214,4 @@ Open questions filed: N
 
 ## Constraints
 
-Follow limits in `references/program.md` (max rounds, max pages, confidence scoring, source preference). Respect constraints over completeness; note gaps in Open Questions section.
+Follow limits in `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` (max rounds, max pages, confidence scoring, source preference). Respect constraints over completeness; note gaps in Open Questions section.

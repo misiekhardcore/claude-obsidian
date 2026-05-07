@@ -29,7 +29,7 @@ Steps:
 
 1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, capture everything after the trigger phrase as a single raw argument string. Scan it non-destructively for image-path tokens (any token that resolves to a path or carries a supported image extension) and URL tokens. Treat all remaining non-path, non-URL tokens as a single verbatim text segment — joined in their original order with single spaces. Preserve the relative order of text, paths, and URLs as they appeared in the input.
 
-2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` then `${CLAUDE_PLUGIN_ROOT}/skills/notes/references/image-capture.md`. Follow those files for the full image-input path; skip steps 3–4 below.
+2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md`. Follow that file for the full image-input path; skip steps 3–4 below.
 
 3. **URL detection (text-only, no images).** If the argument is a single URL:
    - Prompt exactly once: `Detected URL: <url>. Ingest via /ingest? [y/n]`
