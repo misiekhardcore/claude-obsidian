@@ -34,8 +34,8 @@ esac
 
 # Antipattern guard (issue #98): block `obsidian create … overwrite=true` calls
 # whose `path=` targets `daily/*.md`. The /daily skill must use the wrapper-only
-# `create-or-append` (atomic append) and `frontmatter-set` (surgical YAML)
-# verbs instead. Read-modify-overwrite of a daily file at the model layer is
+# `create-or-append` verb for appends and the native `property:set` verb for
+# property updates. Read-modify-overwrite of a daily file at the model layer is
 # the root cause of bullet loss in #98 — this guard catches the regression.
 #
 # Path-scoped to `daily/*.md` so legitimate full-rewrite callers
@@ -57,7 +57,7 @@ if [ "$DAILY_VIOLATION" = 1 ]; then
     "hookSpecificOutput": {
       "hookEventName": "PreToolUse",
       "permissionDecision": "deny",
-      "permissionDecisionReason": "obsidian create overwrite=true on daily/*.md is forbidden (issue #98). Use obsidian create-or-append for appends or obsidian frontmatter-set for updated: bumps. See _shared/cli.md §3.1, §3.2."
+      "permissionDecisionReason": "obsidian create overwrite=true on daily/*.md is forbidden (issue #98). Use obsidian create-or-append for appends or obsidian property:set for property updates. See _shared/cli.md §3.1, §3.2."
     }
   }'
   exit 0

@@ -75,16 +75,6 @@
 #             `Appended to: <path>` (file-exists branch).
 #     Exit:   0 success, 1 generic error (e.g. underlying create/append failed).
 #
-#   frontmatter-set   path=<path> key=<yaml-key> value=<scalar>
-#     Surgical mutation of a single YAML key in the frontmatter block of an
-#     existing file. Body bytes are preserved verbatim. If `key` is present,
-#     its value is replaced; if absent, `key: value` is inserted at the end of
-#     the frontmatter block (just before the closing `---`).
-#     Multi-line values and quoted strings are out of scope — scalars only.
-#     Output: `Set frontmatter: <path>`.
-#     Exit:   0 success, 1 generic error (file missing, no frontmatter block,
-#             malformed frontmatter — closing `---` not found).
-#
 # ─── Empirical contract ──────────────────────────────────────────────────────
 # Every behavior above is verified by tests/cli-smoke.sh and backed by the
 # captures in tests/spike-results/. After every Obsidian CLI minor-version
@@ -115,8 +105,8 @@ if [ -z "$VERSION_OUT" ]; then
   exit 3
 fi
 
-# 4a. Wrapper-only verbs (create-or-append, frontmatter-set) — see header.
-#     Both call the underlying `obsidian` binary directly with the resolved
+# 4a. Wrapper-only verb (create-or-append) — see header.
+#     Calls the underlying `obsidian` binary directly with the resolved
 #     vault name; the upstream CLI's stdout-based error reporting is parsed
 #     here without needing to recurse through this wrapper.
 
@@ -203,93 +193,8 @@ do_create_or_append() {
   return 0
 }
 
-# do_frontmatter_set — see header for the contract.
-do_frontmatter_set() {
-  local path="" key="" value=""
-  for arg in "$@"; do
-    case "$arg" in
-      path=*)  path="${arg#path=}" ;;
-      key=*)   key="${arg#key=}" ;;
-      value=*) value="${arg#value=}" ;;
-      *) echo "Error: frontmatter-set: unknown argument '$arg'" >&2; return 1 ;;
-    esac
-  done
-  if [ -z "$path" ] || [ -z "$key" ] || [ -z "$value" ]; then
-    echo "Error: frontmatter-set requires path=, key=, and value=" >&2
-    return 1
-  fi
-
-  # Read the file. Surface CLI errors (missing file → exit 1).
-  local current read_rc
-  current="$(run_obs read "path=$path")"
-  read_rc=$?
-  if [ "$read_rc" -ne 0 ]; then
-    return "$read_rc"
-  fi
-
-  # Surgical YAML key mutation in awk — body bytes are passed through verbatim.
-  # Frontmatter delimiters: opening `---` must be the first line; closing `---`
-  # is the next line that is exactly `---`. Multi-line values and quoted
-  # strings are out of scope (per /define). Diagnostic codes — not user text —
-  # are emitted on awk's stdout when the input is malformed; the shell
-  # translates them into user-facing messages and discards the partial output.
-  local updated awk_rc
-  updated="$(printf '%s' "$current" | awk -v key="$key" -v value="$value" '
-    BEGIN { state = "pre"; replaced = 0 }
-    NR == 1 {
-      if ($0 == "---") { state = "fm"; print; next }
-      state = "err_no_opening"; exit 2
-    }
-    state == "fm" {
-      if ($0 == "---") {
-        if (!replaced) { print key ": " value }
-        state = "body"; print; next
-      }
-      # Match `key:` at the start of the line; later occurrences are ignored.
-      if (!replaced && index($0, key ":") == 1) {
-        print key ": " value
-        replaced = 1
-        next
-      }
-      print; next
-    }
-    state == "body" { print; next }
-    END {
-      if (state == "pre" || state == "err_no_opening") print "FM_ERR_NO_OPENING"
-      else if (state == "fm") print "FM_ERR_NO_CLOSING"
-    }
-  ')"
-  awk_rc=$?
-
-  case "$updated" in
-    *FM_ERR_NO_OPENING*)
-      echo "Error: frontmatter-set: $path has no frontmatter block" >&2
-      return 1
-      ;;
-    *FM_ERR_NO_CLOSING*)
-      echo "Error: frontmatter-set: $path has malformed frontmatter (no closing ---)" >&2
-      return 1
-      ;;
-  esac
-  if [ "$awk_rc" -ne 0 ]; then
-    echo "Error: frontmatter-set: awk failed parsing $path" >&2
-    return 1
-  fi
-
-  # Write back via `obsidian create overwrite=true`. This wrapper-internal
-  # call does not pass through the rewrite hook (the hook only fires on the
-  # model's Bash tool), so the daily/*.md antipattern guard does not trigger.
-  if ! run_obs create "path=$path" overwrite=true "content=$updated" >/dev/null; then
-    echo "Error: frontmatter-set: write failed for $path" >&2
-    return 1
-  fi
-  echo "Set frontmatter: $path"
-  return 0
-}
-
 case "${1:-}" in
   create-or-append) shift; do_create_or_append "$@"; exit $? ;;
-  frontmatter-set)  shift; do_frontmatter_set "$@";  exit $? ;;
 esac
 
 # 4. Run the verb. Capture stdout so we can inspect it for error markers.

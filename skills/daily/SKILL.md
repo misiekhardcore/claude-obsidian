@@ -9,7 +9,7 @@ Append timestamped bullet to `daily/YYYY-MM-DD.md`. No MATCH/NEW, no inbox, no t
 
 ## Vault I/O
 
-Uses `create-or-append` and `frontmatter-set` (see CLI docs). Local `daily/` dir created via `mkdir -p` if missing.
+Uses `create-or-append` and `property:set` (see CLI docs). Local `daily/` dir created via `mkdir -p` if missing.
 
 ## Vault path
 
@@ -52,13 +52,14 @@ Steps:
 
    The `template` argument is used only when the file is missing; when the file exists, the wrapper appends `content` and ignores `template`. See [§2 frontmatter schema](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) for the daily template shape.
 
-7. **Bump `updated:`** issue one `obsidian frontmatter-set` call. Wrapper rewrites only YAML scalar; body passes verbatim.
+7. **Bump `updated:`** issue one `obsidian property:set` call. Obsidian updates only that property; body passes verbatim.
 
    ```bash
-   obsidian frontmatter-set \
-     path=daily/YYYY-MM-DD.md \
-     key=updated \
-     value=YYYY-MM-DD
+   obsidian property:set \
+     name=updated \
+     value=YYYY-MM-DD \
+     type=date \
+     path=daily/YYYY-MM-DD.md
    ```
 
 8. **Confirm** with exactly one line:

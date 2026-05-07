@@ -52,11 +52,13 @@ Locked by empirical spike. Do not override without documented reason.
 |`tasks`|plain text (no json support)|
 |`tags`|plain text (no json support)|
 |`properties`|plain text (no json support)|
+|`property:read`|plain text (single value)|
+|`property:set`|plain text|
+|`property:remove`|plain text|
 |`bases`|plain text|
 |`commands`|plain text|
 |`outline`|plain text|
 |`create-or-append`|wrapper-only; see §3.1|
-|`frontmatter-set`|wrapper-only; see §3.2|
 
 **Multiline `content=`:** `\n` and `\t` round-trip correctly. Use `\n` for newlines.
 
@@ -86,25 +88,34 @@ obsidian create-or-append \
 |Output (exists)|`Appended to: <path>`|
 |Exit|0 success; 1 on error|
 
-Does NOT read body or touch frontmatter. Use `frontmatter-set` (§3.2) for `updated:` mutations.
+Does NOT read body or touch frontmatter. Use `property:set` (§3.2) for `updated:` mutations.
 
-### 3.2 `frontmatter-set` (wrapper-only)
+### 3.2 Native property verbs
 
-Surgical YAML scalar mutation. Body is untouched (byte-for-byte).
+Read, write, or remove a single frontmatter property without touching the file body.
 
 ```bash
-obsidian frontmatter-set path=daily/YYYY-MM-DD.md key=updated value=YYYY-MM-DD
+# Read one property value
+obsidian property:read name=updated path=daily/YYYY-MM-DD.md
+
+# Set (or insert) a property — type= is optional; omit for plain text
+obsidian property:set name=updated value=YYYY-MM-DD type=date path=daily/YYYY-MM-DD.md
+
+# Remove a property
+obsidian property:remove name=draft path=wiki/concepts/foo.md
+
+# List all properties of a file (yaml output by default)
+obsidian properties path=wiki/concepts/foo.md
 ```
 
-|Aspect|Behavior|
-|-|-|
-|Key present|Replace value on first occurrence|
-|Key absent|Insert `key: value` before closing `---`|
-|Body|Passed through verbatim|
-|Output|`Set frontmatter: <path>`|
-|Exit|0 success; 1 if missing, no opening/closing `---`|
+|Verb|Required args|Optional args|
+|-|-|-|
+|`property:read`|`name=`|`file=` or `path=`|
+|`property:set`|`name=`, `value=`|`type=text\|list\|number\|checkbox\|date\|datetime`, `file=` or `path=`|
+|`property:remove`|`name=`|`file=` or `path=`|
+|`properties`|—|`file=` or `path=`, `name=`, `total`, `sort=count`, `counts`, `format=yaml\|json\|tsv`|
 
-**Limitations:** no multi-line YAML (`>`, `|`), quoted strings with `:`, nested mappings. Assumes flat header per `_shared/capture-pipeline.md` §2.
+**Re-spike after CLI version bump:** add `property:*` cases to `scripts/cli-spike.sh` and capture results.
 
 ## 4. Escape-hatch policy
 

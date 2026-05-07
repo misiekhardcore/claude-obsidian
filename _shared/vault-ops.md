@@ -13,7 +13,9 @@ All vault operations must use the `obsidian` CLI (routed via `scripts/obsidian-c
 |`create`|`path=wiki/concepts/foo.md content="..."`|`Created: <path>`|
 |`append`|`file=wiki/log.md content="..."`|`Appended to: <path>`|
 |`prepend`|`file=wiki/index.md content="..."`|`Prepended to: <path>`|
-|`frontmatter-set`|`path=... key=updated value=...`|`Set frontmatter: <path>`|
+|`property:set`|`name=updated value=... path=...`|plain text|
+|`property:read`|`name=updated path=...`|plain text (value only)|
+|`properties`|`path=...`|YAML block (all properties)|
 
 **Multiline Content:** Use `\n` for newlines.
 **Bypass:** Use direct FS `Read`/`Write` only for `.raw/`, `_attachments/images/**`, or `.canvas` files (see `cli.md` §6–7).
