@@ -24,7 +24,7 @@ Work through checks in `skills/lint/SKILL.md` order using JSON where available, 
 - **#1 (orphans):** use JSON `orphans`.
 - **#2 (dead links):** use JSON `dead_links` (canvas merged).
 - **#6 (frontmatter gaps):** read in-scope pages per `scope.scanned_dirs`.
-- **#7 (empty sections):** For each in-scope page (per `scope.scanned_dirs`), read the file and scan line by line. A heading (`^#{2,} `) is empty when the next non-blank line is another heading (`^#`) or there are no further non-blank lines in the file. Report each as `[[page-slug]]: empty section "## Heading Title"`.
+- **#7 (empty sections):** use JSON `empty_sections`. Each entry is `{source_page, heading}`. Report each as `[[slug]]: empty section "<heading>"`.
 - **#8 (stale index):** `obsidian read path=wiki/index.md` + validate.
 - **#9 (hot.md size):** read + word count.
 - **#10 (backlink density):** use JSON `backlinks`.
