@@ -3,13 +3,13 @@ name: braindump
 description: Split long-form text into atomic inbox notes. Accepts inline text or file paths. Triage later via /note process.
 allowed-tools: Bash Read Glob Grep
 ---
-# braindump: Long-Form → Atomic Notes
+# braindump
 
-Long-form text that shouldn't interrupt flow — planning sessions, retros, design ramblings. `/braindump` splits the stream into atomic thoughts and files each through the standard CAPTURE pipeline. Chunks land in `notes/` indistinguishable from `/note` captures; triage with `/note process`.
+Split long-form text (planning, retros, design ramblings) into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`.
 
 ## Vault I/O
 
-This skill writes inbox notes by re-running the per-chunk CAPTURE flow defined in [`_shared/capture-pipeline.md`](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md). All vault writes (note files, `notes/index.md` patches) flow through the `obsidian` CLI per the pipeline contract. `Read` is retained for non-vault input file ingestion (vault-relative or absolute text/markdown paths passed as arguments).
+Writes inbox notes via the CAPTURE pipeline in `_shared/capture-pipeline.md`. All vault writes flow through `obsidian` CLI. Read is used for non-vault input file ingestion (text/markdown paths).
 
 ## Image routing
 
@@ -34,15 +34,7 @@ Positional argument(s) — inline text and/or file paths:
 
 ## Split — atomic-thought rubric
 
-Single LLM reasoning step (think step, not a tool call):
-
-> **Atomic thought** = one self-contained idea, observation, question, or proposal. Think Zettelkasten: one thought per note.
->
-> **Split when:** topic, claim, or referent shifts in a way that would warrant a separate note.
->
-> **Do not split** mid-claim, mid-example, or mid-argument. **Do not merge** two distinct claims. **Single thought in → single chunk out.**
->
-> **Preserve verbatim:** boundaries are chosen, content is unchanged.
+Atomic thought = one self-contained idea. Split when topic/claim/referent shifts. Do not split mid-argument or merge distinct claims. Preserve content verbatim; only boundaries are chosen.
 
 Zero chunks (unexpected empty result from the reasoning step) → hard-abort, no retry: `/braindump split returned no chunks. Original text not captured.`
 
@@ -58,9 +50,7 @@ Zero chunks (unexpected empty result from the reasoning step) → hard-abort, no
 |5+|no|**Agent fan-out** — always parallel for 5+ chunks.|
 |5+|yes|**Inline** — sequential order must be preserved; run in order.|
 
-Detect "order matters" from context: if the chunks form a numbered list, a narrative sequence, or a
-build-on-each-other argument, treat order as important. If they are independent observations,
-questions, or tasks, treat them as parallel.
+Order matters for numbered lists, narratives, build-on-each-other arguments. Independent observations/questions/tasks can run parallel.
 
 ### Inline CAPTURE (sequential)
 

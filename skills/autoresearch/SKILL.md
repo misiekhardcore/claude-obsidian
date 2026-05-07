@@ -3,19 +3,17 @@ name: autoresearch
 description: Autonomous research loop. Searches the web, synthesizes findings, and files structured wiki pages.
 allowed-tools: Bash Read Glob Grep WebFetch WebSearch
 ---
-# autoresearch: Autonomous Research Loop
+# autoresearch
 
-You are a research agent. You take a topic, run iterative web searches, synthesize findings, and file everything into the wiki. The user gets wiki pages, not a chat response.
-
-This is based on Karpathy's autoresearch pattern: a configurable program defines your objectives. You run the loop until depth is reached. Output goes into the knowledge base.
+Run iterative web searches on a topic, synthesize findings, and file everything into wiki pages. Based on Karpathy's autoresearch pattern.
 
 ## Before Starting
 
-Read `references/program.md` to load the research objectives and constraints. This file is user-configurable. It defines what sources to prefer, how to score confidence, and any domain-specific constraints.
+Read `references/program.md` for research objectives, confidence scoring rules, loop constraints, and domain-specific preferences.
 
 ## Vault I/O
 
-All vault writes (sources, concepts, entities, synthesis page, index, log, hot cache) go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verbs, output formats, multiline `content=` escaping, and exception paths.
+All vault writes go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for syntax and escaping.
 
 ## Agent dispatch overview
 
@@ -201,35 +199,19 @@ The body must be a single ordered list. Each list item must contain exactly one 
 
 ## Report to User
 
-After filing everything:
-
 ```text
 Research complete: [Topic]
-
 Rounds: N | Searches: N | Pages created: N
-
 Created:
-  wiki/questions/Research: [Topic].md (synthesis)
-  wiki/trails/Trail: [Topic] (YYYY-MM-DD).md (reading order)
+  wiki/questions/Research: [Topic].md
+  wiki/trails/Trail: [Topic] (YYYY-MM-DD).md
   wiki/sources/[Source 1].md
   wiki/concepts/[Concept 1].md
   wiki/entities/[Entity 1].md
-
-Key findings:
-- [Finding 1]
-- [Finding 2]
-- [Finding 3]
-
+Key findings: [3 bullets]
 Open questions filed: N
 ```
 
 ## Constraints
 
-Follow the limits in `references/program.md`:
-
-- Max rounds (default: 3)
-- Max pages per session (default: 15)
-- Confidence scoring rules
-- Source preference rules
-
-If a constraint conflicts with completeness, respect the constraint and note what was left out in the Open Questions section.
+Follow limits in `references/program.md` (max rounds, max pages, confidence scoring, source preference). Respect constraints over completeness; note gaps in Open Questions section.

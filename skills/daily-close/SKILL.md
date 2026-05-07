@@ -1,11 +1,11 @@
 ---
 name: daily-close
-description: Synthesize a day's captures into a prose summary appended to the daily file. Reads log, inbox notes, wiki pages, and hot cache.
+description: Synthesize a day's captures into a prose summary. Idempotent; re-run replaces prior summary.
 allowed-tools: Bash Read Glob
 ---
-# daily-close: End-of-Day Synthesis
+# daily-close
 
-Synthesize `<vault_root>/daily/YYYY-MM-DD.md` into a polished prose summary with optional follow-ups. Reads the day's captures, any inbox notes and wiki pages dated to that day, plus `wiki/hot.md` and `wiki/index.md` for cross-reference context. Appends a `## Summary` section (and optional `## Follow-ups`) to the daily file. Re-running replaces the prior summary — idempotent.
+Synthesize `daily/YYYY-MM-DD.md` into prose summary with optional follow-ups. Reads day's captures, dated notes/wiki pages, hot.md, index.md. Appends `## Summary` (and optional `## Follow-ups`). Idempotent.
 
 ## Vault I/O
 

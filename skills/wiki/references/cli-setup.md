@@ -1,6 +1,6 @@
 # Obsidian CLI Setup
 
-The claude-obsidian plugin uses the **Obsidian CLI** to read and write vault notes directly. The CLI ships with Obsidian 1.12.7+, requires no plugins, and survives Obsidian restarts.
+Claude-obsidian uses Obsidian CLI (1.12.7+). Ships with Obsidian. No plugins needed. Survives restarts.
 
 ## Prerequisites
 
@@ -99,22 +99,15 @@ obsidian tags
 
 For a complete reference of all commands and options, see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
 
-## When the CLI is Unavailable
+## When CLI Unavailable
 
-If Obsidian is closed or the CLI is not installed:
+Requires Obsidian running. Scheduled tasks see `bin/wiki-lint-cron.sh` for fallback.
 
-**Cron-time vault writes:** The CLI requires Obsidian to be running. For scheduled tasks (e.g., weekly `wiki-lint`), see `bin/wiki-lint-cron.sh` for direct-file fallback behavior.
-
-**Troubleshooting steps:**
-
-1. Start Obsidian and open your vault
-2. Verify `obsidian version` returns a version string (not empty, not "command not found")
-3. Confirm your vault is registered: `obsidian list vaults`
-4. Re-run your vault operation
+Troubleshooting: start Obsidian, verify `obsidian version`, confirm vault registered, retry.
 
 ## Examples
 
-End-to-end snippets pulled from the converted skills. All vault I/O routes through the wrapper; the `obsidian` invocations below are transparently rewritten to `scripts/obsidian-cli.sh` by the PreToolUse hook.
+All vault I/O routes through wrapper. Obsidian invocations rewritten to `scripts/obsidian-cli.sh` by PreToolUse hook.
 
 ### Ingest a source
 

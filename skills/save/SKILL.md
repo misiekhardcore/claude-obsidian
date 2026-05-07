@@ -1,19 +1,15 @@
 ---
 name: save
-description: Save the current conversation or insight as a structured wiki note. Determines note type, files it, and updates index, log, and hot cache.
+description: Save conversation/insight as structured wiki note. Updates index, log, hot cache.
 allowed-tools: Bash Read Glob Grep
 ---
-# save: File Conversations Into the Wiki
+# save
 
-Good answers and insights shouldn't disappear into chat history. This skill takes what was just discussed and files it as a permanent wiki page.
-
-The wiki compounds. Save often.
+File conversations into wiki as permanent pages. Determines note type, files it, updates index/log/hot-cache. Wiki compounds; save often.
 
 ## Vault I/O
 
-This skill reads templates and existing pages, creates a new note, prepends entries to `wiki/log.md` and `wiki/index.md`, and overwrites `wiki/hot.md`. All operations go through the `obsidian` CLI.
-
-See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, the `overwrite` flag, and multiline `content=` escaping.
+Reads templates/pages, creates new note, prepends to log/index, overwrites hot.md via `obsidian` CLI. See CLI docs for syntax.
 
 ## Note Type Decision
 
@@ -120,21 +116,10 @@ Do **not** write a `domain:` field on any leaf you save. Hub membership is forwa
 - Link every mentioned concept, entity, or wiki page with wikilinks.
 - Cite sources where applicable: `(Source: [[Page]])`.
 
-## What to Save vs. Skip
+## What to Save
 
-Save:
+Non-obvious synthesis, decisions with rationale, significant analyses, comparisons, research findings.
 
-- Non-obvious insights or synthesis
-- Decisions with rationale
-- Analyses that took significant effort
-- Comparisons that are likely to be referenced again
-- Research findings
+## What to Skip
 
-Skip:
-
-- Mechanical Q&A (lookup questions with obvious answers)
-- Setup steps already documented elsewhere
-- Temporary debugging sessions with no lasting insight
-- Anything already in the wiki
-
-If it's already in the wiki, update the existing page instead of creating a duplicate.
+Mechanical Q&A, setup steps already documented, temporary debugging, duplicates. Update existing pages instead.

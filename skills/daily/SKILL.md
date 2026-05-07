@@ -1,15 +1,15 @@
 ---
 name: daily
-description: Append a timestamped bullet to today's daily log. No inbox, no triage — one line per call.
+description: Append a timestamped bullet to today's daily log. One line per call.
 allowed-tools: Bash Read Glob
 ---
-# daily: Chronological Daily Log
+# daily
 
-Append a timestamped bullet to `<vault_root>/daily/YYYY-MM-DD.md`. No MATCH/NEW decision, no inbox, no triage. Every invocation adds one bullet. Use `/note` for knowledge fragments worth triaging later; use `/daily` for time-anchored observations, progress notes, and anything that belongs to the day.
+Append timestamped bullet to `daily/YYYY-MM-DD.md`. No MATCH/NEW, no inbox, no triage. Use `/note` for knowledge fragments; use `/daily` for time-anchored observations and daily progress.
 
 ## Vault I/O
 
-Uses `create-or-append` and `frontmatter-set` (see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3.1, §3.2). The local `daily/` directory is not a vault page; create it via `mkdir -p` if missing.
+Uses `create-or-append` and `frontmatter-set` (see CLI docs). Local `daily/` dir created via `mkdir -p` if missing.
 
 ## Vault path
 
@@ -41,7 +41,7 @@ Steps:
 
 5. **Ensure directory:** if `<vault_root>/daily/` does not exist, create it silently with `mkdir -p`. (Local directory creation, not a vault page op.)
 
-6. **Append the bullet (atomic, branch-free):** issue exactly one `obsidian create-or-append` call. The wrapper handles both the file-missing and file-exists branches internally — the model never reads, parses, or reconstructs the file body.
+6. **Append the bullet:** issue one `obsidian create-or-append` call. Wrapper handles both branches; model never reads/reconstructs body.
 
    ```bash
    obsidian create-or-append \
@@ -52,7 +52,7 @@ Steps:
 
    The `template` argument is used only when the file is missing; when the file exists, the wrapper appends `content` and ignores `template`. See [§2 frontmatter schema](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily) for the daily template shape.
 
-7. **Bump `updated:` (idempotent):** issue one `obsidian frontmatter-set` call. The wrapper rewrites only the YAML scalar; the body — including the bullet just appended — passes through verbatim.
+7. **Bump `updated:`** issue one `obsidian frontmatter-set` call. Wrapper rewrites only YAML scalar; body passes verbatim.
 
    ```bash
    obsidian frontmatter-set \
@@ -66,7 +66,7 @@ Steps:
    Logged to daily/YYYY-MM-DD.md
    ```
 
-Do **not** print the diff, the reasoning, or any other output. One line only.
+One line only. No diff, no reasoning.
 
 ### Idempotency and collision rules
 

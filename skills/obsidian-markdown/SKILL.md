@@ -1,13 +1,11 @@
 ---
 name: obsidian-markdown
-description: Write correct Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, and math. Reference when creating any wiki page.
+description: Obsidian Flavored Markdown syntax. Wikilinks, embeds, callouts, properties, tags, math.
 allowed-tools: Read Write Edit
 ---
-# obsidian-markdown: Obsidian Flavored Markdown
+# obsidian-markdown
 
-Reference this skill when writing any wiki page. Obsidian extends standard Markdown with wikilinks, embeds, callouts, and properties. Getting syntax wrong causes broken links, invisible callouts, or malformed frontmatter.
-
-**Cross-reference**: If the kepano/obsidian-skills plugin is installed, prefer its canonical obsidian-markdown skill for authoritative Obsidian syntax reference. Otherwise, use the reference below. See also [github.com/kepano/obsidian-skills](https://github.com/kepano/obsidian-skills).
+Reference when writing any wiki page. Obsidian Markdown: wikilinks, embeds, callouts, properties. Prefer kepano/obsidian-skills plugin if installed. Otherwise use reference below.
 
 ## Wikilinks
 
@@ -197,10 +195,10 @@ This sentence has a footnote.[^1]
 [^1]: The footnote text goes here.
 ```
 
-## What NOT to Do
+## Do NOT Do
 
-- Do not use `[link text](path/to/note.md)` for internal links: use `[[Note Name]]` instead.
-- Do not use HTML inside callouts: stick to Markdown.
-- Do not use `##` inside a callout body: headings don't render inside callouts.
-- Do not write `tags: [a, b, c]` inline in frontmatter: Obsidian prefers the list format.
-- Do not write ISO datetimes in frontmatter (`2026-04-08T00:00:00Z`): use `2026-04-08`.
+- Don't use `[text](path.md)` for internal links; use `[[Note Name]]`
+- Don't use HTML inside callouts
+- Don't use `##` inside callout body
+- Don't write `tags: [a,b,c]` inline; use list format
+- Don't use ISO datetime in frontmatter; use `YYYY-MM-DD`

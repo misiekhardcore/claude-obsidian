@@ -2,8 +2,8 @@
 description: End-of-day synthesis. Reads captures and context, synthesizes a prose summary with optional follow-ups. Idempotent on re-run.
 argument-hint: "[YYYY-MM-DD]"
 ---
-Read the `daily-close` skill. Then run the synthesis flow against today's daily file (`<vault_root>/daily/YYYY-MM-DD.md`), or against the date supplied as the argument if present. Reads the day's captures, date-matched inbox notes and wiki pages, plus `wiki/hot.md` and `wiki/index.md` for cross-reference context. Appends or replaces `## Summary` (and optionally `## Follow-ups`) on the daily file.
+Run `daily-close` skill against today's daily file or supplied date. Reads captures, dated notes/wiki pages, hot.md, index.md. Appends/replaces `## Summary` and optional `## Follow-ups`.
 
-If no vault is configured, surface: `No vault configured — run /wiki init first.` If the daily file does not exist for the target date, surface: `No daily file for <date> — nothing to close.`
+Dispatches sub-agents for large page reads. Idempotent: re-run to re-synthesize.
 
-The skill may dispatch sub-agents when reading many wiki pages. All writes are idempotent — re-running on the same date re-synthesizes the summary with the latest captures and context.
+If no vault: "No vault configured — run /wiki init first." If no daily file: "No daily file for <date> — nothing to close."

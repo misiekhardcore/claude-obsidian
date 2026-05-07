@@ -1,17 +1,15 @@
 ---
 name: query
-description: Answer questions from the wiki vault. Reads hot cache then index then pages, synthesizes with citations. Files good answers back.
+description: Answer questions from wiki vault. Reads strategically, synthesizes with citations, files answers back.
 allowed-tools: Bash Read Glob Grep
 ---
-# query: Query the Wiki
+# query
 
-The wiki has already done the synthesis work. Read strategically, answer precisely, and file good answers back so the knowledge compounds.
+Wiki has synthesis work done. Read strategically, answer precisely, file answers back so knowledge compounds.
 
 ## Vault I/O
 
-This skill reads `wiki/hot.md`, `wiki/index.md`, and individual pages under `wiki/<category>/`. All reads go through the `obsidian` CLI.
-
-See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, output formats, and exit-code handling.
+Reads hot.md, index.md, individual pages via `obsidian` CLI. See CLI docs for syntax.
 
 ## Query Modes
 

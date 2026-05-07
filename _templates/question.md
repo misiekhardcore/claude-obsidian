@@ -13,11 +13,11 @@ sources: []
 ---
 # <% tp.file.title %>
 
-**Question:** [restate the original query]
+**Question:** [original query]
 
 ## Answer
 
-[The synthesized answer, with citations to specific wiki pages]
+[Synthesized answer, with citations]
 
 (Source: [[]])
 

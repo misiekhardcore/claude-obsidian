@@ -1,8 +1,8 @@
 # Hot Cache Protocol
 
-`wiki/hot.md` is a ~500-word recency cache. It lets any session restore recent context without crawling the full wiki. This document is the single source of truth for when to read it, when to update it, and what to put in it.
+`wiki/hot.md` is a ~500-word recency cache for session context restoration.
 
-Read this file when a skill needs to understand hot-cache behavior. Do not preload — read on demand.
+Read on demand.
 
 ## When to Read
 
@@ -17,31 +17,31 @@ When kept under the 500-word budget, `wiki/hot.md` costs ~500 tokens to read —
 
 ## Auto-Read Gating
 
-The `claude-obsidian.bootstrap_read_hot` plugin config key controls whether `wiki/hot.md` is injected at session start and post-compaction. Set it via `/plugin manage` or by editing `~/.claude/settings.local.json`.
+`claude-obsidian.bootstrap_read_hot` setting (set via `/plugin manage` or `~/.claude/settings.local.json`):
 
 |Value|Hook behavior|Skill behavior|
 |-|-|-|
-|`always`|Inject `wiki/hot.md` on SessionStart and PostCompact|Skills read hot.md as usual|
-|`on-demand` _(default)_|Skip injection|Skills read hot.md when they activate|
-|`never`|Skip injection|Advisory signal — skills should avoid auto-reading hot.md unless the user explicitly asks or the task clearly requires wiki context. Not enforced in skill code today; treat as a user preference.|
+|`always`|Inject at SessionStart and PostCompact|Read as usual|
+|`on-demand` _(default)_|Skip injection|Skills read on activation|
+|`never`|Skip injection|User preference: avoid auto-read unless explicit request|
 
-**Why the default is `on-demand`:** At ~2–3k tokens/turn, always injecting `wiki/hot.md` is a hidden per-session cost that accumulates across all sessions — including unrelated coding work. Wiki skills already read hot.md on activation, so `on-demand` preserves the benefit for wiki sessions while eliminating the cost for everything else. Restore the previous behavior with `bootstrap_read_hot: "always"`.
+**Why default is `on-demand`:** Injecting every time costs ~2–3k tokens/turn across all sessions. Skills read it on activation anyway.
 
 ## When to Update
 
-Update `wiki/hot.md` at the end of every operation that changes wiki content. **The orchestrator writes, once, after all parallel workers have reported.** Never update mid-operation or from within a worker.
+At end of every content-changing operation. **Orchestrator writes once after all parallel workers report.** Never mid-operation or from worker.
 
-|Operation|Who updates|When|
+|Operation|Who|When|
 |-|-|-|
-|Single source ingest|Orchestrator (not individual ingest agents)|After all pages are written|
-|Batch ingest|Orchestrator|Once at the end, not per-source|
-|Autoresearch|Autoresearch skill|After all pages are filed|
-|Save|Save skill|After the note is created|
-|Query (if answer was filed)|Query skill|After filing the answer as a wiki page|
-|Lint (if fixes were applied)|Lint skill|After the lint report is written and any auto-fixes are applied|
-|Session end (wiki changed)|Agent|Before the session closes|
+|Single ingest|Orchestrator|After all pages written|
+|Batch ingest|Orchestrator|Once at end|
+|Autoresearch|Skill|After all pages filed|
+|Save|Skill|After note created|
+|Query (filed)|Skill|After answer filed|
+|Lint (fixed)|Skill|After report + fixes|
+|Session end|Agent|Before close|
 
-Do not skip the hot cache update at the end of an ingest or autoresearch session. It is what keeps future sessions fast.
+Required: update at end of ingest/autoresearch for next-session performance.
 
 ## Format
 
@@ -78,13 +78,8 @@ YYYY-MM-DD. [what happened in one phrase]
 - Open question: [thing still being investigated]
 ```
 
-**Rules:**
-
-- Under 500 words. Trim aggressively.
-- Factual, not narrative. No "the user asked..." phrasing.
-- Overwrite completely. Never append.
-- Wikilinks in `## Recent Changes` must match real page filenames.
+**Rules:** <500 words. Factual only. Overwrite completely (never append). Wikilinks must match real filenames.
 
 ## Parallel Worker Discipline
 
-Parallel workers, whether Task-tool subagents (see `${CLAUDE_PLUGIN_ROOT}/agents/ingest.md`) or TeamCreate teammates, must NOT update `wiki/hot.md`. Only the orchestrating session updates it, once, after all workers have reported back. This prevents race conditions and conflicting writes.
+Parallel workers (Task-tool or TeamCreate) must NOT update `wiki/hot.md`. Orchestrator only, once after all report. Prevents races and conflicts.

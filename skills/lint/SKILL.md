@@ -1,15 +1,15 @@
 ---
 name: lint
-description: Health check the wiki vault. Finds orphans, dead wikilinks, and frontmatter gaps. Generates canvas maps and Bases dashboards.
+description: Wiki health check. Orphans, dead links, gaps. Generates canvas maps and Bases dashboards.
 allowed-tools: Bash Read Glob Grep
 ---
-# lint: Wiki Health Check
+# lint
 
-Run lint after every 10-15 ingests, or weekly. Ask before auto-fixing anything. Output a lint report to `wiki/meta/lint-report-YYYY-MM-DD.md`.
+Health check after every 10-15 ingests or weekly. Finds orphans, dead links, frontmatter gaps. Ask before auto-fixing. Reports to `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
 ## Scan Scope
 
-The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs on an unchanged vault produce byte-identical JSON (excluding `scan_date`).
+Deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Byte-identical JSON across runs (excluding `scan_date`).
 
 **Folders scanned:**
 
@@ -122,11 +122,10 @@ Work through these in order:
 
 ## Manual Review
 
-The following checks require entity-extraction or semantic contradiction detection that cannot be automated without NLP infrastructure. They are not run by the lint agent. Perform them as a periodic human review (suggested: monthly, or after a burst of ingests from a new domain).
-
-- **Stale claims.** Look for assertions on older pages that newer sources may have contradicted or updated. Focus on pages with `confidence: INFERRED` or `AMBIGUOUS` and compare their claims against recently ingested sources in the same domain.
-- **Missing pages.** Look for concepts or entities mentioned in three or more pages that lack their own wiki page. Use the hot cache and index as a starting point; search for recurring noun phrases that have no `[[wikilink]]` target.
-- **Missing cross-references.** Look for entity names mentioned in page prose without a `[[wikilink]]`. Focus on high-traffic entities visible in the backlink density report (check #10).
+Periodic human review (monthly or after new domain burst). Cannot be automated without NLP:
+- Stale claims: older pages contradicted/updated by newer sources
+- Missing pages: concepts/entities in 3+ pages without own page
+- Missing cross-references: entity names without wikilinks (esp. high-traffic in backlink report)
 
 ## Lint Report Format
 
@@ -320,39 +319,20 @@ Add one node per domain hub (`wiki/domains/<slug>/_index.md`). Connect hubs that
 
 ## Before Auto-Fixing
 
-Always show the lint report first. Ask: "Should I fix these automatically, or do you want to review each one?"
+Show report first. Ask: "Auto-fix or review each?"
 
-Safe to auto-fix:
+Safe: add missing frontmatter, create stubs, add wikilinks.
 
-- Adding missing frontmatter fields with placeholder values
-- Creating stub pages for missing entities
-- Adding wikilinks for unlinked mentions
+Review first: delete orphans, resolve contradictions, merge duplicates, move misplaced entries (per-entry safer than batch).
 
-Needs review before fixing:
-
-- Deleting orphan pages (they might be intentionally isolated)
-- Resolving contradictions (requires human judgment)
-- Merging duplicate pages
-- Moving misplaced index entries (check #15). Rationale: low expected volume in a healthy vault makes batch auto-move offer little value over per-entry confirmation, and a misclassification (e.g., a concept intentionally filed under a different section) is harder to undo than to confirm.
-
-Never auto-fix:
-
-- Trail integrity findings (check #16). Trails are frozen-at-write-time run-snapshots; rewriting them post-emission destroys the run-record property. Surface the finding and let the user repair manually or accept the drift.
+Never: trail integrity (check #16). Trails frozen at write-time; repairs destroy run-record. User repairs or accepts drift.
 
 ## After Lint
 
-If the lint run applied any auto-fixes that modified wiki pages (new stubs, added frontmatter, added wikilinks), update `wiki/hot.md` before closing the session. Note which pages were touched under `## Recent Changes` and summarize the lint outcome under `## Last Updated`.
+If auto-fixes modified pages: update hot.md (note touched pages, summarize outcome). See hot-cache protocol in _shared/hot-cache-protocol.md.
 
-For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
-
-If the lint report is advisory only (no auto-fixes applied), skip the hot.md update — reports live at `wiki/meta/lint-report-*.md` and do not count as wiki content changes.
+If advisory only: skip hot.md update; reports are metadata.
 
 ## Report Rotation
 
-Prune older lint artifacts (both `.md` reports and `.json` data files) after the lint agent finishes. The main-thread dispatch block (see **Agent Dispatch** above) runs this automatically:
-
-```bash
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"
-```
-
-The script keeps the most recent 3 of each artifact type by default. Pass a count to override (`prune-lint-reports.sh 5`). See the script header for rationale.
+Prune old artifacts after agent finishes: `bash $CLAUDE_PLUGIN_ROOT/scripts/prune-lint-reports.sh`. Keeps 3 most recent by default; pass count to override.

@@ -1,6 +1,6 @@
 # Research Program
 
-This file configures the autoresearch loop. Edit it to match your domain and research style. The autoresearch skill reads it before every run.
+Configures autoresearch loop. Edit to match domain/style. Read before every run.
 
 ## Search Objectives
 
@@ -40,28 +40,18 @@ Always note the source date for factual claims. Mark claims from sources older t
 
 ## Domain Notes
 
-[Add domain-specific instructions here. Examples:]
+[Edit to match domain. Examples:]
 
-For AI/tech research:
+AI/tech: arXiv, GitHub, official docs, HN (high karma). LLM benchmarks gamed; low confidence unless verified.
 
-- Prefer: arXiv, official GitHub repos, official product documentation, Hacker News discussions with high karma
-- Note: LLM benchmarks are often gamed: treat leaderboard claims as low confidence unless independently verified
+Business: filings, Crunchbase, Bloomberg, verified reports. Press releases unverified.
 
-For business/market research:
-
-- Prefer: company filings, Crunchbase, Bloomberg, verified industry reports
-- Flag: press releases as low confidence without independent verification
-
-For medical/health research:
-
-- Prefer: PubMed, Cochrane reviews, peer-reviewed clinical trials
-- Always note: sample size, study type (RCT vs observational), and recency
+Medical: PubMed, Cochrane, RCTs. Note sample size, study type, recency.
 
 ## Exclusions
 
-Do not cite as high-confidence sources:
-
-- Reddit posts or forums (use as pointers to primary sources only)
-- Social media posts
-- Undated web pages
-- Sources that don't cite their own claims
+Never high-confidence:
+- Reddit/forums (pointers only)
+- Social media
+- Undated pages
+- Sources with no citations

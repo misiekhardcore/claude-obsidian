@@ -1,13 +1,11 @@
 ---
 name: defuddle
-description: Strip clutter from web pages before ingesting. Removes ads, navigation, and boilerplate — leaving clean markdown that saves 40-60% tokens.
+description: Strip ads, nav, boilerplate from web pages. Saves 40-60% tokens. Use before URL ingestion.
 allowed-tools: Read Bash
 ---
-# defuddle: Web Page Cleaner
+# defuddle
 
-Defuddle extracts the meaningful content from a web page and drops everything else: ads, cookie banners, nav bars, related articles, footers, social sharing buttons. What remains is the article body as clean markdown.
-
-Use this before any URL ingestion. It is optional but strongly recommended. It cuts token usage by 40-60% on typical web articles and produces cleaner wiki pages.
+Extract meaningful content from web pages: drop ads, nav, cookie banners, footers, related articles. Optional but recommended (saves 40-60% tokens, cleaner wiki pages).
 
 ## Install
 
@@ -50,33 +48,13 @@ defuddle page.html
 
 ## When to Use
 
-**Use defuddle when:**
-
-- Ingesting a news article, blog post, or documentation page from a URL
-- The page has a lot of surrounding content (most web pages do)
-- You want to stay within token budget on a long article
-
-**Skip defuddle when:**
-
-- The source is already a clean markdown or PDF file
-- The page is a dashboard, app, or structured data (defuddle expects article-style content)
-- defuddle is not installed and the article is short enough to process raw
+Use: articles/blogs/docs from URLs with surrounding content, long articles on token budget.
+Skip: clean markdown/PDF, dashboards/apps/structured data, defuddle not installed + short article.
 
 ## Fallback
 
-If defuddle is not installed, check:
-
-```bash
-which defuddle 2>/dev/null || echo "not installed"
-```
-
-If not installed: use WebFetch directly. The content will be less clean but still workable.
+If not installed: use WebFetch directly. Content is less clean but workable.
 
 ## Integration with /ingest
 
-The `/ingest` skill checks for defuddle automatically when a URL is passed. You do not need to run defuddle manually before ingesting a URL. The ingest skill will call it if available.
-
-To manually clean a page and save before ingesting:
-
-1. Run the save command above
-2. Then: `ingest .raw/articles/[slug].md`
+`/ingest` calls defuddle automatically if available when given a URL. Manual path: run save command above, then `ingest .raw/articles/[slug].md`.

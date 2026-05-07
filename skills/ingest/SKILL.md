@@ -1,13 +1,11 @@
 ---
 name: ingest
-description: Ingest sources into the wiki vault. Extracts entities and concepts, creates or updates wiki pages, and cross-references them. Supports files and URLs.
+description: Ingest sources into wiki. Extracts entities/concepts, creates/updates pages, cross-references. Supports files and URLs.
 allowed-tools: Bash Read Glob Grep WebFetch
 ---
-# ingest: Source Ingestion
+# ingest
 
-Read the source. Write the wiki. Cross-reference everything. A single source typically touches 8-15 wiki pages.
-
-**Syntax standard**: Write all Obsidian Markdown using proper Obsidian Flavored Markdown. Wikilinks as `[[Note Name]]`, callouts as `> [!type] Title`, embeds as `![[file]]`, properties as YAML frontmatter. If the kepano/obsidian-skills plugin is installed, prefer its canonical obsidian-markdown skill for Obsidian syntax reference. Otherwise, follow the guidance in this skill.
+Read source. Write wiki. Cross-reference everything. Single source typically touches 8-15 pages. Use obsidian-markdown skill for syntax (or guidance in that skill if kepano plugin unavailable).
 
 ## Delta Tracking
 
@@ -175,16 +173,9 @@ Steps:
 
 Batch ingest is non-interactive. For 30+ sources, expect significant processing time. Check in with the user after every 10 sources by reporting intermediate progress.
 
-## Context Window Discipline
+## Token Discipline
 
-Token budget matters. Follow these rules during ingest:
-
-- Read `wiki/hot.md` first. If it contains the relevant context, don't re-read full pages.
-- Read `wiki/index.md` to find existing pages before creating new ones.
-- Read only 3-5 existing pages per ingest. If you need 10+, you are reading too broadly.
-- Use PATCH for surgical edits. Never re-read an entire file just to update one field.
-- Keep wiki pages short. 100-300 lines max. If a page grows beyond 300 lines, split it.
-- Use search (`/search/simple/`) to find specific content without reading full pages.
+Read hot.md first (reuse context). Read index.md before creating. Read only 3-5 existing pages max. Use PATCH for edits (no full re-reads). Keep pages 100-300 lines; split if longer. Use search for content discovery.
 
 ## Contradictions
 
@@ -206,9 +197,9 @@ On the new source summary, reference it:
 
 Do not silently overwrite old claims. Flag and let the user decide.
 
-## What Not to Do
+## Do Not
 
-- Do not modify anything in `.raw/`. These are immutable source documents.
-- Do not create duplicate pages. Always check the index and search before creating.
-- Do not skip the log entry. Every ingest must be recorded.
-- Do not skip the hot cache update. It is what keeps future sessions fast.
+- Modify `.raw/` (immutable sources)
+- Create duplicates (check index+search first)
+- Skip log entry (record every ingest)
+- Skip hot cache update (keeps future sessions fast)

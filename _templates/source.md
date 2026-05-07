@@ -20,7 +20,7 @@ sources: []
 
 ## Summary
 
-[2-3 sentence summary of the source]
+[2-3 sentence summary]
 
 ## Key Claims
 

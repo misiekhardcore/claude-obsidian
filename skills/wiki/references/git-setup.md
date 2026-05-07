@@ -1,37 +1,17 @@
 # Git Setup
 
-Initialize git in the vault to get full history and protect against bad writes.
-
-## Initialize
+Initialize git in vault for history + safety.
 
 ```bash
 cd "$VAULT_PATH"
-git init
-git add -A
-git commit -m "Initial vault scaffold"
+git init && git add -A && git commit -m "Initial vault scaffold"
 ```
 
-## .gitignore
+.gitignore already covers: workspace.json (changes constantly), workspace-mobile.json, .smart-connections/, .trash/, .DS_Store.
 
-The root `.gitignore` in this repo already covers the right exclusions:
-
-```text
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.smart-connections/
-.trash/
-.DS_Store
-```
-
-`workspace.json` changes constantly as you move panes around. Excluding it keeps the diff clean.
-
-## Remote (Optional)
-
-To back up to GitHub:
-
+Optional remote backup:
 ```bash
-git remote add origin https://github.com/yourname/your-vault
+git remote add origin https://github.com/yourname/vault
 git push -u origin main
 ```
-
-Keep the repo private if the vault contains personal notes.
+Keep private if vault contains personal notes.

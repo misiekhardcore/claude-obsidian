@@ -1,13 +1,11 @@
 ---
 name: notes
-description: Capture quick inbox notes without breaking flow. Verbatim capture with auto-match. Per-project filtering. Lists and triages the inbox.
+description: Capture quick inbox notes without breaking flow. Verbatim, auto-match, per-project filtering, list/triage.
 allowed-tools: Bash Read Glob Grep
 ---
-# notes: Inbox Capture for the Vault
+# notes
 
-Some thoughts shouldn't interrupt the work to write a real wiki page. A bug in tooling. A follow-up for another project. "This didn't work, revisit later." This skill catches them, verbatim, and files them in `<vault_root>/notes/` without prompts. Triage happens later.
-
-The wiki is the polished knowledge base. `notes/` is the inbox. Keep them separate. `/save` files synthesised pages; `/note` files raw thoughts.
+Capture raw thoughts verbatim in `notes/` without interrupting work. Triage later. Wiki is polished; notes/ is inbox. `/save` files synthesis; `/note` files raw thoughts.
 
 ## Vault path
 
@@ -57,13 +55,8 @@ Do **not** print the diff, the match reasoning, or attachment details.
 
 ## LIST Operation
 
-Goal: show pending and deferred notes for triage.
-
-Steps:
-
-1. Read `<vault_root>/notes/*.md` frontmatter (title, source_project, status, updated). Skip `notes/index.md`. For each note file, call `obsidian properties path=notes/<filename>` to extract the YAML frontmatter block (plain-text output; no `format=json` support — see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` §3). Inbox is bounded by user discipline; serial reads are acceptable.
-2. Sort by `updated` descending.
-3. Render flat reverse-chronological bullets:
+1. Read frontmatter from all `notes/*.md` (skip index). Call `obsidian properties path=notes/<filename>`. Sort by `updated` descending.
+2. Render reverse-chronological bullets:
 
    ```text
    Pending notes (N):
@@ -84,9 +77,7 @@ Steps:
 
 ## PROCESS Operation
 
-Goal: walk pending notes one at a time and route each to `/save`, defer, or delete.
-
-Steps:
+Walk pending notes one-at-a-time. Route to `/save`, defer, or delete.
 
 1. Enumerate pending notes (skip `status: deferred` unless `--include-deferred`). Sort by `updated` ascending — oldest first. If there are no notes to process, print `Inbox is empty.` and exit.
 2. For each note, read full frontmatter + body and display:
@@ -100,16 +91,16 @@ Steps:
    Action? [s]ave / [d]efer / [x]delete / [q]uit
    ```
 
-3. Wait for the user's single-letter action. Loop on invalid input.
-4. **`s` (save)** — invoke the `save` skill via the Skill tool, passing the note body, the frontmatter, and an explicit note name: `"Save this as: <title>"` so the save skill's step 2 name-prompt is pre-satisfied and the interactive loop is not broken. On success:
+3. Wait for single-letter action. Loop on invalid input.
+4. **`s` (save)** — invoke `save` skill via Skill tool with note body, frontmatter, explicit name so name-prompt is pre-satisfied. On success:
    - Delete `<vault_root>/notes/<filename>`.
    - Remove the corresponding row from `notes/index.md`. On `/save` failure, leave the note untouched and surface the error.
 5. **`d` (defer)** — patch the note's frontmatter: `status: deferred`, bump `updated:` to today. Move the row in `notes/index.md` from `## Pending` to `## Deferred`.
 6. **`x` (delete)** — delete the file unconditionally. Remove the corresponding row from `notes/index.md`.
-7. **`q` (quit)** — exit the loop. Remaining notes stay pending.
-8. After the loop, print a one-line summary: `Processed N notes: X saved, Y deferred, Z deleted.`
+7. **`q` (quit)** — exit. Remaining notes stay pending.
+8. Print one-line summary: `Processed N notes: X saved, Y deferred, Z deleted.`
 
-`/save` handoff is the primary off-ramp. Defer is for notes that aren't actionable yet but may be later. Delete is for noise.
+/save is primary off-ramp. Defer for future-actionable notes. Delete for noise.
 
 ## Frontmatter schema
 

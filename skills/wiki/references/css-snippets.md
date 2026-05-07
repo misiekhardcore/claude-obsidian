@@ -69,27 +69,25 @@ Tell the user: Settings > Appearance > CSS Snippets > open folder > paste the fi
 
 ## Graph View Groups
 
-Guide the user to set these in Graph View settings (click the settings icon in the graph view):
+Set in Graph View settings (gear icon):
 
-|Query|Color|
-|-|-|
-|`path:wiki/domains`|Blue (`#4fc1ff`)|
-|`path:wiki/entities`|Purple (`#c586c0`)|
-|`path:wiki/concepts`|Yellow (`#dcdcaa`)|
-|`path:wiki/sources`|Orange (`#ce9178`)|
-|`path:wiki/questions`|Green (`#6a9955`)|
-|`path:.raw`|Gray (dimmed)|
+| Query | Color |
+| `path:wiki/domains` | Blue |
+| `path:wiki/entities` | Purple |
+| `path:wiki/concepts` | Yellow |
+| `path:wiki/sources` | Orange |
+| `path:wiki/questions` | Green |
+| `path:.raw` | Gray (dimmed) |
 
 ## Custom Callouts
 
-This vault defines **four custom callout types** beyond Obsidian's built-in set (`note`, `tip`, `warning`, `info`, `todo`, `success`, `question`, `failure`, `danger`, `bug`, `example`, `quote`). They render correctly **only when `vault-colors.css` is enabled**. Without the snippet, they fall back to default callout styling (still readable, just plain).
+Four custom types (render with vault-colors.css only; fall back to default without):
 
-|Custom callout|Color|Icon|Use for|
-|-|-|-|-|
-|`contradiction`|reddish-brown (rgb 209,105,105)|`lucide-alert-triangle`|New source conflicts with existing claim|
-|`gap`|beige (rgb 220,220,170)|`lucide-help-circle`|Topic has no source yet|
-|`key-insight`|bright blue (rgb 79,193,255)|`lucide-lightbulb`|Important takeaway worth highlighting|
-|`stale`|gray (rgb 128,128,128)|`lucide-clock`|Claim may be outdated, source older than threshold|
+| Callout | Icon | Use |
+| `contradiction` | alert-triangle | New source conflicts existing claim |
+| `gap` | help-circle | Topic missing source |
+| `key-insight` | lightbulb | Important takeaway |
+| `stale` | clock | Claim outdated (old source) |
 
 ### Usage
 
@@ -105,22 +103,10 @@ Use these in wiki pages to flag important states:
 > [!stale] Title This claim may be outdated. Source was from 2022.
 ```
 
-### Why custom callouts (vs built-in)
+Why custom: map wiki concepts not in defaults. contradiction=conflict (not generic warning). gap=missing source (not generic question). key-insight=top takeaway (not generic tip). stale=time decay (no built-in).
 
-The four custom types map to wiki-specific concepts that don't fit cleanly into Obsidian's default set:
-
-- `contradiction` is more specific than `warning`: it signals a **resolvable conflict** between two wiki pages, not a generic warning.
-- `gap` is more specific than `question`: it signals a **missing source**, an actionable improvement.
-- `key-insight` is more specific than `tip`: it marks **the** most important takeaway from a section, used sparingly.
-- `stale` has no built-in equivalent: it signals time-based decay of a claim.
-
-If you don't want custom callouts, replace them with built-ins:
-
-- `[!contradiction]` → `[!warning] Contradiction`
-- `[!gap]` → `[!question] Gap`
-- `[!key-insight]` → `[!tip] Key insight`
-- `[!stale]` → `[!warning] Stale`
+Replacements: contradiction→warning, gap→question, key-insight→tip, stale→warning.
 
 ## Minimal Theme (Recommended)
 
-The color scheme looks best with the Minimal theme. Install via Settings > Appearance > Manage > search "Minimal".
+Best with Minimal theme. Install: Settings > Appearance > Manage > search "Minimal".
