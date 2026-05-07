@@ -1,7 +1,7 @@
 ---
 name: braindump
 description: Split long-form text into atomic inbox notes. Accepts inline text or file paths. Triage later via /note process.
-allowed-tools: Bash Read Glob Grep
+allowed-tools: Agent Bash Read
 ---
 # braindump
 

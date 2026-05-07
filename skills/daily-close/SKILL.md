@@ -1,7 +1,7 @@
 ---
 name: daily-close
 description: Synthesize a day's captures into a prose summary. Idempotent; re-run replaces prior summary.
-allowed-tools: Bash Read Glob
+allowed-tools: Bash Read Glob Agent
 ---
 # daily-close
 

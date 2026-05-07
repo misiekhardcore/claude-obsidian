@@ -1,7 +1,7 @@
 ---
 name: lint
 description: Wiki health check. Orphans, dead links, gaps. Generates canvas maps and Bases dashboards.
-allowed-tools: Bash Read Glob Grep
+allowed-tools: Agent Bash Read
 ---
 # lint
 
@@ -63,9 +63,9 @@ The main thread does **not** run the 16 lint checks itself — the agent owns th
 
 ## Lint Checks
 
-The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
+The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, #7, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
 
-When invoking CLI verbs directly (checks #6–#9, #11–#16):
+When invoking CLI verbs directly (checks #6, #8–#9, #11–#16):
 
 - Inbound links per page: `obsidian backlinks path=<page> format=json` (returns `[{"file": "<path>"}]`; count entries for the inbound-link count) — only needed if the JSON backlinks map is not available.
 - Unresolved links: `obsidian unresolved format=json` (returns `[{"link": "..."}]`)
@@ -78,7 +78,7 @@ Work through these in order:
   **Anti-pattern note:** URL-as-wikilink occurrences (e.g. `[[https://...]]`) are in the `anti_patterns` array of the JSON. Report these in a dedicated **Anti-patterns** section; do **not** count them toward the dead-link total.
 
 - **Check #6: Frontmatter gaps**. Pages missing required fields (`type`, `status`, `created`, `updated`, `tags`, `confidence`). Additionally, flag missing `evidence:` when `confidence:` is `INFERRED` or `AMBIGUOUS` (per `_shared/frontmatter.md` rule 7 — `evidence:` is required for those confidence levels).
-- **Check #7: Empty sections**. Headings with no content underneath.
+- **Check #7: Empty sections**. Source: `empty_sections` array in `lint-data-YYYY-MM-DD.json`. Each entry is `{source_page, heading}` — a heading (`##` or deeper) with no non-blank content before the next heading or end-of-file. Frontmatter and fenced code blocks are excluded.
 - **Check #8: Stale index entries**. Items in `wiki/index.md` pointing to renamed or deleted pages.
 - **Check #9: hot.md size budget**. Count words in `wiki/hot.md`.
   - **WARN** if word count > 500 (spec limit per `_shared/hot-cache-protocol.md`).

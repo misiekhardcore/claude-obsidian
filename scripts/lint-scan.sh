@@ -195,6 +195,57 @@ for page in "${md_pages[@]}"; do
   done < <(grep -oP '(?<=\[\[)[^\]]+(?=\]\])' <<< "$content" 2>/dev/null | sort -u)
 done
 
+# ─── Empty sections ──────────────────────────────────────────────────────────
+# A heading (## or deeper) is empty when the next non-blank line is another
+# heading or there are no further non-blank lines. Frontmatter and code blocks
+# are excluded so fenced content can't produce false positives.
+
+empty_sections_entries=()
+for page in "${md_pages[@]}"; do
+  content=$("$CLI" read "path=${page}" 2>/dev/null) || continue
+
+  in_frontmatter=false
+  in_code_block=false
+  prev_heading=""
+  saw_content=false
+  first_line=true
+
+  while IFS= read -r line; do
+    if $first_line; then
+      first_line=false
+      if [[ "$line" == "---" ]]; then in_frontmatter=true; continue; fi
+    fi
+    if $in_frontmatter; then
+      [[ "$line" == "---" || "$line" == "..." ]] && in_frontmatter=false
+      continue
+    fi
+    if [[ "$line" =~ ^(\`\`\`|~~~) ]]; then
+      $in_code_block && in_code_block=false || in_code_block=true
+      saw_content=true; continue
+    fi
+    if $in_code_block; then saw_content=true; continue; fi
+
+    if [[ "$line" =~ ^#{2,}[[:space:]] ]]; then
+      if [[ -n "$prev_heading" ]] && ! $saw_content; then
+        empty_sections_entries+=(
+          "$(jq -n --arg p "$page" --arg h "$prev_heading" \
+               '{source_page: $p, heading: $h}')"
+        )
+      fi
+      prev_heading="$line"; saw_content=false
+    elif [[ -n "${line// }" ]]; then
+      saw_content=true
+    fi
+  done <<< "$content"
+
+  if [[ -n "$prev_heading" ]] && ! $saw_content; then
+    empty_sections_entries+=(
+      "$(jq -n --arg p "$page" --arg h "$prev_heading" \
+           '{source_page: $p, heading: $h}')"
+    )
+  fi
+done
+
 # ─── Orphans ─────────────────────────────────────────────────────────────────
 orphans_list=()
 while IFS= read -r p; do
@@ -256,6 +307,13 @@ else
   anti_json='[]'
 fi
 
+if [[ ${#empty_sections_entries[@]} -gt 0 ]]; then
+  empty_sections_json=$(printf '%s\n' "${empty_sections_entries[@]}" \
+    | jq -s 'sort_by(.source_page, .heading)')
+else
+  empty_sections_json='[]'
+fi
+
 backlinks_json=$(
   {
     for key in $(printf '%s\n' "${!backlink_counts[@]}" | sort); do
@@ -278,6 +336,7 @@ output=$(jq -n \
   --argjson orphans            "$orphans_json" \
   --argjson unresolved_targets "$unresolved_json" \
   --argjson anti_patterns      "$anti_json" \
+  --argjson empty_sections     "$empty_sections_json" \
   --argjson backlinks          "$backlinks_json" \
   '{
     scan_date:           $scan_date,
@@ -287,6 +346,7 @@ output=$(jq -n \
     orphans:             $orphans,
     unresolved_targets:  $unresolved_targets,
     anti_patterns:       $anti_patterns,
+    empty_sections:      $empty_sections,
     backlinks:           $backlinks
   }')
 

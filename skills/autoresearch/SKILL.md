@@ -1,7 +1,7 @@
 ---
 name: autoresearch
 description: Autonomous research loop. Searches the web, synthesizes findings, and files structured wiki pages.
-allowed-tools: Bash Read Glob Grep WebFetch WebSearch
+allowed-tools: Agent Bash Read WebFetch WebSearch
 ---
 # autoresearch
 

@@ -4,6 +4,7 @@ description: Comprehensive wiki health check. Scans for orphans, dead links, fro
 model: sonnet
 maxTurns: 40
 tools: Read, Write, Glob, Grep, Bash
+disallowedTools: WebFetch WebSearch
 ---
 Scan vault and produce comprehensive lint report. Receives: vault path, scope (full or specific folder).
 
@@ -24,7 +25,7 @@ Work through checks in `skills/lint/SKILL.md` order using JSON where available, 
 - **#1 (orphans):** use JSON `orphans`.
 - **#2 (dead links):** use JSON `dead_links` (canvas merged).
 - **#6 (frontmatter gaps):** read in-scope pages per `scope.scanned_dirs`.
-- **#7 (empty sections):** read pages.
+- **#7 (empty sections):** use JSON `empty_sections`. Each entry is `{source_page, heading}`. Report each as `[[slug]]: empty section "<heading>"`.
 - **#8 (stale index):** `obsidian read path=wiki/index.md` + validate.
 - **#9 (hot.md size):** read + word count.
 - **#10 (backlink density):** use JSON `backlinks`.

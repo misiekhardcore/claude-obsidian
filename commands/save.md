@@ -1,5 +1,6 @@
 ---
 description: Save the current conversation or a specific insight into the wiki vault as a structured note.
+argument-hint: "[name|session|concept [name]|decision [name]]"
 ---
 Run `save` skill. Usage:
 - `/save` — analyze conversation and save most valuable content
