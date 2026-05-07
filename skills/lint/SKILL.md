@@ -28,6 +28,39 @@ The deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Two runs
 
 **File extensions valid as wikilink targets (resolver pool):** `.md`, `.canvas`, `.base`, `.png`, `.jpg`, `.jpeg`, `.svg`, `.pdf`
 
+## Agent Dispatch
+
+When the user triggers lint (`/lint`, "lint the wiki", "health check"), the main thread runs the deterministic scan script first, then dispatches the lint agent to triage findings and draft the report.
+
+Steps:
+
+1. **Run the scan script** on the main thread:
+
+   ```bash
+   cd "${VAULT_ROOT}" && pwd   # verify CWD before running scan
+   CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" \
+     bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
+   ```
+
+   This produces `wiki/meta/lint-data-YYYY-MM-DD.json`. Confirm the file was written.
+
+2. **Dispatch** `agents/lint.md`. Pass:
+   - `vault_path` — `$VAULT_ROOT`
+   - `scope` — "full" (or a specific folder if the user requested a scoped check)
+
+   The agent reads the JSON, performs all 16 checks, drafts the lint report at
+   `wiki/meta/lint-report-YYYY-MM-DD.md`, and returns the report path plus a one-line summary.
+
+3. **Collect** the agent's result. Present the report path and summary to the user.
+
+4. **Prune** old lint artifacts (the agent does not do this):
+
+   ```bash
+   bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"
+   ```
+
+The main thread does **not** run the 16 lint checks itself — the agent owns that work.
+
 ## Lint Checks
 
 The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
@@ -316,7 +349,7 @@ If the lint report is advisory only (no auto-fixes applied), skip the hot.md upd
 
 ## Report Rotation
 
-After writing the new report, prune older lint artifacts (both `.md` reports and `.json` data files):
+Prune older lint artifacts (both `.md` reports and `.json` data files) after the lint agent finishes. The main-thread dispatch block (see **Agent Dispatch** above) runs this automatically:
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"

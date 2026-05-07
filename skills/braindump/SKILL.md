@@ -48,12 +48,49 @@ Zero chunks (unexpected empty result from the reasoning step) → hard-abort, no
 
 ## CAPTURE loop
 
-For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append to a note written by chunk K-1). Then:
+### When to dispatch agents vs. run inline
+
+|Chunks|Input order matters?|Mode|
+|-|-|-|
+|1|n/a|**Inline** — run CAPTURE directly on the main thread.|
+|2–4|yes (sequential argument)|**Inline** — chunks must run in order so K can MATCH-append to K-1.|
+|2–4|no (independent thoughts)|**Agent fan-out** — dispatch one `agents/capture.md` per chunk in parallel.|
+|5+|no|**Agent fan-out** — always parallel for 5+ chunks.|
+|5+|yes|**Inline** — sequential order must be preserved; run in order.|
+
+Detect "order matters" from context: if the chunks form a numbered list, a narrative sequence, or a
+build-on-each-other argument, treat order as important. If they are independent observations,
+questions, or tasks, treat them as parallel.
+
+### Inline CAPTURE (sequential)
+
+For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append
+to a note written by chunk K-1). Then:
 
 1. MATCH/NEW per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template) — skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
 2. MATCH or NEW path per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template); slug via [§3](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven).
 3. Index patch per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
 4. Record filename + success/failure. On error: append to failure list, continue — never abort the loop.
+
+### Agent fan-out (parallel)
+
+When dispatching agents, verify CWD first:
+
+```bash
+cd "${VAULT_ROOT}" && pwd   # confirm vault root before agent fan-out
+```
+
+Dispatch one `agents/capture.md` per independent chunk. Pass each agent:
+- `CHUNK` — the verbatim chunk text
+- `VAULT_ROOT` — `$VAULT_ROOT`
+- `SOURCE_PROJECT` — `basename(cwd)`
+- `TODAY` — ISO date `YYYY-MM-DD`
+
+Wait for all agents to complete. Collect their `Filed:` / `Error:` lines for the confirmation
+output.
+
+**Note:** parallel agents cannot MATCH-append to each other's notes (they run concurrently). If
+two chunks would logically MATCH the same note, run them inline in order instead.
 
 `source_project` = `basename(cwd)`. Frontmatter: note shape from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily), no braindump provenance.
 

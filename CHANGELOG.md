@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **`agents/capture.md`** — single CAPTURE-pipeline worker; files one atomic inbox note per invocation. Used by `braindump` for parallel chunk dispatch (#118).
+- **`agents/research-round.md`** — runs one depth-≥2 research branch (search + fetch + source-synth dispatch). Used by `autoresearch` for Round 2 gap-fill and Round 3 synthesis-check phases (#118).
+- **`agents/source-synth.md`** — synthesises one fetched source into wiki pages (entities, concepts, source summary). Used by `autoresearch` and `research-round` (#118).
+- **`agents/gather.md`** — read-only sweep agent; reads a cluster of vault files and returns a structured summary. Used by `daily-close` (dated-page sweep) and `query` deep mode (per-cluster page reads) (#118).
+
+### Changed
+
+- **`skills/ingest/SKILL.md`** — single-source path now dispatches `agents/ingest.md` after the interactive discussion; batch path fans out one agent per source in parallel (#118).
+- **`skills/lint/SKILL.md`** — added explicit **Agent Dispatch** section; main thread runs `lint-scan.sh` then dispatches `agents/lint.md`; report-rotation note updated to reference the dispatch block (#118).
+- **`skills/braindump/SKILL.md`** — added **CAPTURE loop** dispatch table; 5+ independent chunks (or 2–4 independent chunks) fan out to `agents/capture.md` in parallel; sequential/order-sensitive paths remain inline (#118).
+- **`skills/autoresearch/SKILL.md`** — added agent-dispatch overview table; Round 1 stays inline; Round 1 source filing fans out `source-synth` agents; Round 2 gap-fill fans out `research-round` agents; Round 3 uses a single `research-round` dispatch (#118).
+- **`skills/daily-close/SKILL.md`** — step 5 dispatches `agents/gather.md` for the dated-page read sweep when more than 3 files are matched; small sweeps remain inline (#118).
+- **`skills/query/SKILL.md`** — deep mode step 5 dispatches one `agents/gather.md` per page cluster (> 5 candidates) in parallel; smaller candidate sets remain inline (#118).
+
 ## [1.1.0] — 2026-05-03
 
 ### Added

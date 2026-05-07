@@ -112,13 +112,33 @@ Steps:
    - "What should I emphasize from this source?"
    - "How granular should I go?"
    - "Is there existing wiki context I should link against?" **Wait for the user's response before proceeding.** Do not assume defaults and do not skip ahead. **Skip this step only if** the user's original message included "just ingest it" or "auto-ingest".
-3. **Create** source summary in `wiki/sources/`. Use the source frontmatter schema from `${CLAUDE_PLUGIN_ROOT}/_shared/frontmatter.md`.
-4. **Create or update** entity pages for every person, org, product, and repo mentioned. One page per entity.
-5. **Create or update** concept pages for significant ideas and frameworks. When checking for existing pages to link against, include canvas files in `wiki/canvases/` — they are first-class wiki pages. The ingest skill itself creates `.md` pages; canvas creation is done by the `canvas` skill.
-6. **Update** relevant domain hubs at `wiki/domains/<slug>/_index.md` if any new leaves match an existing hub's tag — append the new leaves to the hub's `related:` list and bump the hub's `page_count:`. Do not write a `domain:` field on the leaves.
-7. **Update** `wiki/index.md`. Add entries for all new pages.
-8. **Update** `wiki/hot.md` with this ingest's context.
-9. **Append** to `wiki/log.md` (new entries at the TOP):
+3. **Dispatch** the ingest agent once the discussion is complete (or skipped). Pass the source path, vault path, and any emphasis/granularity decisions from the discussion. The agent handles all wiki writes and returns a structured report.
+
+   Spawn the ingest agent with:
+   - `source_path` — the `.raw/` file path
+   - `vault_path` — `$VAULT_ROOT`
+   - `emphasis` — user's emphasis notes (empty string if auto-ingest)
+
+   ```bash
+   cd "${VAULT_ROOT}" && pwd   # verify CWD before agent spawn
+   ```
+
+   > **Agent:** `agents/ingest.md` — processes the source, creates/updates wiki pages, and
+   > returns a report of pages created/updated. The main thread must **not** write wiki pages
+   > directly when the agent path is taken.
+
+4. **Collect** the agent's report. It returns:
+   ```text
+   Source: [title]
+   Created: [[Page 1]], [[Page 2]]
+   Updated: [[Page 3]], [[Page 4]]
+   Contradictions: [[Page 5]] conflicts with [[Page 6]] on [topic]
+   Key insight: [one sentence]
+   ```
+
+5. **Update** `wiki/index.md`. Add entries for all pages listed in the agent's `Created:` output.
+6. **Update** `wiki/hot.md` with this ingest's context.
+7. **Append** to `wiki/log.md` (new entries at the TOP):
 
    ```markdown
    ## [YYYY-MM-DD] ingest | Source Title
@@ -130,8 +150,6 @@ Steps:
    - Key insight: One sentence on what is new.
    ```
 
-10. **Check for contradictions.** If new info conflicts with existing pages, add `> [!contradiction]` callouts on both pages.
-
 ## Batch Ingest
 
 Trigger: user drops multiple files or says "ingest all of these."
@@ -139,12 +157,23 @@ Trigger: user drops multiple files or says "ingest all of these."
 Steps:
 
 1. List all files to process. Confirm with user before starting.
-2. Process each source following the single ingest flow. Defer cross-referencing between sources until step 3.
-3. After all sources: do a cross-reference pass. Look for connections between the newly ingested sources.
-4. Update index, hot cache, and log once at the end (not per-source).
-5. Report: "Processed N sources. Created X pages, updated Y pages. Here are the key connections I found."
+2. **Fan out** — dispatch one `agents/ingest.md` agent per source **in parallel**. Pass each agent:
+   - `source_path` — the `.raw/` file path
+   - `vault_path` — `$VAULT_ROOT`
+   - `emphasis` — empty string (batch ingest is non-interactive)
 
-Batch ingest is less interactive. For 30+ sources, expect significant processing time. Check in with the user after every 10 sources.
+   Before spawning agents, verify CWD:
+
+   ```bash
+   cd "${VAULT_ROOT}" && pwd   # confirm vault root before agent fan-out
+   ```
+
+3. **Wait** for all agents to finish. Collect each agent's structured report.
+4. **Cross-reference pass** — look for connections between pages the agents created across sources.
+5. **Update** index, hot cache, and log **once** at the end (not per-source), using the aggregate of all agents' `Created:` / `Updated:` lists.
+6. Report: "Processed N sources. Created X pages, updated Y pages. Here are the key connections I found."
+
+Batch ingest is non-interactive. For 30+ sources, expect significant processing time. Check in with the user after every 10 sources by reporting intermediate progress.
 
 ## Context Window Discipline
 
