@@ -1,7 +1,7 @@
 ---
 name: query
 description: Answer questions from wiki vault. Reads strategically, synthesizes with citations, files answers back.
-allowed-tools: Bash Read Agent
+allowed-tools: Agent Bash Read
 ---
 # query
 
