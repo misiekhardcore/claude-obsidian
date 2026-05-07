@@ -2,7 +2,7 @@
 name: query
 description: Answer questions from wiki vault. Reads strategically, synthesizes with citations, files answers back.
 when_to_use: Use when the user asks a question that may be answered from the wiki vault — factual lookups, comparisons, synthesis.
-allowed-tools: Bash Read Glob Grep
+allowed-tools: Bash Read Glob Grep Agent
 ---
 # query
 
