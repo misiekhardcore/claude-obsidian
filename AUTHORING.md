@@ -52,7 +52,8 @@ Do not promote docs specific to one skill's operation, even if long.
 | `allowed-tools` | Space-separated allowlist active while skill is running. Skills that dispatch sub-agents **must include `Agent`**. Vault ops go through `obsidian` CLI (Bash) — do not list `Read`, `Write`, `Glob`, or `Grep` unless the skill calls those tools directly outside the vault. |
 | `effort` | `low`\|`medium`\|`high`\|`xhigh`\|`max` — effort level override. |
 | `argument-hint` | Shown in autocomplete (e.g. `[topic]`). Add to any command that takes an argument. |
-| `context: fork` + `agent` | Runs the skill in an isolated subagent. `agent` names the agent type. |
+| `context` | Accepted value: `fork`. Runs the skill in an isolated subagent instead of inline. |
+| `agent` | Used with `context: fork`. Names the agent type to dispatch (e.g., `claude-obsidian:ingest`). |
 | `model` | `sonnet`, `opus`, `haiku`, or full model ID. |
 | `user-invocable` | `false` hides skill from `/` menu (orchestrator-only skills). |
 
