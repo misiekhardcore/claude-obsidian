@@ -4,7 +4,7 @@ Technical guide for `.canvas` JSON files.
 
 ## Coordinate System
 - **Origin (0,0)**: Center of viewport.
-- **Axis**: X increases right; Y increases downward (more negative = higher up).
+- **Axis**: X increases right; Y increases downward.
 - **Anchor**: `x` and `y` refer to the **top-left corner** of the node.
 
 ## Node Types
