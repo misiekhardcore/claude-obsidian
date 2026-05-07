@@ -9,7 +9,7 @@ Technical guide for `.canvas` JSON files.
 
 ## Node Types
 |Type|Key Fields|Usage|
-|:-|:-|:-|
+|-|-|-|
 |**text**|`text` (markdown)|Styled cards. Min size: 200x60.|
 |**file**|`file` (vault-path)|Images, PDFs, notes.|
 |**group**|`label`, `color`|Visual zones. Purely aesthetic; no parent-child logic.|
@@ -22,7 +22,7 @@ Technical guide for `.canvas` JSON files.
 
 ## Asset Sizing Guidelines
 |Aspect Ratio|Condition|Width|Height|
-|:-|:-|:-|:-|
+|-|-|-|-|
 |16:9 (wide)|1.6–2.0|420|236|
 |4:3|1.2–1.6|380|285|
 |1:1 (sq)|0.9–1.1|280|280|

@@ -14,7 +14,7 @@ Claude-obsidian uses Obsidian CLI (1.12.7+).
 
 ## 2. Essential Plugins
 |Plugin|Type|Purpose|
-|:-|:-|:-|
+|-|-|-|
 |**Bases**|Core|Powers `.base` DB views and `obsidian-bases` skill. Required for dashboards.|
 |**Templater**|Community|Resolves `<% tp... %>` syntax in `_templates/` for auto-populated frontmatter.|
 

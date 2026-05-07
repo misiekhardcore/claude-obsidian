@@ -20,7 +20,7 @@ Build and maintain persistent, compounding wiki in Obsidian vault. Wiki is produ
 Route user requests to the correct sub-skill:
 
 |Trigger|Operation|Skill|
-|:-|:-|:-|
+|-|-|-|
 |`/wiki init`, "init vault"|INIT|`wiki`|
 |"scaffold", "create wiki"|SCAFFOLD|`wiki`|
 |`/wiki promote <tag>`, "promote tag"|PROMOTE|`wiki`|

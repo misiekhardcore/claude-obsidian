@@ -10,7 +10,7 @@ Standard configuration for the `autoresearch` loop. Read before every run.
 
 ## Confidence Scoring
 |Level|Criteria|
-|:-|:-|
+|-|-|
 |**high**|Multiple independent authoritative sources agree.|
 |**medium**|Single good source, or partial agreement.|
 |**low**|Speculation, opinion pieces, or unverified claims.|

@@ -8,7 +8,7 @@ All vault operations must use the `obsidian` CLI (routed via `scripts/obsidian-c
 
 ### Standard Verbs
 |Verb|Usage|Output|
-|:-|:-|:-|
+|-|-|-|
 |`read`|`path=wiki/hot.md`|Plain text|
 |`create`|`path=wiki/concepts/foo.md content="..."`|`Created: <path>`|
 |`append`|`file=wiki/log.md content="..."`|`Appended to: <path>`|
