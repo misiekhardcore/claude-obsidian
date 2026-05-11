@@ -5,7 +5,7 @@ allowed-tools: Bash Read
 ---
 # obsidian-bases
 
-Obsidian Bases: turn vault notes into queryable views (tables, cards, lists, maps). Core feature; no plugin needed. Prefer kepano/obsidian-skills if installed. Docs: https://help.obsidian.md/bases/syntax
+Obsidian Bases: turn vault notes into queryable views (tables, cards, lists, maps). Core feature; no plugin needed. Docs: https://help.obsidian.md/bases/syntax
 
 ## Vault I/O
 
@@ -55,208 +55,64 @@ views:
 
 ## Filters
 
-Filters select which notes appear. Applied globally or per-view.
+Filters select which notes appear (globally or per-view). Operators: `==` `!=` `>` `<` `>=` `<=`. Single string or nested objects:
 
 ```yaml
-# Single string filter
-filters: 'status == "current"'
-
-# AND: all must be true
-filters:
-  and:
-    - 'status != "archived"'
-    - file.hasTag("wiki")
-
-# OR: any can be true
-filters:
-  or:
-    - file.hasTag("concept")
-    - file.hasTag("entity")
-
-# NOT: exclude matches
-filters:
-  not:
-    - file.inFolder("wiki/meta")
-
-# Nested
-filters:
-  and:
-    - file.inFolder("wiki/")
-    - or:
-        - 'type == "concept"'
-        - 'type == "entity"'
+filters: 'status == "current"'                          # Single condition
+filters: { and: [...] }                                 # All must be true
+filters: { or: [...] }                                  # Any can be true
+filters: { not: [...] }                                 # Exclude matches
+filters: { and: [cond1, { or: [cond2, cond3] }] }    # Nested
 ```
 
-### Filter operators
-
-`==` `!=` `>` `<` `>=` `<=`
-
-### Useful filter functions
-
-|Function|Example|
-|-|-|
-|`file.hasTag("x")`|Notes with tag `x`|
-|`file.inFolder("path/")`|Notes in folder|
-|`file.hasLink("Note")`|Notes linking to Note|
+Common functions: `file.hasTag("x")`, `file.inFolder("path/")`, `file.hasLink("Note")`, `file.ext`, `file.name`, `file.mtime`, `file.size`, `file.ctime`, `file.tags`, `file.folder`.
 
 ## Properties
 
-Three types:
+Three types of properties:
+- **Note properties** (frontmatter): `status`, `type`, `updated`, custom fields
+- **File properties** (metadata): `file.name`, `file.mtime`, `file.size`, `file.ctime`, `file.tags`, `file.folder`
+- **Formula properties** (computed): `formula.age_days`, custom formulas from `formulas:` section
 
-- **Note properties**: from frontmatter: `status`, `type`, `updated`
-- **File properties**: metadata: `file.name`, `file.mtime`, `file.size`, `file.ctime`, `file.tags`, `file.folder`
-- **Formula properties**: computed: `formula.age_days`
+Use `properties:` block to override display names: `formula.age_days: {displayName: "Age (days)"}`.
 
 ## Formulas
 
-Defined in `formulas:`. Referenced as `formula.name` in `order:` and `properties:`.
+Defined in `formulas:`, referenced as `formula.name` in `order:` and `properties:`.
 
-```yaml
-formulas:
-  # Days since created
-  age_days: "(now() - file.ctime).days.round(0)"
-
-  # Days until a date property
-  days_until: 'if(due_date, (date(due_date) - today()).days, "")'
-
-  # Conditional label
-  status_icon: 'if(status == "mature", "✅", if(status == "developing", "🔄", "🌱"))'
-
-  # Word count estimate
-  word_est: "(file.size / 5).round(0)"
-```
-
-**Key rule**: Subtracting two dates returns a `Duration`. Not a number. Always access `.days` first:
-
+**Key rule**: Subtracting two dates returns a `Duration`, not a number. Always access `.days` first:
 ```yaml
 # CORRECT
 age: '(now() - file.ctime).days'
 
-# WRONG: crashes
+# WRONG (crashes)
 age: '(now() - file.ctime).round(0)'
 ```
 
 **Always guard nullable properties with `if()`**:
-
 ```yaml
-# CORRECT
 days_left: 'if(due_date, (date(due_date) - today()).days, "")'
 ```
 
+Examples: See [references/examples.md](${CLAUDE_PLUGIN_ROOT}/skills/obsidian-bases/references/examples.md) for common formulas (age, conditional icons, word estimates, etc.).
+
 ## View Types
 
-### Table
+- **Table**: `type: table`. Order columns, optionally group and limit.
+- **Cards**: `type: cards`. Order displayed properties.
+- **List**: `type: list`. Single-line display per item, ordered.
 
-```yaml
-views:
-  - type: table
-    name: "Wiki Index"
-    limit: 100
-    order:
-      - file.name
-      - type
-      - status
-      - updated
-    groupBy:
-      property: type
-      direction: ASC
-```
+Each view has: `name`, optional `limit`, `order: [properties]`, optional `groupBy: {property, direction}`, optional view-level `filters`.
 
-### Cards
-
-```yaml
-views:
-  - type: cards
-    name: "Gallery"
-    order:
-      - file.name
-      - tags
-      - status
-```
-
-### List
-
-```yaml
-views:
-  - type: list
-    name: "Quick List"
-    order:
-      - file.name
-      - status
-```
+Sort direction (ASC/DESC) cannot be encoded per-property in YAML; click column headers in Obsidian to toggle.
 
 ## Wiki Vault Templates
 
-### Wiki content dashboard (all non-meta pages)
-
-```yaml
-filters:
-  and:
-    - file.inFolder("wiki/")
-    - not:
-        - file.inFolder("wiki/meta")
-
-formulas:
-  age: "(now() - file.ctime).days.round(0)"
-
-properties:
-  formula.age:
-    displayName: "Age (days)"
-
-views:
-  - type: table
-    name: "All Wiki Pages"
-    order:
-      - file.name
-      - type
-      - status
-      - updated
-      - formula.age
-    groupBy:
-      property: type
-      direction: ASC
-```
-
-### Entity index (people, orgs, repos)
-
-```yaml
-filters:
-  and:
-    - file.inFolder("wiki/entities/")
-    - 'file.ext == "md"'
-
-views:
-  - type: table
-    name: "Entities"
-    order:
-      - file.name
-      - entity_type
-      - status
-      - updated
-    groupBy:
-      property: entity_type
-      direction: ASC
-```
-
-### Recent ingests
-
-```yaml
-filters:
-  and:
-    - file.inFolder("wiki/sources/")
-
-views:
-  - type: table
-    name: "Sources"
-    order:
-      - file.name
-      - source_type
-      - created
-      - status
-    groupBy:
-      property: source_type
-      direction: ASC
-```
+Common patterns for wiki dashboards. See [references/examples.md](${CLAUDE_PLUGIN_ROOT}/skills/obsidian-bases/references/examples.md) for full templates:
+- **Wiki content dashboard** (all non-meta pages with age formula)
+- **Entity index** (people, orgs, repos grouped by entity_type)
+- **Recent ingests** (sources grouped by source_type)
+- **View type examples** (table, cards, list)
 
 ## Embedding in Notes
 

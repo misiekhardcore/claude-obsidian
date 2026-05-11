@@ -1,7 +1,7 @@
 ---
 name: query
 description: Answer questions from wiki vault. Reads strategically, synthesizes with citations, files answers back.
-when_to_use: Use when the user asks a question that may be answered from the wiki vault — factual lookups, comparisons, synthesis.
+when_to_use: Use when the user asks a question, or when there is any need to retrieve information.
 allowed-tools: Agent Bash Read
 ---
 # query
@@ -192,7 +192,7 @@ Trails are run-records emitted by `/autoresearch`. They live under `wiki/trails/
 
 ## Filing Answers Back
 
-Good answers compound into the wiki. Don't let insights disappear into chat history.
+Good answers compound into the wiki. Don't let insights disappear into chat history. Use `/save` to file the answer as a wiki page when it contains reusable knowledge.
 
 When filing an answer:
 
@@ -224,4 +224,4 @@ If the question cannot be answered from the wiki:
 1. Say clearly: "I don't have enough in the wiki to answer this well."
 2. Identify the specific gap: "I have nothing on [subtopic]."
 3. Suggest: "Want to find a source on this? I can help you search or process one."
-4. Do not fabricate. Do not answer from training data if the question is about the specific domain in this wiki.
+4. Do not fabricate; if the wiki lacks the answer, say so and offer to run `/autoresearch`.

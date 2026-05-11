@@ -1,15 +1,15 @@
 ---
 name: lint
-description: Wiki health check. Orphans, dead links, gaps. Generates canvas maps and Bases dashboards.
+description: Wiki health check. Orphans, dead links, frontmatter gaps. Generates canvas maps and Bases dashboards.
 allowed-tools: Agent Bash Read
 ---
 # lint
 
-Health check after every 10-15 ingests or weekly. Finds orphans, dead links, frontmatter gaps. Ask before auto-fixing. Reports to `wiki/meta/lint-report-YYYY-MM-DD.md`.
+Health check after every 10-15 ingests or weekly. Finds orphans, dead links, frontmatter gaps. Ask before auto-fixing; reports to `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
 ## Scan Scope
 
-Deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Byte-identical JSON across runs (excluding `scan_date`).
+Deterministic scan script (`scripts/lint-scan.sh`) produces byte-identical JSON (excluding `scan_date`).
 
 **Folders scanned:**
 
@@ -30,64 +30,31 @@ Deterministic scan script (`scripts/lint-scan.sh`) uses this scope. Byte-identic
 
 ## Agent Dispatch
 
-When the user triggers lint (`/lint`, "lint the wiki", "health check"), the main thread runs the deterministic scan script first, then dispatches the lint agent to triage findings and draft the report.
+On user trigger (`/lint`, "lint the wiki", "health check"):
+1. Run `cd "${VAULT_ROOT}" && pwd` then `CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"` (produces `wiki/meta/lint-data-YYYY-MM-DD.json`).
+2. Dispatch `agents/lint.md` with `vault_path=$VAULT_ROOT` and `scope="full"` (or specific folder). Agent performs all 16 checks, drafts report to `wiki/meta/lint-report-YYYY-MM-DD.md`.
+3. Present report path and summary to user.
+4. Run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"` to prune old artifacts.
 
-Steps:
-
-1. **Run the scan script** on the main thread:
-
-   ```bash
-   cd "${VAULT_ROOT}" && pwd   # verify CWD before running scan
-   CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" \
-     bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
-   ```
-
-   This produces `wiki/meta/lint-data-YYYY-MM-DD.json`. Confirm the file was written.
-
-2. **Dispatch** `agents/lint.md`. Pass:
-   - `vault_path` — `$VAULT_ROOT`
-   - `scope` — "full" (or a specific folder if the user requested a scoped check)
-
-   The agent reads the JSON, performs all 16 checks, drafts the lint report at
-   `wiki/meta/lint-report-YYYY-MM-DD.md`, and returns the report path plus a one-line summary.
-
-3. **Collect** the agent's result. Present the report path and summary to the user.
-
-4. **Prune** old lint artifacts (the agent does not do this):
-
-   ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/prune-lint-reports.sh"
-   ```
-
-The main thread does **not** run the 16 lint checks itself — the agent owns that work.
+Main thread does not run checks — agent owns that work.
 
 ## Lint Checks
 
-The lint agent (`agents/lint.md`) runs `scripts/lint-scan.sh` first to produce `wiki/meta/lint-data-YYYY-MM-DD.json`. Checks #1, #2, #7, and #10 read directly from that JSON; the remaining checks use the native `obsidian` CLI verbs or page reads as noted below.
-
-When invoking CLI verbs directly (checks #6, #8–#9, #11–#16):
-
-- Inbound links per page: `obsidian backlinks path=<page> format=json` (returns `[{"file": "<path>"}]`; count entries for the inbound-link count) — only needed if the JSON backlinks map is not available.
-- Unresolved links: `obsidian unresolved format=json` (returns `[{"link": "..."}]`)
-
-Work through these in order:
+Lint agent runs all checks in order. Checks #1, #2, #7, #10 read from JSON; others use `obsidian` CLI or page reads. CLI verbs: `obsidian backlinks path=<page> format=json` (inbound counts), `obsidian unresolved format=json` (dead links).
 
 - **Check #1: Orphan pages**. Source: `orphans` array in `lint-data-YYYY-MM-DD.json`. Wiki pages (`.md` and `.canvas`) with no inbound wikilinks. They exist but nothing points to them. `wiki/trails/*.md` and `notes/` are already excluded from the JSON output — trails are designed-orphan (forward-only model), so they would be flagged in perpetuity.
 - **Check #2: Dead links**. Source: `dead_links` array in `lint-data-YYYY-MM-DD.json`. Each entry is `{source_page, link_text}` — a wikilink in `source_page` that does not resolve to any existing page. Canvas dead links are merged into the same array; no separate handling. Findings inside `wiki/trails/*.md` are surfaced for visibility but **never auto-fixed** — trails are run-snapshots frozen at write time; the user repairs manually or accepts the drift (same policy as check #16).
 
   **Anti-pattern note:** URL-as-wikilink occurrences (e.g. `[[https://...]]`) are in the `anti_patterns` array of the JSON. Report these in a dedicated **Anti-patterns** section; do **not** count them toward the dead-link total.
 
-- **Check #6: Frontmatter gaps**. Pages missing required fields (`type`, `status`, `created`, `updated`, `tags`, `confidence`). Additionally, flag missing `evidence:` when `confidence:` is `INFERRED` or `AMBIGUOUS` (per `_shared/frontmatter.md` rule 7 — `evidence:` is required for those confidence levels).
-- **Check #7: Empty sections**. Source: `empty_sections` array in `lint-data-YYYY-MM-DD.json`. Each entry is `{source_page, heading}` — a heading (`##` or deeper) with no non-blank content before the next heading or end-of-file. Frontmatter and fenced code blocks are excluded.
-- **Check #8: Stale index entries**. Items in `wiki/index.md` pointing to renamed or deleted pages.
-- **Check #9: hot.md size budget**. Count words in `wiki/hot.md`.
-  - **WARN** if word count > 500 (spec limit per `_shared/hot-cache-protocol.md`).
-  - **FAIL** if word count > 750 (50 % buffer exceeded).
-  - Remediation: move entries older than 2 weeks to `wiki/log.md`; trim `## Last Updated` to the 3–5 most recent items.
-- **Check #10: Backlink density**. Source: `backlinks` map in `lint-data-YYYY-MM-DD.json` (pre-computed by `lint-scan.sh`; do **not** call `obsidian backlinks` per page). For every in-scope page (`.md` and `.canvas`, per the scope definition above), use the precomputed inbound count and compare against the outbound count from the page's frontmatter `related:` length plus inline wikilinks. Flag pages where `inbound ≥ 3` **and** `outbound ≤ 1` — heavily cited but weakly linking. These pages are retrieval-late under the forward-only `related:` model, so surfacing them prompts targeted cross-linking.
-- **Check #11: Hub promotion candidates**. Group all leaves under `wiki/concepts/`, `wiki/entities/`, `wiki/solutions/`, `wiki/sources/` by their primary tag (the first non-type tag in `tags:`). For each tag-cluster of **≥ 10 leaves**, check whether `wiki/domains/<cluster-tag>/_index.md` exists. If it does not, surface the cluster as a **promotion candidate** — recommend running `/wiki promote <tag>` to scaffold a domain hub. Threshold rationale: clusters below ~10 leaves are noisy; LYT MOC heuristics put the mental-squeeze trigger around this size.
-- **Check #12: Hub stale-count drift**. For every `wiki/domains/<slug>/_index.md`, compare the hub's frontmatter `page_count:` to the actual inbound count returned by `obsidian backlinks path=wiki/domains/<slug>/_index.md format=json`. Flag drift **> 20 %** (in either direction). Suggest resync — either update `page_count:` to the live count or re-curate the `related:` list to match reality.
-- **Check #13: Hub demotion candidates**. For every `wiki/domains/<slug>/_index.md`, count the leaves linked from the hub's `related:` field. If **< 5**, surface the hub as a **demotion candidate** — its cluster is below the hub-worthwhile threshold and the hub may be churn rather than signal. Recommend either growing the cluster or merging the hub into a sibling.
+- **Check #6: Frontmatter gaps**. Pages missing required fields (`type`, `status`, `created`, `updated`, `tags`, `confidence`). Flag missing `evidence:` when `confidence:` is `INFERRED`/`AMBIGUOUS`.
+- **Check #7: Empty sections**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#empty-sections`.
+- **Check #8: Stale index entries**. Items in `wiki/index.md` pointing to renamed/deleted pages.
+- **Check #9: hot.md size budget**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hot-md-size-budget`.
+- **Check #10: Backlink density**. Source: `backlinks` map in JSON (pre-computed). Compare inbound count vs. outbound count (`related:` + inline wikilinks). Flag pages where `inbound ≥ 3` **and** `outbound ≤ 1`.
+- **Check #11: Hub promotion candidates**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hub-promotion-candidates`.
+- **Check #12: Hub stale-count drift**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hub-stale-count-drift`.
+- **Check #13: Hub demotion candidates**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hub-demotion-candidates`.
 - **Check #14: Notes inbox**. Scoped to `<vault_root>/notes/` only. Two checks:
   - **Frontmatter gaps** — flag any `notes/*.md` (excluding `notes/index.md`) missing one of: `type`, `title`, `created`, `updated`, `source_project`, `status`. The `topic` and `tags` fields are optional and never flagged.
   - **Index drift** — flag any file in `notes/` that is missing from `notes/index.md`, and any row in `notes/index.md` whose title text doesn't match any existing note's frontmatter `title:` field. Match against frontmatter `title:`, not filenames — filenames are slugs that may diverge from display titles after CAPTURE rewrites (AC4).
@@ -122,100 +89,11 @@ Work through these in order:
 
 ## Manual Review
 
-Periodic human review (monthly or after new domain burst). Cannot be automated without NLP:
-- Stale claims: older pages contradicted/updated by newer sources
-- Missing pages: concepts/entities in 3+ pages without own page
-- Missing cross-references: entity names without wikilinks (esp. high-traffic in backlink report)
+Monthly or after new domain burst. Cannot be automated without NLP. Check for: stale claims (older pages contradicted by newer sources), missing pages (concepts/entities in 3+ pages without own page), missing cross-references (entity names without wikilinks).
 
 ## Lint Report Format
 
-Create at `wiki/meta/lint-report-YYYY-MM-DD.md`:
-
-```markdown
----
-type: meta
-title: "Lint Report YYYY-MM-DD"
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-tags: [meta, lint]
-status: developing
----
-
-# Lint Report: YYYY-MM-DD
-
-## Summary
-
-- Pages scanned: N
-- Issues found: N
-- Auto-fixed: N
-- Needs review: N
-
-## Orphan Pages
-
-- [[Page Name]]: no inbound links. Suggest: link from [[Related Page]] or delete.
-
-## Dead Links
-
-- [[Missing Page]]: referenced in [[Source Page]] but does not exist. Suggest: create stub or remove link.
-
-## Frontmatter Gaps
-
-- [[Page Name]]: missing fields: status, tags
-
-## Backlink Density
-
-- [[Page Name]]: N inbound, M outbound. Heavily cited, weakly linking. Suggest: add `related:` entries on this page to its top citers, or thread it into a domain hub.
-
-## Hub Promotion Candidates
-
-- `<tag>`: N leaves share this tag, no `wiki/domains/<tag>/_index.md`. Suggest: `/wiki promote <tag>` to scaffold a hub.
-
-## Hub Stale-Count Drift
-
-- [[domains/<slug>/_index]]: `page_count: N` in frontmatter, M inbound backlinks (drift: ±X%). Suggest: update `page_count:` or re-curate `related:`.
-
-## Hub Demotion Candidates
-
-- [[domains/<slug>/_index]]: only N leaves linked. Below threshold (5). Suggest: grow the cluster or merge into a sibling hub.
-
-## Hot Cache Size
-
-- hot.md: N words (spec: 500, delta: +N). Status: OK | WARN | FAIL
-  - Suggest: move entries older than 2026-XX-XX to [[log]], trim ## Last Updated to top 3–5 items.
-
-## Notes Inbox
-
-Scope: `notes/` only. Frontmatter gaps and index drift; no orphan/dead-link/stale checks.
-
-### Frontmatter gaps
-
-- `notes/<filename>.md`: missing fields: <field>, <field>
-
-### Index drift
-
-- File missing from index: `notes/<filename>.md` (no row in `notes/index.md`)
-- Index row missing file: `notes/index.md` references "<title>" but no file resolves to it
-
-## Misplaced Index Entries
-
-- `[[<slug>]]`: under `<Current>`, expected `<Expected>` (type=<x>). Suggest: move under `<Expected>`.
-- `[[<slug>]]`: above all sections (stray). Suggest: move under `<Expected>`.
-
-## Trail Integrity
-
-Scope: `wiki/trails/*.md`. Run-record snapshots; never auto-fixed.
-
-- `[[Trail: Topic (YYYY-MM-DD)]]`: missing trail frontmatter: <field>, <field>
-- `[[Trail: Topic (YYYY-MM-DD)]]`: synthesis link `[[Research: Topic]]` does not resolve.
-- `[[Trail: Topic (YYYY-MM-DD)]]`: body is not an ordered list (found: <prose paragraph | nested list | multiple top-level lists | no list>).
-- `[[Trail: Topic (YYYY-MM-DD)]]`: step N has <no wikilink | multiple wikilinks | no annotation | URL in annotation | extra wikilink in annotation>.
-
-## Anti-patterns
-
-Source: `anti_patterns` array from `wiki/meta/lint-data-YYYY-MM-DD.json`. Not counted toward dead-link total. Each entry is `[[https://...]]` used as a wikilink.
-
-- `[[Source Page]]`: URL-as-wikilink `[[https://example.com]]`. Suggest: convert to a plain `[text](url)` Markdown link.
-```
+Create at `wiki/meta/lint-report-YYYY-MM-DD.md`. Include: Summary (pages scanned, issues found, auto-fixed, needs review), sections for each check type with flagged items and remediation suggestions. Orphans, dead links, frontmatter gaps, backlink density, hub promotion/stale/demotion candidates, hot.md size, notes inbox (frontmatter + index drift), misplaced index entries, trail integrity. Anti-patterns section (URL-as-wikilink `[[https://...]]`) — report separately, not in dead-link count.
 
 ## Naming Conventions
 
@@ -241,97 +119,19 @@ During lint, flag pages that violate the style guide:
 
 ## Bases Dashboard
 
-Create or update `wiki/meta/dashboard.base` (a Bases file — see `skills/obsidian-bases/SKILL.md` for syntax). One file, four views over the wiki:
-
-```yaml
-filters:
-  and:
-    - file.inFolder("wiki/")
-    - not:
-        - file.inFolder("wiki/meta")
-
-views:
-  - type: table
-    name: "Recent Activity"
-    limit: 15
-    order:
-      - file.name
-      - type
-      - status
-      - updated
-
-  - type: list
-    name: "Seed Pages (Need Development)"
-    filters: 'status == "seed"'
-    order:
-      - file.name
-      - updated
-
-  - type: list
-    name: "Entities Missing Sources"
-    filters:
-      and:
-        - file.inFolder("wiki/entities/")
-        - or:
-            - "!sources"
-            - "length(sources) == 0"
-    order:
-      - file.name
-
-  - type: list
-    name: "Open Questions"
-    filters:
-      and:
-        - file.inFolder("wiki/questions/")
-        - 'answer_quality == "draft"'
-    order:
-      - file.name
-      - created
-```
-
-**Note on sort direction:** Bases YAML does not encode per-property sort direction in `order:`. After Obsidian renders the view, click a column header to flip ASC/DESC; the choice persists. Use `groupBy.direction:` for grouping order if needed.
-
-**Embedding:** add `![[dashboard.base]]` (or `![[dashboard.base#Recent Activity]]` for a single view) inside any wiki page to surface the dashboard.
+Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/dashboard.md` for Bases dashboard config template and embedding syntax.
 
 ## Canvas Map
 
-Create or update `wiki/meta/overview.canvas` for a visual domain map. Use `wiki/index.md` as the central node:
-
-```json
-{
-  "nodes": [
-    {
-      "id": "1",
-      "type": "file",
-      "file": "wiki/index.md",
-      "x": 0,
-      "y": 0,
-      "width": 300,
-      "height": 140,
-      "color": "1"
-    }
-  ],
-  "edges": []
-}
-```
-
-Add one node per domain hub (`wiki/domains/<slug>/_index.md`). Connect hubs that have significant cross-references. Colors map to the CSS scheme: 1=blue, 2=purple, 3=yellow, 4=orange, 5=green, 6=red.
+Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/canvas-map.md` for canvas map config template.
 
 ## Before Auto-Fixing
 
-Show report first. Ask: "Auto-fix or review each?"
-
-Safe: add missing frontmatter, create stubs, add wikilinks.
-
-Review first: delete orphans, resolve contradictions, merge duplicates, move misplaced entries (per-entry safer than batch).
-
-Never: trail integrity (check #16). Trails frozen at write-time; repairs destroy run-record. User repairs or accepts drift.
+Show report first; ask "Auto-fix or review each?" Safe to auto-fix: missing frontmatter, stubs, wikilinks. Review first: deletions, contradictions, merges, misplaced entries (per-entry safer). Never auto-fix check #16 (trail integrity) — trails frozen at write-time; user repairs or accepts drift.
 
 ## After Lint
 
-If auto-fixes modified pages: update hot.md (note touched pages, summarize outcome). See hot-cache protocol in _shared/hot-cache-protocol.md.
-
-If advisory only: skip hot.md update; reports are metadata.
+If auto-fixes modified pages: update hot.md per `_shared/hot-cache-protocol.md`. If advisory only: skip hot.md update.
 
 ## Report Rotation
 

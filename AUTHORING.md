@@ -42,31 +42,35 @@ Use `${CLAUDE_PLUGIN_ROOT}/_shared/<file>` (runtime resolved). Read on-demand, n
 
 Do not promote docs specific to one skill's operation, even if long.
 
+**On-demand only.** Never preload `_shared/` files at skill start — reference them in the specific Process step that needs them. Preloading burns tokens on every invocation regardless of code path.
+
+**Entry-point cap.** Skill bodies must stay ≤150 lines. When a skill exceeds this: extract stable reference material (schemas, tables, examples) into `skills/<name>/references/<file>.md` and add a one-line load instruction in the relevant step.
+
 ## Skill & Command Frontmatter
 
-| Field | Notes |
-|-------|-------|
-| `name` | Required. Must match the directory name for skills. |
-| `description` | **≤150 chars.** Shown in `/` menu and used for harness routing. |
-| `when_to_use` | Optional routing hint shown alongside `description`. Combined `description` + `when_to_use` must be **≤1,536 chars**. Use when routing context would push description over 150 chars. |
-| `allowed-tools` | Space-separated allowlist active while skill is running. Skills that dispatch sub-agents **must include `Agent`**. Vault ops go through `obsidian` CLI (Bash) — do not list `Read`, `Write`, `Glob`, or `Grep` unless the skill calls those tools directly outside the vault. |
-| `effort` | `low`\|`medium`\|`high`\|`xhigh`\|`max` — effort level override. |
-| `argument-hint` | Shown in autocomplete (e.g. `[topic]`). Add to any command that takes an argument. |
-| `context` | Accepted value: `fork`. Runs the skill in an isolated subagent instead of inline. |
-| `agent` | Used with `context: fork`. Names the agent type to dispatch (e.g., `claude-obsidian:ingest`). |
-| `model` | `sonnet`, `opus`, `haiku`, or full model ID. |
-| `user-invocable` | `false` hides skill from `/` menu (orchestrator-only skills). |
+|Field|Notes|
+|-|-|
+|`name`|Required. Must match the directory name for skills.|
+|`description`|**≤150 chars.** Shown in `/` menu and used for harness routing.|
+|`when_to_use`|Optional routing hint alongside `description`. Combined ≤1,536 chars. Include only when mis-routing is plausible: exclusions ("Does NOT X — use /Y"), preconditions, or disambiguation. Omit when `description` is unambiguous.|
+|`allowed-tools`|Space-separated allowlist active while skill is running. Skills that dispatch sub-agents **must include `Agent`**. Vault ops go through `obsidian` CLI (Bash) — do not list `Read`, `Write`, `Glob`, or `Grep` unless the skill calls those tools directly outside the vault.|
+|`effort`|`low`\|`medium`\|`high`\|`xhigh`\|`max` — effort level override.|
+|`argument-hint`|Shown in autocomplete (e.g. `[topic]`). Add to any command that takes an argument.|
+|`context`|Accepted value: `fork`. Runs the skill in an isolated subagent instead of inline.|
+|`agent`|Used with `context: fork`. Names the agent type to dispatch (e.g., `claude-obsidian:ingest`).|
+|`model`|`sonnet`, `opus`, `haiku`, or full model ID.|
+|`user-invocable`|`false` hides skill from `/` menu (orchestrator-only skills).|
 
 ## Agent Frontmatter
 
 Agents use **`tools`** (allowlist), not `allowed-tools` — using the wrong key is a **silent no-op**.
 
-| Field | Notes |
-|-------|-------|
-| `tools` | Space-separated allowlist. |
-| `disallowedTools` | Space-separated denylist. Defense-in-depth beyond the `tools` allowlist. |
-| `maxTurns` | Max agentic turns. |
-| `model` | Same aliases as skills. |
+|Field|Notes|
+|-|-|
+|`tools`|Space-separated allowlist.|
+|`disallowedTools`|Space-separated denylist. Defense-in-depth beyond the `tools` allowlist.|
+|`maxTurns`|Max agentic turns.|
+|`model`|Same aliases as skills.|
 
 **Plugin security restrictions:** `permissionMode`, `hooks`, and `mcpServers` are **silently ignored** for plugin agents — do not set them.
 
@@ -78,3 +82,12 @@ Agents use **`tools`** (allowlist), not `allowed-tools` — using the wrong key 
 **Orchestrator:** verify CWD (`cd "${VAULT_ROOT}" && pwd`), collect reports, update index/log/hot.md once (never per-agent), never write vault state in parallel.
 
 See agents/ for patterns: `capture` (single note), `ingest` (single source), `lint` (vault scan), `gather` (page cluster).
+
+## Writing Style
+
+- **Imperative**: "Read issue", not "You should read".
+- **Dense**: No filler, no preamble.
+- **Numbered workflows**: Step-by-step processes outperform prose.
+- **Decision tables**: Resolve routing ambiguity before coding.
+- **Paired prohibitions**: Every "Don't" must have a matching "Do".
+- **100–150 line cap**: Push stable reference content into `_shared/` or `references/` when body exceeds 150 lines.

@@ -19,83 +19,17 @@ See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.m
 No vault configured — run /wiki init first.
 ```
 
-## Steps
+## Pipeline
 
-1. **Resolve vault** per [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort with `No vault configured — run /wiki init first.` if unresolved.
-
-2. **Parse date argument:**
-   - No argument → use today's date as `YYYY-MM-DD`.
-   - Argument provided → validate it matches `YYYY-MM-DD` format. Abort with `Invalid date: <arg>. Expected YYYY-MM-DD.` if not parseable.
-   - Once parsed, check whether the date is in the future. Abort with `Cannot close a future date: <date>.` if future.
-
-3. **Check daily file existence:** call `obsidian read path=daily/YYYY-MM-DD.md`. Treat exit 1 with `Error: File "..." not found.` as the file-missing branch and abort with `No daily file for YYYY-MM-DD.` (do not auto-create).
-
-4. **Check for empty day:** Scan for content worth synthesizing:
-   - Count bullets under `## Captures` in the daily file content from step 3.
-   - If zero bullets, scan for date-matched activity:
-     - Glob `<vault_root>/notes/*.md` and call `obsidian properties path=notes/<file>` per candidate. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD` AND `status: pending`.
-     - Glob `<vault_root>/wiki/**/*.md` and call `obsidian properties path=wiki/<file>` per candidate. Match `created: YYYY-MM-DD` OR `updated: YYYY-MM-DD`. Exclude `wiki/hot.md` and `wiki/index.md` (they are always read in full in step 5).
-   - If both zero bullets AND no matching notes or wiki pages → abort with `Nothing to synthesize for YYYY-MM-DD.` (no LLM call fired).
-
-5. **Gather synthesis input** via a `gather` agent dispatch.
-
-   When there are more than 3 matched files (notes + wiki pages combined), dispatch
-   `agents/gather.md` to perform the read sweep off the main thread:
-
-   ```bash
-   cd "${VAULT_ROOT}" && pwd   # verify CWD before agent dispatch
-   ```
-
-   Pass to the gather agent:
-   - `FILE_LIST` — newline-separated vault-relative paths: all matched pending notes + all matched
-     wiki pages from step 4
-   - `VAULT_ROOT` — `$VAULT_ROOT`
-   - `CONTEXT` — `daily-close dated sweep for <YYYY-MM-DD>`
-   - `MAX_FILES` — 20
-
-   Wait for the gather agent to complete. Collect its structured summary.
-
-   When there are 3 or fewer matched files, read them inline (no agent needed):
-   - Full daily file (already read in step 3 — reuse the content).
-   - Each pending note matched in step 4: `obsidian read path=notes/<file>`
-   - Each wiki page matched in step 4: `obsidian read path=wiki/<file>`
-
-   Always read these two inline (they are not passed to the gather agent):
-   - `obsidian read path=wiki/hot.md` in full.
-   - `obsidian read path=wiki/index.md` in full.
-
-6. **Call LLM for synthesis** using the prompt template below. Populate `{{pending_notes_content_if_any}}` and `{{wiki_pages_content_if_any}}` from either the gather agent's structured summary or the inline reads — both are equivalent inputs to the synthesis prompt. If the call fails, abort with `Synthesis failed: <reason>.` and leave the daily file unchanged.
-
-7. **Construct the updated file content in memory:**
-   - No existing `## Summary` section → append the new section after the last bullet in `## Captures`.
-   - Existing `## Summary` section → remove from the `## Summary` heading through any immediately following `## Follow-ups` section, stopping at the next level-2 heading that is **not** `## Follow-ups`, or at EOF if none exists; insert the new section in its place. Idempotent.
-   - Structure: `## Summary` followed by prose, then optional `## Follow-ups` with bulleted items (omit the heading and bullets entirely when no follow-ups).
-   - Bump `updated:` in the frontmatter to today's date (the close-run date, even when closing a past day).
-
-8. **Atomic write back via the CLI:**
-
-   ```bash
-   obsidian create \
-     path=daily/YYYY-MM-DD.md \
-     overwrite=true \
-     content="<full updated file content with \n escapes>"
-   ```
-
-   The `overwrite` flag replaces the file in one operation; the wrapper keeps Obsidian's index consistent. If the call returns non-zero, abort with the wrapper's error and leave the daily file unchanged (the upstream CLI either succeeds atomically or reports an error before mutating).
-
-9. **Confirm** with exactly one line:
-
-   ```text
-   Closed daily/YYYY-MM-DD.md (N follow-ups)
-   ```
-
-   Omit the `(N follow-ups)` suffix entirely when there are none:
-
-   ```text
-   Closed daily/YYYY-MM-DD.md
-   ```
-
-   Do **not** print the synthesis prose, the input context, the reasoning, or any other output. One line only.
+1. **Resolve vault** [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort if unconfigured.
+2. **Parse date** (no arg = today, validate `YYYY-MM-DD`, reject future dates).
+3. **Read daily file** `obsidian read path=daily/YYYY-MM-DD.md`. Abort if missing (no auto-create).
+4. **Scan for content**: count `## Captures` bullets. If zero, glob pending notes + wiki pages dated today. Abort if nothing.
+5. **Gather input**: if >3 matched files, dispatch `agents/gather.md` (max 20); else read inline. Always read `wiki/hot.md` and `wiki/index.md` inline.
+6. **LLM synthesis** via template below. Pass gathered content to `{{pending_notes_content_if_any}}` and `{{wiki_pages_content_if_any}}`.
+7. **Update in-memory**: insert or replace `## Summary` section (idempotent); add optional `## Follow-ups` with bullets. Bump `updated:` frontmatter.
+8. **Atomic write** via `obsidian create path=daily/YYYY-MM-DD.md overwrite=true content=...`
+9. **Confirm**: one line only: `Closed daily/YYYY-MM-DD.md` (omit follow-up count if none).
 
 ## Prompt template (step 6)
 
@@ -133,17 +67,9 @@ Write a prose summary (1–3 paragraphs) of the day's key insights, decisions, a
 Output only the prose and optional section headers/bullets. Do not include the input summaries.
 ```
 
-## Failure modes
+## Abort conditions
 
-|Condition|Abort message|
-|-|-|
-|No vault configured|`No vault configured — run /wiki init first.`|
-|Invalid date format|`Invalid date: <arg>. Expected YYYY-MM-DD.`|
-|Future date|`Cannot close a future date: <date>.`|
-|Daily file not found|`No daily file for YYYY-MM-DD.`|
-|Nothing to synthesize|`Nothing to synthesize for YYYY-MM-DD.`|
-|LLM synthesis fails|`Synthesis failed: <reason>.` — daily file left unchanged|
-|File write fails|filesystem error — daily file left in pre-close state (atomic write)|
+Abort if: no vault configured, invalid date, future date, daily file missing, nothing to synthesize, LLM call fails (file left unchanged), file write fails (atomic write preserves pre-close state). See the raw SKILL.md for full error messages.
 
 ## Examples
 

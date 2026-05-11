@@ -1,6 +1,7 @@
 ---
 name: defuddle
 description: Strip ads, nav, boilerplate from web pages. Saves 40-60% tokens. Use before URL ingestion.
+when_to_use: Use before ingesting a URL to strip ads, navigation, and boilerplate.
 allowed-tools: Read Bash
 ---
 # defuddle

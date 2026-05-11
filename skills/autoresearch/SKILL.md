@@ -1,6 +1,7 @@
 ---
 name: autoresearch
 description: Autonomous research loop. Searches the web, synthesizes findings, and files structured wiki pages.
+when_to_use: Does NOT answer questions from existing wiki — use /query for that.
 allowed-tools: Agent Bash Read WebFetch WebSearch
 ---
 # autoresearch
@@ -93,94 +94,11 @@ After research is complete, create these pages:
 - No minimum atomic-note count. A run that produced one note still emits a one-step trail — the run-record value beats the empty-trail cost.
 - Create `wiki/trails/` lazily on first emission if it does not exist.
 
-## Synthesis Page Structure
+## Page Schemas
 
-```markdown
----
-type: synthesis
-title: "Research: [Topic]"
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-tags:
-  - research
-  - [topic-tag]
-status: developing
-related:
-  - "[[Every page created in this session]]"
-sources:
-  - "[[wiki/sources/Source 1]]"
-  - "[[wiki/sources/Source 2]]"
----
-
-# Research: [Topic]
-
-## Overview
-
-[2-3 sentence summary of what was found]
-
-## Key Findings
-
-- Finding 1 (Source: [[Source Page]])
-- Finding 2 (Source: [[Source Page]])
-- ...
-
-## Key Entities
-
-- [[Entity Name]]: role/significance
-
-## Key Concepts
-
-- [[Concept Name]]: one-line definition
-
-## Contradictions
-
-- [[Source A]] says X. [[Source B]] says Y. [Brief note on which is more credible and why]
-
-## Open Questions
-
-- [Question that research didn't fully answer]
-- [Gap that needs more sources]
-
-## Sources
-
-- [[Source 1]]: author, date
-- [[Source 2]]: author, date
-```
-
-## Trail Page Structure
-
-```markdown
----
-type: trail
-title: "Trail: [Topic] (YYYY-MM-DD)"
-topic: "<topic-slug>"
-research_run: YYYY-MM-DD
-synthesis: "[[Research: Topic]]"
-created: YYYY-MM-DD
-updated: YYYY-MM-DD
-tags:
-  - trail
-  - [topic-tag]
-status: mature
-confidence: EXTRACTED
-evidence:
-  - "[[Atomic Note 1]]"
-  - "[[Atomic Note 2]]"
----
-
-# Trail: [Topic] (YYYY-MM-DD)
-
-Reading order for the [[Research: Topic]] run on YYYY-MM-DD. One step per atomic note; the annotation explains the note's argument role.
-
-1. [[Atomic Note 1]] — opens the question by establishing X.
-2. [[Atomic Note 2]] — sharpens X into the testable claim Y.
-3. [[Atomic Note 3]] — surfaces the counter-evidence that constrains Y to its scope.
-4. [[Atomic Note 4]] — resolves the constraint by introducing mechanism Z.
-```
-
-The body must be a single ordered list. Each list item must contain exactly one `[[wikilink]]` to an atomic note created in this run plus exactly one annotation describing the note's argument role. Annotation text must be **plain text** (inline formatting like bold/italic is fine; wikilinks and URLs are not allowed in annotations — a wikilink in an annotation would confuse the lint check's "exactly one wikilink per step" rule). No bare-text steps, no nested lists, no prose paragraphs between items.
-
-`status: mature` reflects that trails are frozen at write time and never edited; the run produced what the run produced. `confidence: EXTRACTED` because the trail records run output, not inference. Use `evidence:` to list the atomic notes (the same wikilinks that appear in the body, in order).
+See `references/page-schemas.md` for full synthesis and trail templates. Key rules:
+- **Synthesis pages**: one `type: synthesis`, `related:` lists all created pages, sections include Overview, Key Findings, Entities, Concepts, Contradictions, Open Questions, Sources.
+- **Trail pages**: one `type: trail`, `status: mature`, `confidence: EXTRACTED`, body is **exactly one** ordered list with one wikilink + annotation per item (no URLs, no extra wikilinks in annotations).
 
 ## After Filing
 
