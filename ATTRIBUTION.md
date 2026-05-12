@@ -12,19 +12,6 @@ claude-obsidian is an original work. The following third-party patterns, tools, 
 
 ---
 
-## ITS CSS Snippets
-
-**Author:** SlRvb
-**Source:** https://github.com/SlRvb/Obsidian--ITS-Theme
-**License:** GPL-2.0
-**Files:**
-- `.obsidian/snippets/ITS-Dataview-Cards.css`
-- `.obsidian/snippets/ITS-Image-Adjustments.css`
-
-These snippets are distributed under the GPL-2.0 license. Per GPL-2.0 terms, any modifications to these files must also be released under GPL-2.0.
-
----
-
 ## Obsidian Plugins (pre-installed)
 
 The following Obsidian community plugins ship with this vault as pre-installed binaries. They are the property of their respective authors and are distributed here solely to reduce setup friction. Users should verify license terms via each plugin's repository.

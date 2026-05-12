@@ -69,7 +69,7 @@ Output only the prose and optional section headers/bullets. Do not include the i
 
 ## Abort conditions
 
-Abort if: no vault configured, invalid date, future date, daily file missing, nothing to synthesize, LLM call fails (file left unchanged), file write fails (atomic write preserves pre-close state). See the raw SKILL.md for full error messages.
+Abort if: no vault configured, invalid date, future date, daily file missing, nothing to synthesize, LLM call fails (file left unchanged), file write fails (atomic write preserves pre-close state). See the Examples section below for the exact abort messages.
 
 ## Examples
 

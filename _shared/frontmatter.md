@@ -28,7 +28,7 @@ sources:
 
 **status:** `seed` | `developing` | `current` | `mature` | `evergreen` | `superseded`
 **confidence:** `EXTRACTED` | `INFERRED` | `AMBIGUOUS` (conflict)
-**evidence:** wikilinks required for `INFERRED` or `AMBIGUOUS`.
+**evidence:** always present; wikilinks required when `confidence` is `INFERRED` or `AMBIGUOUS`; may be empty for `EXTRACTED`.
 
 See `_shared/vault-structure.md` for hub structure and semantics.
 

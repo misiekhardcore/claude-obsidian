@@ -86,29 +86,6 @@ For each trail:
 
 Auto-fix policy: **never**. Trails are run-snapshots; rewriting destroys run-record. Findings are advisory.
 
-## Detailed Check Descriptions
-
-### Check #3: Empty sections
-Source: `empty_sections` array in `lint-data-YYYY-MM-DD.json`. Each entry is `{source_page, heading}` — a heading (`##` or deeper) with no non-blank content before the next heading or end-of-file. Frontmatter and fenced code blocks are excluded.
-
-### Check #4: Stale index entries
-Items in `wiki/index.md` pointing to renamed or deleted pages.
-
-### Check #5: hot.md size budget
-Count words in `wiki/hot.md`. Spec limit: 500 words (per `_shared/hot-cache-protocol.md`).
-- **WARN** if word count > 500.
-- **FAIL** if word count > 750 (50% buffer exceeded).
-- Remediation: move entries older than 2 weeks to `wiki/log.md`; trim `## Last Updated` to 3–5 most recent items.
-
-### Check #11: Hub promotion candidates
-Group all leaves under `wiki/concepts/`, `wiki/entities/`, `wiki/solutions/`, `wiki/sources/` by their primary tag (first non-type tag in `tags:`). For each tag-cluster of **≥ 10 leaves**, check whether `wiki/domains/<cluster-tag>/_index.md` exists. If it does not, surface as promotion candidate — recommend `/wiki promote <tag>` to scaffold a hub. Threshold rationale: clusters below ~10 leaves are noisy; LYT MOC heuristics trigger around this size.
-
-### Check #12: Hub stale-count drift
-For every `wiki/domains/<slug>/_index.md`, compare frontmatter `page_count:` to actual inbound count from `obsidian backlinks path=wiki/domains/<slug>/_index.md format=json`. Flag drift **> 20%** (either direction). Suggest resync — update `page_count:` to live count or re-curate `related:` list.
-
-### Check #13: Hub demotion candidates
-For every `wiki/domains/<slug>/_index.md`, count leaves linked from hub's `related:` field. If **< 5**, surface as demotion candidate — cluster below hub-worthwhile threshold. Recommend growing cluster or merging hub into sibling.
-
 ## Gotchas
 
 - Scan scope: `wiki/{concepts, entities, sources, domains, comparisons, questions, solutions}/`, plus `wiki/index.md`, `wiki/log.md`, `wiki/hot.md`, and `wiki/canvases/*.canvas`.

@@ -20,4 +20,4 @@ Create or update `wiki/meta/overview.canvas` for a visual domain map. Use `wiki/
 }
 ```
 
-Add one node per domain hub (`wiki/domains/<slug>/_index.md`). Connect hubs that have significant cross-references. Colors map to the CSS scheme: 1=blue, 2=purple, 3=yellow, 4=orange, 5=green, 6=red.
+Add one node per domain hub (`wiki/domains/<slug>/_index.md`). Connect hubs that have significant cross-references. Colors: 1=red, 2=orange, 3=yellow, 4=green, 5=cyan, 6=purple (matches `skills/canvas/references/node-templates.md`).

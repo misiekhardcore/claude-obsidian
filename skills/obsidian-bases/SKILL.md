@@ -57,12 +57,12 @@ views:
 
 Filters select which notes appear (globally or per-view). Operators: `==` `!=` `>` `<` `>=` `<=`. Single string or nested objects:
 
-```yaml
-filters: 'status == "current"'                          # Single condition
-filters: { and: [...] }                                 # All must be true
-filters: { or: [...] }                                  # Any can be true
-filters: { not: [...] }                                 # Exclude matches
-filters: { and: [cond1, { or: [cond2, cond3] }] }    # Nested
+```text
+filters: 'status == "current"'                          # single condition
+filters: { and: [...] }                                 # all must be true
+filters: { or: [...] }                                  # any can be true
+filters: { not: [...] }                                 # exclude matches
+filters: { and: [cond1, { or: [cond2, cond3] }] }    # nested
 ```
 
 Common functions: `file.hasTag("x")`, `file.inFolder("path/")`, `file.hasLink("Note")`, `file.ext`, `file.name`, `file.mtime`, `file.size`, `file.ctime`, `file.tags`, `file.folder`.

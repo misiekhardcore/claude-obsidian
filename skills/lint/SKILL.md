@@ -48,13 +48,13 @@ Lint agent runs all checks in order. Checks #1, #2, #7, #10 read from JSON; othe
   **Anti-pattern note:** URL-as-wikilink occurrences (e.g. `[[https://...]]`) are in the `anti_patterns` array of the JSON. Report these in a dedicated **Anti-patterns** section; do **not** count them toward the dead-link total.
 
 - **Check #6: Frontmatter gaps**. Pages missing required fields (`type`, `status`, `created`, `updated`, `tags`, `confidence`). Flag missing `evidence:` when `confidence:` is `INFERRED`/`AMBIGUOUS`.
-- **Check #7: Empty sections**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#empty-sections`.
+- **Check #7: Empty sections**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#check-7-empty-sections`.
 - **Check #8: Stale index entries**. Items in `wiki/index.md` pointing to renamed/deleted pages.
-- **Check #9: hot.md size budget**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hot-md-size-budget`.
+- **Check #9: hot.md size budget**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#check-9-hotmd-size-budget`.
 - **Check #10: Backlink density**. Source: `backlinks` map in JSON (pre-computed). Compare inbound count vs. outbound count (`related:` + inline wikilinks). Flag pages where `inbound ≥ 3` **and** `outbound ≤ 1`.
-- **Check #11: Hub promotion candidates**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hub-promotion-candidates`.
-- **Check #12: Hub stale-count drift**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hub-stale-count-drift`.
-- **Check #13: Hub demotion candidates**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#hub-demotion-candidates`.
+- **Check #11: Hub promotion candidates**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#check-11-hub-promotion-candidates`.
+- **Check #12: Hub stale-count drift**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#check-12-hub-stale-count-drift`.
+- **Check #13: Hub demotion candidates**. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md#check-13-hub-demotion-candidates`.
 - **Check #14: Notes inbox**. Scoped to `<vault_root>/notes/` only. Two checks:
   - **Frontmatter gaps** — flag any `notes/*.md` (excluding `notes/index.md`) missing one of: `type`, `title`, `created`, `updated`, `source_project`, `status`. The `topic` and `tags` fields are optional and never flagged.
   - **Index drift** — flag any file in `notes/` that is missing from `notes/index.md`, and any row in `notes/index.md` whose title text doesn't match any existing note's frontmatter `title:` field. Match against frontmatter `title:`, not filenames — filenames are slugs that may diverge from display titles after CAPTURE rewrites (AC4).
