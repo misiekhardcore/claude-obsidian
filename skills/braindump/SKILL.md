@@ -1,36 +1,26 @@
 ---
 name: braindump
 description: Split long-form text into atomic inbox notes. Accepts inline text or file paths. Triage later via /note process.
+when_to_use: Does NOT process notes — use /note process for that.
 allowed-tools: Agent Bash Read
 ---
 # braindump
 
-Split long-form text (planning, retros, design ramblings) into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`.
-
-## Vault I/O
-
-Writes inbox notes via the CAPTURE pipeline in `_shared/capture-pipeline.md`. All vault writes flow through `obsidian` CLI. Read is used for non-vault input file ingestion (text/markdown paths).
+Split long-form text into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`. All vault writes flow through the CAPTURE pipeline (`_shared/capture-pipeline.md`) via `obsidian` CLI. Read is used for non-vault input file ingestion.
 
 ## Image routing
 
-If any image paths are present in the argument list → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` before parsing input.
+If any image paths are present: read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` before parsing.
 
-## Vault path
+## Vault path & input parsing
 
-See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with `No vault configured — run /wiki init first.`
+Vault path: See [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort if unconfigured: `No vault configured — run /wiki init first.`
 
-## Input parsing
-
-Positional argument(s) — inline text and/or file paths:
-
-1. Empty or whitespace-only → abort: `/braindump requires text or a file path.`
-2. Parse input as space-separated text snippets and/or file paths.
-3. For each path argument, resolve: absolute when `<arg>` starts with `/`; otherwise relative to `<vault_root>` (not CWD).
-4. Path resolves to a readable text file → use file contents as body.
-5. Path resolves to a readable file that is neither a supported text file nor a supported image type → abort: `Unsupported input type: <ext>. /braindump accepts text, markdown, and image inputs.`
-6. Path does not resolve:
-   - If `<arg>` looks like a supported image input by extension → abort: `Image not found or unreadable: <path>`
-   - Otherwise → treat `<arg>` verbatim as inline text. No error.
+Input: space-separated text snippets and/or file paths.
+- Empty → abort: `/braindump requires text or a file path.`
+- Paths: absolute (starts `/`) or vault-relative. Dirs excluded. Unsupported types → abort.
+- Image paths in args → read `_shared/image-capture.md` first.
+- Unresolvable args treated as inline text (no error).
 
 ## Split — atomic-thought rubric
 

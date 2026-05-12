@@ -27,126 +27,67 @@ sources:
 ```
 
 **status:** `seed` | `developing` | `current` | `mature` | `evergreen` | `superseded`
-
-**confidence:** `EXTRACTED` (from document) | `INFERRED` (LLM-derived) | `AMBIGUOUS` (conflict present)
-
-**evidence:** wikilinks supporting claims. Required for `INFERRED` or `AMBIGUOUS`.
+**confidence:** `EXTRACTED` | `INFERRED` | `AMBIGUOUS` (conflict)
+**evidence:** always present; wikilinks required when `confidence` is `INFERRED` or `AMBIGUOUS`; may be empty for `EXTRACTED`.
 
 See `_shared/vault-structure.md` for hub structure and semantics.
 
 ## Typed Relationship Fields
 
-All optional. Use these alongside `related:` when the semantic is unambiguous. Keep `related:` for general or untyped links (Obsidian graph view uses it).
+Optional; use when semantic is unambiguous. Keep `related:` for general links (graph view uses it).
 
-```yaml
-supersedes:
-  - "[[old-page]]" # this page replaces the listed page(s)
-contradicts:
-  - "[[conflicting]]" # this page's claims conflict with the listed page(s)
-uses:
-  - "[[dependency]]" # this page/concept depends on or applies the listed page(s)
-depends_on:
-  - "[[dep]]" # stronger dependency — can't function without the listed page(s)
-caused:
-  - "[[effect]]" # this page describes something that caused the listed outcome(s)
-fixed:
-  - "[[bug-page]]" # this page describes a fix for the listed issue(s)
-implements:
-  - "[[spec]]" # this page is an implementation of the listed spec/pattern(s)
-```
-
-Allowed: `supersedes`, `contradicts`, `uses`, `depends_on`, `caused`, `fixed`, `implements`. Note: `depends_on` uses underscore.
+Allowed fields: `supersedes`, `contradicts`, `uses`, `depends_on`, `caused`, `fixed`, `implements`. Note: `depends_on` uses underscore.
 
 ## Type-Specific Additions
 
 ### source
 
-Add these fields after the universal fields:
+- `source_type:` article | video | podcast | paper | book | transcript | data
+- `author:`, `date_published:` (YYYY-MM-DD), `url:`
+- `source_reliability:` high | medium | low (source's trustworthiness)
+- `key_claims:` list of main assertions
 
-```yaml
-source_type: article # article | video | podcast | paper | book | transcript | data
-author: ""
-date_published: YYYY-MM-DD
-url: ""
-source_reliability: high # high | medium | low — reliability of the source itself
-key_claims:
-  - "First key claim from this source"
-  - "Second key claim"
-```
-
-Note: `confidence` is always `EXTRACTED` for source pages. `source_reliability` is the source's trustworthiness.
+Note: `confidence` is always `EXTRACTED`.
 
 ### entity
 
-```yaml
-entity_type: person # person | organization | product | repository | place
-role: ""
-first_mentioned: "[[Source Title]]"
-```
+- `entity_type:` person | organization | product | repository | place
+- `role:`, `first_mentioned:` (wikilink)
 
 ### concept
 
-```yaml
-complexity: intermediate # basic | intermediate | advanced
-aliases:
-  - "alternative name"
-  - "abbreviation"
-```
+- `complexity:` basic | intermediate | advanced
+- `aliases:` alternative names
 
-Note: concept pages do NOT declare hub membership; forward-only model only. See `vault-structure.md`.
+Forward-only model; pages don't declare hub membership (see `vault-structure.md`).
 
 ### comparison
 
-```yaml
-subjects:
-  - "[[Thing A]]"
-  - "[[Thing B]]"
-dimensions:
-  - "performance"
-  - "cost"
-  - "ease of use"
-verdict: "One-line conclusion."
-```
+- `subjects:`, `dimensions:`, `verdict:` (one-line conclusion)
 
 ### question
 
-```yaml
-question: "The original query as asked."
-answer_quality: solid # draft | solid | definitive
-```
+- `question:`, `answer_quality:` draft | solid | definitive
 
 ### trail
 
-Autoresearch run-records: atomic notes in argument order with one-line role annotations. One per run, frozen at write time. Filename: `Trail: [Topic] (YYYY-MM-DD).md` (date-suffix distinguishes multiple runs).
+Autoresearch run-records (one per run, frozen; filename: `Trail: [Topic] (YYYY-MM-DD).md`).
 
-```yaml
-topic: "<slug>"
-research_run: YYYY-MM-DD
-synthesis: "[[Research: Topic]]"
-```
-
-Notes: `confidence` is `EXTRACTED`. `evidence` lists atomic notes. Run-scoped; not edited post-emission. Lint #16 validates. Excluded from orphan check; dead-link findings surfaced but not auto-fixed.
+- `topic:`, `research_run:` (YYYY-MM-DD), `synthesis:` (wikilink)
+- `confidence` always `EXTRACTED`; `evidence` lists atomic notes
+- Run-scoped, not edited post-emission. Lint #16 validates. Excluded from orphan check.
 
 ### domain
 
-Hub layer for cross-folder clusters. Location: `wiki/domains/<slug>/_index.md`. Forward-only model: leaves don't declare membership.
+Hub layer (location: `wiki/domains/<slug>/_index.md`). Forward-only model; leaves don't declare membership.
 
-```yaml
-subdomain_of: ""
-page_count: 0
-owns_folder: false
-```
-
-`owns_folder` defaults false (most hubs curate leaves elsewhere).
+- `subdomain_of:`, `page_count:`, `owns_folder:` (default false)
 
 ## Rules
 
-1. Use flat YAML only. Never nest objects.
-2. Dates as `YYYY-MM-DD` strings, not ISO datetime.
-3. Lists always use the `- item` format, not inline `[a, b, c]`.
-4. Wikilinks in YAML fields must be quoted: `"[[Page Name]]"`.
-5. Keep `related` and `sources` as wikilinks, not plain URLs.
-6. Update `updated` every time you edit the page content.
-7. Every new page must include `confidence:` and `evidence:`. Default to `INFERRED` when uncertain.
-8. Typed relationship fields are optional — only add them when the semantic is genuinely unambiguous.
-9. `related:` remains the catch-all for links that don't fit a typed field.
+- Flat YAML only (no nesting).
+- Dates: `YYYY-MM-DD` strings; lists: `- item` format.
+- Wikilinks in YAML quoted: `"[[Page Name]]"`.
+- Update `updated` on every edit.
+- New pages: include `confidence:` and `evidence:` (default `INFERRED`).
+- Typed relationship fields optional; `related:` is catch-all.

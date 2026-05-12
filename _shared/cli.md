@@ -18,20 +18,9 @@ All vault operations through `scripts/obsidian-cli.sh` (PreToolUse hook rewrites
 
 **All output to stdout** (including errors). Wrapper normalizes exit codes.
 
-## 2. Exit-code table
+## 2. Exit codes
 
-|Code|Meaning|Pattern|
-|-|-|-|
-|0|Success|Non-error output or empty stdout|
-|1|CLI error|`Error: ...`|
-|2|Vault not found|`Vault not found.`|
-|3|Pre-flight failed|Binary missing or Obsidian not running|
-|4|Vault resolution failed|`resolve-vault.sh` exited non-zero|
-
-**Error patterns (exit 1):**
-- `Error: File "<path>" not found.` — missing file
-- `Error: Command "<verb>" not found.` — unknown verb or bad `command id=`
-- `Error: No active file...` — missing `file=` or `path=`
+See `${CLAUDE_PLUGIN_ROOT}/_shared/cli-reference.md` for full exit-code table and escape hatches.
 
 ## 3. Format defaults
 
@@ -117,17 +106,11 @@ obsidian properties path=wiki/concepts/foo.md
 
 **Re-spike after CLI version bump:** add `property:*` cases to `scripts/cli-spike.sh` and capture results.
 
-## 4. Escape-hatch policy
-
-1. **`command id=<command-id>`** — run registered Obsidian command. Discover with `commands filter=<prefix>`. Exit 1 if not found.
-2. **`eval code=<js>`** — last resort only. Must explain why in comment. Behavior not guaranteed across versions.
-3. **Direct `Read`/`Write`/`Edit` on vault paths** — reserved exceptions in §6 only.
-
-## 5. Cron-time behavior
+## 4. Cron-time behavior
 
 CLI requires Obsidian running; cron context fails at pre-flight (exit 3). See issue #52 for workaround.
 
-## 6. Documented exceptions
+## 5. Documented exceptions
 
 Intentional CLI bypasses (verify call sites before removing):
 
@@ -138,7 +121,7 @@ Intentional CLI bypasses (verify call sites before removing):
 |Cron writes|Obsidian closed; unreachable (§5)|
 |`bin/setup-vault.sh`, `bin/seed-demo.sh`|Bootstrap before vault registration|
 
-## 7. Canvas file handling
+## 6. Canvas file handling
 
 Canvas files (`.canvas`) lack CLI verbs. Mix standard verbs + direct reads:
 
@@ -153,7 +136,7 @@ Canvas files (`.canvas`) lack CLI verbs. Mix standard verbs + direct reads:
 
 **`obsidian files` verb:** `obsidian files dir=<dir> format=json` → array of `{"path": "..."}`. Filter extensions client-side with `jq`.
 
-## 8. Re-spiking after CLI version bump
+## 7. Re-spiking after CLI version bump
 
 Run `scripts/cli-spike.sh` and diff `tests/spike-results/`. Update this file if:
 - New error patterns in stdout

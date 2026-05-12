@@ -1,6 +1,6 @@
 ---
 name: save
-description: Save conversation/insight as structured wiki note. Updates index, log, hot cache.
+description: Save conversation/insight/note as structured wiki page. Updates index, log, hot cache.
 allowed-tools: Bash Read
 ---
 # save
