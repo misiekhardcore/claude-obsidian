@@ -61,6 +61,21 @@ Do not promote docs specific to one skill's operation, even if long.
 |`model`|`sonnet`, `opus`, `haiku`, or full model ID.|
 |`user-invocable`|`false` hides skill from `/` menu (orchestrator-only skills).|
 
+## Cross-plugin scope boundary
+
+Skills in this repo operate on **vault contents only**: `wiki/`, `notes/`, `daily/`, `.raw/`, `wiki/meta/`.
+
+**Out-of-scope here** — plugin-authoring audits (SKILL.md quality, AUTHORING.md accuracy, `_shared/` content) belong in the **`claude-workflow:/prune` Authoring Lane** (`misiekhardcore/claude-workflow:skills/prune/SKILL.md`).
+
+**Sibling convention**: `misiekhardcore/claude-workflow:_templates/AUTHORING.md` is the parallel authoring guide for that plugin.
+
+**Worked example — "audit SKILL.md content":**
+
+|Direction|Action|
+|-|-|
+|**Do**|Run `/prune` in `claude-workflow` — the Authoring Lane audits skill files.|
+|**Don't**|Open a `wiki-lint` issue in `claude-obsidian` — vault skills do not inspect skill source files.|
+
 ## Agent Frontmatter
 
 Agents use **`tools`** (allowlist), not `allowed-tools` — using the wrong key is a **silent no-op**.
