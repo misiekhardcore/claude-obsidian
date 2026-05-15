@@ -48,4 +48,18 @@ TS=$(date -Iseconds 2>/dev/null || date)
 printf '%s\t%s\t%s\n' "$TS" "${VERB:-?}" "$KEY_ARG" \
   >> "$VAULT/.obsidian-cli.log" 2>/dev/null || true
 
+# Auto-commit vault changes after mutating obsidian verbs, mirroring the
+# Write|Edit PostToolUse hook. The PreToolUse hook only intercepts Bash, so
+# agents that write vault pages via `obsidian create/append` (Bash) instead of
+# Write/Edit would otherwise miss the auto-commit trigger.
+case "${VERB:-}" in
+  create|append|prepend|create-or-append|property:set|property:remove|eval)
+    [ -d "$VAULT/.git" ] \
+      && git -C "$VAULT" add wiki/ .raw/ 2>/dev/null \
+      && (git -C "$VAULT" diff --cached --quiet \
+           || git -C "$VAULT" commit -m "wiki: auto-commit $(date '+%Y-%m-%d %H:%M')" 2>/dev/null) \
+      || true
+    ;;
+esac
+
 exit 0

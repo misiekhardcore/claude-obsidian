@@ -51,3 +51,12 @@ obsidian prepend file=wiki/log.md content="## [YYYY-MM-DD] <op> | <title>\n- <de
 Maintain `wiki/hot.md` after every operation.
 - **Format:** Follow `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
 - **Operation:** Overwrite existing content to keep it a concise (~500 word) summary of recent state.
+
+## 5. Enforcement Gap — Hook Scope
+
+The `PreToolUse` hook intercepts `Bash` only. It never fires on `Read`, `Write`, `Edit`, `Glob`, or `Grep` tool calls. This means:
+
+- **Agents and skills must not list `Read`, `Glob`, or `Grep` for vault access.** Without `Bash`, the obsidian CLI hook never applies and the agent can only bypass it.
+- **`Write`/`Edit` tool calls on vault paths bypass the CLI preflight** (app-running check, vault-open check). Vault writes must go through `obsidian create`/`obsidian append` via Bash.
+- **PostToolUse auto-commit covers both paths:** the `Write|Edit` matcher fires when the Write/Edit tool is used; the `Bash` matcher fires (via `log-obsidian-calls.sh`) for mutating obsidian verbs (`create`, `append`, `prepend`, `create-or-append`, `property:set`, `property:remove`, `eval`).
+- **Legitimate bypasses** (direct `Read`/`Write`/`Bash cat`): `.raw/` source files, `_attachments/images/**`, `.canvas` files, `wiki/meta/lint-data-*.json` (JSON administrative artifact written by `lint-scan.sh`; `obsidian read` not verified for non-markdown files) — see `cli.md` §5–7.
