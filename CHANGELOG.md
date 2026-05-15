@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- `bootstrap_read_index` option to auto-inject `wiki/index.md` at session start and after context compaction when set to `"always"` (mirrors `bootstrap_read_hot`).
 - **`agents/capture.md`** — single CAPTURE-pipeline worker; files one atomic inbox note per invocation. Used by `braindump` for parallel chunk dispatch (#118).
 - **`agents/research-round.md`** — runs one depth-≥2 research branch (search + fetch + source-synth dispatch). Used by `autoresearch` for Round 2 gap-fill and Round 3 synthesis-check phases (#118).
 - **`agents/source-synth.md`** — synthesises one fetched source into wiki pages (entities, concepts, source summary). Used by `autoresearch` and `research-round` (#118).

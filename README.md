@@ -125,7 +125,9 @@ See `_shared/setup.md` for troubleshooting and Flatpak setup.
 The plugin auto-runs passive automations via `hooks/hooks.json`:
 
 - **SessionStart — hot cache restore.** Injects `wiki/hot.md` if `bootstrap_read_hot` is `"always"` (default: `"on-demand"`, read by skills on activation to save tokens).
+- **SessionStart — index auto-read.** Injects `wiki/index.md` if `bootstrap_read_index` is `"always"` (default: `"on-demand"`, read by skills on activation to avoid baseline token cost).
 - **PostCompact — hot cache restore.** Re-injects after context compaction.
+- **PostCompact — index auto-read.** Re-injects `wiki/index.md` after context compaction when `bootstrap_read_index` is `"always"`.
 - **PostToolUse (Edit | Write) — auto-commit.** Changes under `wiki/` and `.raw/` are committed to vault git.
 - **PostToolUse (Edit | Write) — scratch log.** Touched files logged for SessionEnd reflection.
 - **Stop — hot cache nudge.** If wiki changed, prompt to refresh `wiki/hot.md`.
