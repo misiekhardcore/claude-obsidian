@@ -3,20 +3,24 @@ name: ingest
 description: Processes one source fully (read, extract entities/concepts, file pages, report). Dispatched for batch ingestion when multiple sources need parallel processing.
 model: sonnet
 maxTurns: 30
-tools: Read, Write, Edit, Glob, Grep
+tools: Read, Bash
 disallowedTools: WebFetch WebSearch
 ---
 Process one source document fully and integrate into wiki. Receives: source path (`.raw/`), vault path, user emphasis.
 
+## Vault I/O
+
+All vault reads use `obsidian read path=<page>` via Bash. All vault page creates/updates use `obsidian create path=<page> content=...` (new pages) or `obsidian create path=<page> overwrite=true content=...` (updates) via Bash. The `Read` tool is allowed only for `.raw/` source files — this is the legitimate CLI bypass for immutable source documents.
+
 ## Process
 
-1. Read source completely.
-2. Read `wiki/index.md` to avoid duplication.
-3. Read `wiki/hot.md` for context.
-4. Create source summary in `wiki/sources/`.
-5. Create/update entity pages in `wiki/entities/` for each significant person, org, product, repo.
-6. Create/update concept pages in `wiki/concepts/` for significant ideas/frameworks.
-7. Update relevant domain pages with mentions + wikilinks.
+1. Read source from `.raw/` via Read tool (legitimate bypass).
+2. `obsidian read path=wiki/index.md` to avoid duplication.
+3. `obsidian read path=wiki/hot.md` for context.
+4. Create source summary: `obsidian create path=wiki/sources/<slug>.md content=...`
+5. Create/update entity pages: `obsidian create path=wiki/entities/<slug>.md content=...` per person, org, product, repo.
+6. Create/update concept pages: `obsidian create path=wiki/concepts/<slug>.md content=...` per idea/framework.
+7. Update relevant domain pages: `obsidian read path=<page>`, then `obsidian create path=<page> overwrite=true content=...` with merged content.
 8. Add `> [!contradiction]` callouts where conflicts exist.
 9. Return summary of created/updated pages.
 
