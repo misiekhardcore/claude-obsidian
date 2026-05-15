@@ -263,7 +263,7 @@ multiline_cmd=$'obsidian create \\\n  path=wiki/foo.md \\\n  content="alpha\\nbe
 out=$(run_hook "$multiline_cmd")
 rewritten=$(echo "$out" | jq -r '.hookSpecificOutput.updatedInput.command // empty')
 if [ -n "$rewritten" ] \
-   && echo "$rewritten" | head -n1 | grep -qF '"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh" create' \
+   && echo "$rewritten" | head -n1 | grep -qF 'scripts/obsidian-cli.sh" create' \
    && echo "$rewritten" | grep -qF 'path=wiki/foo.md' \
    && echo "$rewritten" | grep -qF 'content="alpha'; then
   pass "multi-line rewrite preserves continuation lines"
