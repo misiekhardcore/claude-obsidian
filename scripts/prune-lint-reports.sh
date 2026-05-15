@@ -44,7 +44,7 @@ prune_pattern() {
   # ISO-8601 dates sort lexically; sort -r puts newest first; tail -n +SKIP
   # emits everything past the top KEEP.
   "$CLI" files dir=wiki/meta \
-    | grep -E "$pattern" \
+    | { grep -E "$pattern" || true; } \
     | sort -r \
     | tail -n "+$SKIP" \
     | while IFS= read -r stale; do
