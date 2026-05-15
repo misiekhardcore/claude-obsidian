@@ -314,13 +314,17 @@ else
   empty_sections_json='[]'
 fi
 
-backlinks_json=$(
-  {
-    for key in $(printf '%s\n' "${!backlink_counts[@]}" | sort); do
-      jq -n --arg k "$key" --argjson v "${backlink_counts[$key]}" '{($k): $v}'
-    done
-  } | jq -s 'add // {}'
-)
+if [[ ${#backlink_counts[@]} -eq 0 ]]; then
+  backlinks_json='{}'
+else
+  backlinks_json=$(
+    {
+      while IFS= read -r key; do
+        jq -n --arg k "$key" --argjson v "${backlink_counts[$key]:-0}" '{($k): $v}'
+      done < <(printf '%s\n' "${!backlink_counts[@]}" | sort)
+    } | jq -s 'add // {}'
+  )
+fi
 
 # vault commit hash (best-effort)
 vault_commit=""
