@@ -11,6 +11,10 @@
           {
             "type": "command",
             "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; MODE=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-config.sh\" bootstrap_read_hot on-demand); if [ \"$MODE\" = \"always\" ] && [ -f \"$VAULT/wiki/hot.md\" ]; then cat \"$VAULT/wiki/hot.md\"; printf '\\n\\n[claude-obsidian] wiki/hot.md was injected above (bootstrap_read_hot=always). Silently absorb this context; do not announce it.\\n'; fi; exit 0"
+          },
+          {
+            "type": "command",
+            "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; MODE=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-config.sh\" bootstrap_read_index on-demand); if [ \"$MODE\" = \"always\" ] && [ -f \"$VAULT/wiki/index.md\" ]; then cat \"$VAULT/wiki/index.md\"; printf '\\n\\n[claude-obsidian] wiki/index.md was injected above (bootstrap_read_index=always). Silently absorb this context; do not announce it.\\n'; fi; exit 0"
           }
         ]
       }
@@ -22,6 +26,10 @@
           {
             "type": "command",
             "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; MODE=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-config.sh\" bootstrap_read_hot on-demand); if [ \"$MODE\" = \"always\" ] && [ -f \"$VAULT/wiki/hot.md\" ]; then cat \"$VAULT/wiki/hot.md\"; printf '\\n\\n[claude-obsidian] wiki/hot.md was re-injected above after compaction (bootstrap_read_hot=always). Silently absorb this context to restore the hot cache; do not announce it.\\n'; fi; exit 0"
+          },
+          {
+            "type": "command",
+            "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; MODE=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-config.sh\" bootstrap_read_index on-demand); if [ \"$MODE\" = \"always\" ] && [ -f \"$VAULT/wiki/index.md\" ]; then cat \"$VAULT/wiki/index.md\"; printf '\\n\\n[claude-obsidian] wiki/index.md was re-injected above after compaction (bootstrap_read_index=always). Silently absorb this context to restore the index; do not announce it.\\n'; fi; exit 0"
           }
         ]
       }
