@@ -66,9 +66,14 @@ fi
 # Rewrite ONLY the leading `obsidian` token on the first line. Preserves
 # multi-line commands (backslash continuations, here-docs, embedded newlines)
 # verbatim after the first token. Mid-string occurrences of `obsidian` (e.g.
-# inside content=, comments) are not touched. Leave ${CLAUDE_PLUGIN_ROOT}
-# unexpanded so the rewrite is portable — Bash expands it at execution time.
-REWRITTEN=$(printf '%s' "$CMD" | sed -E '1 s~^([[:space:]]*)obsidian([[:space:]]|$)~\1"${CLAUDE_PLUGIN_ROOT}/scripts/obsidian-cli.sh"\2~')
+# inside content=, comments) are not touched.
+#
+# Resolve the plugin root from this script's own location and embed the
+# absolute path literally in the rewritten command. $CLAUDE_PLUGIN_ROOT is
+# not available in the Bash tool's subprocess environment where the rewritten
+# command executes, so it cannot be left for "Bash to expand at runtime".
+PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REWRITTEN=$(printf '%s' "$CMD" | sed -E "1 s~^([[:space:]]*)obsidian([[:space:]]|\$)~\1\"${PLUGIN_ROOT}/scripts/obsidian-cli.sh\"\2~")
 
 # No-op if the leading token wasn't `obsidian` (e.g. `which obsidian`,
 # `cat $obsidian_path`, `pgrep -f obsidian`).
