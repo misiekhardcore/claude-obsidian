@@ -12,17 +12,59 @@ hooks/            Claude Code hooks (hooks.json + .sh)
 _templates/       Templater templates + authoring guidance
 ```
 
-## `_shared/` Promotion Rubric
+## Plugin File Model
 
-Promote a doc to `_shared/` when **≥3 skills** reference it. Otherwise keep under `skills/<name>/references/`.
+Plugins consist of three file types. Organize by concern, load on-demand, promote reusable content to `_shared/`.
 
-**Current shared docs:**
-- `vault-structure.md` — conventions, tagging, relationships
-- `frontmatter.md` — YAML schema, status/confidence values
-- `hot-cache-protocol.md` — hot-cache read/write, parallel worker discipline
-- `cli.md` — Obsidian CLI contract (exit codes, patterns, escape hatches)
-- `capture-pipeline.md` — vault I/O contract, MATCH/NEW heuristic, image handling
-- `image-capture.md` — image validation, move, embed, frontmatter (shared across note/daily/braindump)
+### Three-Tier Architecture
+
+| File Type | Location | Role | Loaded when |
+|---|---|---|---|
+| **Entry point** | `SKILL.md` | Thin orchestrator. Describes I/O, routes to references. ≤150 lines. | Skill invoked |
+| **Reference module** | `skills/<name>/references/<concern>.md` | Owns one phase or topic. Heavy content (schemas, tables, detailed logic). | Point of need: when the phase becomes active |
+| **Shared library** | `_shared/<concern>.md` | Cross-skill protocol or reusable concern. Promote when ≥3 skills need it. | Point of need; when first skill activates that concern |
+
+### Principles
+
+**Single responsibility:** One file per concern (phase, schema, topic, workflow stage). A file covering two concerns is two files.
+
+**Lazy loading:** Never preload `_shared/` or reference files at skill start. Place every `Read` instruction at the step that activates the concern. Preloading burns tokens on every invocation regardless of code path.
+
+**DRY promotion:** When content repeats across ≥3 skills, extract to `_shared/`. Otherwise keep under `skills/<name>/references/`.
+
+**Composition:** `SKILL.md` describes what to do and cites where detail lives; it does not contain the detail.
+
+### Split Heuristic
+
+Extract to a reference file when content exceeds ~10 lines AND is stable, or the same block repeats in ≥2 steps. Promote to `_shared/` when ≥3 skills need the same concern.
+
+A file growing past ~60 lines is a signal to audit for natural phase/topic boundaries — not a mandate to split.
+
+Split at **natural gates**: user approval, scope branch, condition. Content always needed together = one file; content gated by a condition = separate file. Sequential steps that always run in order stay together.
+
+### Naming
+
+Name files after the phase or topic they own: `detection.md`, `scope.md`, `gates.md`, `schemas.md`, `syntax-tables.md`. Avoid generic names (`process.md`, `config.md`, `rules.md`) unless the file genuinely has no sub-topics.
+
+### Entry-Point Cap
+
+`SKILL.md` stays ≤150 lines. Extract stable reference material (schemas, tables, phase logic) into `skills/<name>/references/<concern>.md` and add a one-line `Read` instruction at the relevant step. Reference files have no line limit; single-concern discipline keeps them bounded.
+
+### On-Demand Loading
+
+Place `Read` at the step that activates the concern — never at the top:
+
+```
+Read ${CLAUDE_PLUGIN_ROOT}/_shared/<file>.md
+Read ${CLAUDE_PLUGIN_ROOT}/skills/<name>/references/<concern>.md
+```
+
+**Phase-gated:** Read after the decision branch that activates the phase.
+**Conditional:** Read only in the code path where the concern applies.
+
+**In-repo exemplar** — `lint/SKILL.md` reads reference files at two distinct execution points:
+- `references/checks.md` — read inline within each check step (heavy check logic, not preloaded)
+- `references/dashboard.md` and `references/canvas-map.md` — read only in the output step when generating Bases and canvas artifacts
 
 ## Vault Operations: CLI Wrapper
 
@@ -35,16 +77,6 @@ All vault I/O via `scripts/obsidian-cli.sh`:
 ```
 
 PreToolUse hook transparently rewrites raw `obsidian <verb> ...` calls. For error handling, exit codes, and escape hatches, see `_shared/cli.md`.
-
-## Referencing `_shared/`
-
-Use `${CLAUDE_PLUGIN_ROOT}/_shared/<file>` (runtime resolved). Read on-demand, not preloaded.
-
-Do not promote docs specific to one skill's operation, even if long.
-
-**On-demand only.** Never preload `_shared/` files at skill start — reference them in the specific Process step that needs them. Preloading burns tokens on every invocation regardless of code path.
-
-**Entry-point cap.** Skill bodies must stay ≤150 lines. When a skill exceeds this: extract stable reference material (schemas, tables, examples) into `skills/<name>/references/<file>.md` and add a one-line load instruction in the relevant step.
 
 ## Skill & Command Frontmatter
 
@@ -105,4 +137,4 @@ See agents/ for patterns: `capture` (single note), `ingest` (single source), `li
 - **Numbered workflows**: Step-by-step processes outperform prose.
 - **Decision tables**: Resolve routing ambiguity before coding.
 - **Paired prohibitions**: Every "Don't" must have a matching "Do".
-- **100–150 line cap**: Push stable reference content into `_shared/` or `references/` when body exceeds 150 lines.
+- **150-line cap on `SKILL.md`**: Extract stable reference material into `_shared/` or `skills/<name>/references/` when the entry point exceeds 150 lines. Reference files have no line limit.
