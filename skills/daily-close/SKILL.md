@@ -24,7 +24,7 @@ No vault configured — run /wiki init first.
 1. **Resolve vault** [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort if unconfigured.
 2. **Parse date** (no arg = today, validate `YYYY-MM-DD`, reject future dates).
 3. **Read daily file** `obsidian read path=daily/YYYY-MM-DD.md`. Abort if missing (no auto-create).
-4. **Scan for content**: count `## Captures` bullets. If zero, list pending notes via `obsidian files dir=notes format=json` and wiki pages dated today via `obsidian files dir=wiki format=json` (filter by `created:` or `updated:` matching date). Abort if nothing.
+4. **Scan for content**: count `## Captures` bullets. If zero, list pending notes via `obsidian files dir=notes format=json`; list wiki page candidates via `obsidian files dir=wiki format=json` (returns `{"path": "..."}` only — no frontmatter), then per candidate run `obsidian properties path=<file>` and keep only those whose `created:` or `updated:` value matches the date. Abort if nothing remains.
 5. **Gather input**: if >3 matched files, dispatch `agents/gather.md` (max 20); else read each via `obsidian read path=<file>`. Always read `wiki/hot.md` and `wiki/index.md` via `obsidian read path=...`.
 6. **LLM synthesis** via template below. Pass gathered content to `{{pending_notes_content_if_any}}` and `{{wiki_pages_content_if_any}}`.
 7. **Update in-memory**: insert or replace `## Summary` section (idempotent); add optional `## Follow-ups` with bullets. Bump `updated:` frontmatter.

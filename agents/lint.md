@@ -10,7 +10,13 @@ Scan vault and produce comprehensive lint report. Receives: vault path, scope (f
 
 ## Step 1 — Locate scan data
 
-The orchestrator runs `lint-scan.sh` before dispatching this agent. Read the scan data via `obsidian read path=wiki/meta/lint-data-YYYY-MM-DD.json` (today's date). If today's JSON is missing, run the scan as a fallback:
+The orchestrator runs `lint-scan.sh` before dispatching this agent. Read the scan data via direct FS read (documented bypass — see `_shared/vault-ops.md` §5):
+
+```bash
+cat "${vault_path}/wiki/meta/lint-data-$(date +%Y-%m-%d).json"
+```
+
+If today's JSON is missing, run the scan as a fallback:
 
 ```bash
 CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT}" bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"
