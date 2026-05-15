@@ -43,14 +43,14 @@ prune_pattern() {
   local pattern="$1"
   # ISO-8601 dates sort lexically; sort -r puts newest first; tail -n +SKIP
   # emits everything past the top KEEP.
-  "$CLI" files dir=wiki/meta format=json \
-    | jq -r --arg pat "$pattern" '.[] | select(.path | test($pat)) | .path' \
+  "$CLI" files dir=wiki/meta \
+    | grep -E "$pattern" \
     | sort -r \
     | tail -n "+$SKIP" \
-    | while read -r stale; do
+    | while IFS= read -r stale; do
         "$CLI" delete path="$stale"
       done
 }
 
-prune_pattern '^wiki/meta/lint-report-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md$'
-prune_pattern '^wiki/meta/lint-data-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.json$'
+prune_pattern '^wiki/meta/lint-report-[0-9]{4}-[0-9]{2}-[0-9]{2}\.md$'
+prune_pattern '^wiki/meta/lint-data-[0-9]{4}-[0-9]{2}-[0-9]{2}\.json$'
