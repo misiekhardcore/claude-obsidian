@@ -1,5 +1,7 @@
 # Lint Scan Scope
 
+`scripts/lint-scan.sh` produces byte-identical JSON across runs (excluding `scan_date`).
+
 ## Folders Scanned
 
 - `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/domains/`, `wiki/comparisons/`, `wiki/questions/`, `wiki/solutions/`

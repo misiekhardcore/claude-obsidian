@@ -23,7 +23,7 @@ Main thread does not run checks — agent owns that work.
 
 ## Lint Checks
 
-Lint agent runs all 16 checks in order. Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md` for each check's source, logic, and auto-fix policy. Checks #1, #2, #7, #10 read from JSON; others use `obsidian` CLI or page reads.
+Lint agent runs checks #1, #2, #6–#16 in order (no checks #3–#5). Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/checks.md` for each check's source, logic, and auto-fix policy. Checks #1, #2, #7, #10 read from JSON; others use `obsidian` CLI or page reads.
 
 ## Manual Review
 
