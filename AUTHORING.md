@@ -62,7 +62,7 @@ Read ${CLAUDE_PLUGIN_ROOT}/skills/<name>/references/<concern>.md
 **Phase-gated:** Read after the decision branch that activates the phase.
 **Conditional:** Read only in the code path where the concern applies.
 
-**In-repo exemplar** — `lint/SKILL.md` reads two reference files at different steps:
+**In-repo exemplar** — `lint/SKILL.md` reads reference files at two distinct execution points:
 - `references/checks.md` — read inline within each check step (heavy check logic, not preloaded)
 - `references/dashboard.md` and `references/canvas-map.md` — read only in the output step when generating Bases and canvas artifacts
 
