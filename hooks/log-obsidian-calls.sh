@@ -4,54 +4,45 @@
 #
 # Silent on any failure — this hook must never disrupt a turn.
 
-set -e
-
 VAULT=$("${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") 2>/dev/null || exit 0
 [ -d "$VAULT" ] || exit 0
 
+# jq is a hard prerequisite for this hook; exit silently if absent.
+command -v jq >/dev/null 2>&1 || exit 0
+
 INPUT=$(cat)
+CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null) || exit 0
+[ -z "$CMD" ] && exit 0
 
-# Log commands that went through the obsidian-cli wrapper OR raw `obsidian`
-# calls (PostToolUse may see either the pre- or post-rewrite command depending
-# on the Claude Code version).
-CMD=""
-if command -v jq >/dev/null 2>&1; then
-  CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null || true)
-else
-  CMD=$(printf '%s' "$INPUT" \
-    | grep -o '"command"[[:space:]]*:[[:space:]]*"[^"]*"' \
-    | head -n1 \
-    | sed 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
-fi
+# Join backslash continuations, collapse whitespace, then strip content=/template=
+# args whose values can contain "obsidian-cli.sh" text (false-positive guard).
+# Invariant: content= and template= must be the last args in any obsidian command;
+# everything after them is silently dropped, including KEY_ARG extraction.
+CMD_EXEC=$(printf '%s' "$CMD" \
+  | tr '\n' ' ' \
+  | sed -e 's/ *\\ */ /g' -e 's/  */ /g' -e 's/ content=.*//' -e 's/ template=.*//')
 
-case "$CMD" in
-  *obsidian-cli*) ;;
-  # Raw `obsidian <verb>` — matches if PostToolUse sees the pre-rewrite input.
-  obsidian\ *) ;;
+# Strip leading KEY=val assignments; require first token to be "obsidian" or "…/obsidian-cli.sh".
+CMD_NOENV=$(printf '%s' "$CMD_EXEC" | sed -E 's/^([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]+ )*//')
+case "$CMD_NOENV" in
+  *obsidian-cli.sh*|obsidian\ *|obsidian) ;;
   *) exit 0 ;;
 esac
 
-# Extract verb.  Two shapes:
-#   rewritten: "…/obsidian-cli.sh" read path=…
-#   raw:       obsidian read path=…
-VERB=$(printf '%s' "$CMD" \
-  | sed 's|.*obsidian-cli\.sh[^[:space:]]*[[:space:]]*||; s|^obsidian[[:space:]]*||' \
+# The sed requires a space after obsidian-cli.sh, so path args (e.g. path=wiki/obsidian-cli.sh-foo.md)
+# don't match the first sub and fall through to the second.
+VERB=$(printf '%s' "$CMD_EXEC" \
+  | sed -E 's/.*obsidian-cli\.sh[^[:space:]]* //; s/^([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]+ )*obsidian //' \
   | awk '{print $1}')
 
-# Extract key path arg (path= or file=).
-KEY_ARG=$(printf '%s' "$CMD" \
-  | grep -oE '(path|file)=[^[:space:]"]+' \
-  | head -n1 \
-  | sed 's/^[^=]*=//')
+KEY_ARG=$(printf '%s' "$CMD_EXEC" \
+  | grep -oEm1 '(path|file|query)=[^[:space:]"]+' \
+  | sed 's/^[^=]*=//' || true)
 
 TS=$(date -Iseconds 2>/dev/null || date)
-printf '%s\t%s\t%s\n' "$TS" "${VERB:-?}" "$KEY_ARG" \
+printf '%s\t%s\t%s\n' "$TS" "${VERB:-?}" "${KEY_ARG:-}" \
   >> "$VAULT/.obsidian-cli.log" 2>/dev/null || true
 
-# Auto-commit vault changes after mutating obsidian verbs, mirroring the
-# Write|Edit PostToolUse hook. The PreToolUse hook only intercepts Bash, so
-# agents that write vault pages via `obsidian create/append` (Bash) instead of
-# Write/Edit would otherwise miss the auto-commit trigger.
 case "${VERB:-}" in
   create|append|prepend|create-or-append|property:set|property:remove|eval)
     [ -d "$VAULT/.git" ] \
