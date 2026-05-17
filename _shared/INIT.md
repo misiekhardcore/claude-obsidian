@@ -1,0 +1,18 @@
+# claude-obsidian — session init
+
+This session has an Obsidian vault configured by the `claude-obsidian` plugin. The vault is a knowledge base, not a code directory.
+
+## When to engage the vault
+
+- The user plans or brainstorms → `/query` the vault for context.
+- The user asks a question that prior notes might answer → `/query`.
+- The user wants to file something for later → `/note`, `/daily`, `/save`.
+- The user mentions vault / wiki / notes / daily / ingest / research / lint / canvas.
+
+## When NOT to engage the vault
+
+General coding, build, or test work in the current repo. Do not read the vault for routine code questions — the wiki is for synthesized knowledge, not for re-deriving things from source.
+
+## Vault I/O
+
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).

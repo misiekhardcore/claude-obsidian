@@ -7,6 +7,10 @@ allowed-tools: Agent Bash Read
 
 Health check after every 10-15 ingests or weekly. Finds orphans, dead links, frontmatter gaps. Ask before auto-fixing; reports to `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
+## Vault I/O
+
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+
 ## Scan Scope
 
 Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/scan-scope.md` for folders scanned/excluded and valid wikilink target extensions.

@@ -15,8 +15,8 @@ Check `.raw/.manifest.json` before ingesting any file to avoid re-processing.
 - **Bypass**: Skip if user says "force ingest" or "re-ingest".
 
 ## Vault I/O
-All vault reads and writes follow `_shared/vault-ops.md`.
-- **Bypass**: `.raw/.manifest.json` is mutated via `jq + mv`.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+
 
 ## Ingestion Flows
 

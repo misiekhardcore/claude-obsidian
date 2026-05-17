@@ -8,6 +8,10 @@ allowed-tools: Bash Read
 
 Capture raw thoughts verbatim in `notes/` without interrupting work. Triage later. Wiki is polished; notes/ is inbox. `/save` files synthesis; `/note` files raw thoughts.
 
+## Vault I/O
+
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+
 ## Vault path
 
 See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Always write to `<vault_root>/notes/` regardless of CWD. If no vault is configured, abort with `No vault configured — run /wiki init first.`

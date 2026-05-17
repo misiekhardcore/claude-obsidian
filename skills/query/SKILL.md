@@ -10,7 +10,7 @@ Wiki has synthesis work done. Read strategically, answer precisely, file answers
 
 ## Vault I/O
 
-Reads hot.md, index.md, individual pages via `obsidian` CLI. See CLI docs for syntax.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Query Modes
 
