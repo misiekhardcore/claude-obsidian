@@ -10,7 +10,7 @@
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" >/dev/null 2>&1 || exit 0; [ -f \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\" ] || exit 0; sed \"s|\\${CLAUDE_PLUGIN_ROOT}|${CLAUDE_PLUGIN_ROOT}|g\" \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\"; printf '\\n[claude-obsidian] Session init injected above (_shared/INIT.md). Silently absorb this context; do not announce it.\\n'; exit 0"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" >/dev/null 2>&1 || exit 0; [ -f \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\" ] || exit 0; envsubst '$CLAUDE_PLUGIN_ROOT' < \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\"; printf '\\n[claude-obsidian] Session init injected above (_shared/INIT.md). Silently absorb this context; do not announce it.\\n'; exit 0"
           },
           {
             "type": "command",
@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" >/dev/null 2>&1 || exit 0; [ -f \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\" ] || exit 0; sed \"s|\\${CLAUDE_PLUGIN_ROOT}|${CLAUDE_PLUGIN_ROOT}|g\" \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\"; printf '\\n[claude-obsidian] Session init injected above (_shared/INIT.md). Silently absorb this context; do not announce it.\\n'; exit 0"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" >/dev/null 2>&1 || exit 0; [ -f \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\" ] || exit 0; envsubst '$CLAUDE_PLUGIN_ROOT' < \"${CLAUDE_PLUGIN_ROOT}/_shared/INIT.md\"; printf '\\n[claude-obsidian] Session init injected above (_shared/INIT.md). Silently absorb this context; do not announce it.\\n'; exit 0"
           },
           {
             "type": "command",
