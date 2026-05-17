@@ -16,6 +16,8 @@ CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null) |
 
 # Join backslash continuations, collapse whitespace, then strip content=/template=
 # args whose values can contain "obsidian-cli.sh" text (false-positive guard).
+# Invariant: content= and template= must be the last args in any obsidian command;
+# everything after them is silently dropped, including KEY_ARG extraction.
 CMD_EXEC=$(printf '%s' "$CMD" \
   | tr '\n' ' ' \
   | sed -e 's/ *\\ */ /g' -e 's/  */ /g' -e 's/ content=.*//' -e 's/ template=.*//')
