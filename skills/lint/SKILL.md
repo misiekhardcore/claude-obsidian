@@ -7,6 +7,10 @@ allowed-tools: Agent Bash Read
 
 Health check after every 10-15 ingests or weekly. Finds orphans, dead links, frontmatter gaps. Ask before auto-fixing; reports to `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
+## Vault I/O
+
+See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. This skill dispatches `agents/lint.md` for the actual scan; `scripts/lint-scan.sh` produces `wiki/meta/lint-data-*.json` (one of the documented bypasses — admin JSON artifact). The agent reads vault pages via `obsidian read` and writes the report via `obsidian create`.
+
 ## Scan Scope
 
 Read `${CLAUDE_PLUGIN_ROOT}/skills/lint/references/scan-scope.md` for folders scanned/excluded and valid wikilink target extensions.

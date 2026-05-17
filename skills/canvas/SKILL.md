@@ -7,6 +7,10 @@ allowed-tools: Bash Read
 
 Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite visual boards. Read `${CLAUDE_PLUGIN_ROOT}/_shared/canvas-spec.md` before editing canvas JSON (follows JSON Canvas 1.0 standard).
 
+## Vault I/O
+
+See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. `.canvas` files are one of the documented bypasses (`content=` escape asymmetry corrupts canvas JSON) — read and write them with the `Read` / `Write` tools directly. Image attachments under `_attachments/` are likewise bypassed. Non-canvas pages this skill touches (e.g. `wiki/meta/dashboard.md`) still go through the `obsidian` CLI.
+
 ## Default Canvas
 
 `wiki/canvases/main.canvas`. See `references/node-templates.md` for default structure.

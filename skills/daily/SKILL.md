@@ -9,7 +9,7 @@ Append timestamped bullet to `daily/YYYY-MM-DD.md`. No MATCH/NEW, no inbox, no t
 
 ## Vault I/O
 
-Uses `create-or-append` and `property:set` (see CLI docs). Local `daily/` dir created via `mkdir -p` if missing.
+See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. This skill uses `obsidian create-or-append` for the bullet (step 6) and `obsidian property:set` for the `updated:` bump (step 7). Local `daily/` directory creation via `mkdir -p` is not a vault page op.
 
 ## Vault path
 

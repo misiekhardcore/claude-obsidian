@@ -6,7 +6,11 @@ allowed-tools: Agent Bash Read
 ---
 # braindump
 
-Split long-form text into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`. All vault writes flow through the CAPTURE pipeline (`_shared/capture-pipeline.md`) via `obsidian` CLI. Read is used for non-vault input file ingestion.
+Split long-form text into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`. All vault writes flow through the CAPTURE pipeline (`_shared/capture-pipeline.md`). The `Read` tool is used only for non-vault input file ingestion.
+
+## Vault I/O
+
+See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. Capture-pipeline writes (note pages, index patch) go through `obsidian create` / `obsidian append`; `Read` on non-vault input files is allowed because those paths are outside the vault.
 
 ## Image routing
 

@@ -8,6 +8,10 @@ allowed-tools: Read Bash
 
 Extract meaningful content from web pages: drop ads, nav, cookie banners, footers, related articles. Optional but recommended (saves 40-60% tokens, cleaner wiki pages).
 
+## Vault I/O
+
+This skill is a URL-preprocessing utility; it does not read from or write to the vault. Output is written to stdout for the caller (typically `/ingest`) to consume. See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` if a downstream caller needs the vault-I/O patterns.
+
 ## Install
 
 ```bash

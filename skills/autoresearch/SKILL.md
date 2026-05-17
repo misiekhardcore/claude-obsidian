@@ -14,7 +14,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` for research objectives
 
 ## Vault I/O
 
-All vault writes go through the `obsidian` CLI. See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for syntax and escaping.
+See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list.
 
 ## Agent dispatch overview
 

@@ -9,14 +9,7 @@ Obsidian Bases: turn vault notes into queryable views (tables, cards, lists, map
 
 ## Vault I/O
 
-This skill creates and edits `.base` files inside the vault. All reads and writes go through the `obsidian` CLI:
-
-- Read an existing base: `obsidian read path=wiki/meta/<name>.base`
-- List existing bases: `obsidian bases`
-- Create a new base: `obsidian create path=wiki/meta/<name>.base content="<yaml with \n escapes>"`
-- Replace an existing base: `obsidian create path=... overwrite=true content=...` (read first, modify in memory, write atomically)
-
-See `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md` for verb syntax, multiline `content=` escapes, and the `overwrite` flag.
+See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. `.base` files are YAML text — `obsidian read`, `obsidian create [overwrite=true]`, and the dedicated `obsidian bases` listing verb all work normally.
 
 ## File Format
 
