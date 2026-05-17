@@ -321,6 +321,80 @@ else
 fi
 
 echo ""
+echo "=== block-direct-vault-io — PreToolUse Read|Write|Edit enforcement ==="
+
+BLOCK_HOOK="$PLUGIN_ROOT/hooks/block-direct-vault-io.sh"
+
+if [ ! -x "$BLOCK_HOOK" ]; then
+  echo "block-direct-vault-io: $BLOCK_HOOK missing or not executable — skipping"
+else
+  run_bvio() {
+    local tool="$1" path="$2"
+    printf '%s' "{\"tool_name\":\"${tool}\",\"tool_input\":{\"file_path\":$(printf '%s' "$path" | jq -Rs .)}}" | bash "$BLOCK_HOOK"
+  }
+
+  BVIO_VAULT=$("$PLUGIN_ROOT/scripts/resolve-vault.sh" 2>/dev/null) || BVIO_VAULT=""
+
+  if [ -n "$BVIO_VAULT" ]; then
+    # 1–3. wiki/** denied for all file tools.
+    out=$(run_bvio Read "$BVIO_VAULT/wiki/foo.md")
+    echo "$out" | jq -e '.hookSpecificOutput.permissionDecision == "deny"' >/dev/null 2>&1 \
+      && pass "vault wiki/foo.md — Read denied" \
+      || fail "vault wiki/foo.md — Read expected deny; got: $(echo "$out" | jq -c '.hookSpecificOutput.permissionDecision // empty')"
+
+    out=$(run_bvio Write "$BVIO_VAULT/wiki/foo.md")
+    echo "$out" | jq -e '.hookSpecificOutput.permissionDecision == "deny"' >/dev/null 2>&1 \
+      && pass "vault wiki/foo.md — Write denied" \
+      || fail "vault wiki/foo.md — Write expected deny; got: $(echo "$out" | jq -c '.hookSpecificOutput.permissionDecision // empty')"
+
+    out=$(run_bvio Edit "$BVIO_VAULT/wiki/foo.md")
+    echo "$out" | jq -e '.hookSpecificOutput.permissionDecision == "deny"' >/dev/null 2>&1 \
+      && pass "vault wiki/foo.md — Edit denied" \
+      || fail "vault wiki/foo.md — Edit expected deny; got: $(echo "$out" | jq -c '.hookSpecificOutput.permissionDecision // empty')"
+
+    # 4. .raw/** Read allowed (source documents bypass).
+    out=$(run_bvio Read "$BVIO_VAULT/.raw/some-source.md")
+    [ -z "$out" ] && pass ".raw/** — Read allowed" \
+      || fail ".raw/** — Read expected allow; got: $(echo "$out" | jq -c '.hookSpecificOutput.permissionDecision // empty')"
+
+    # 5. _attachments/** allowed for all tools (binary files bypass).
+    out=$(run_bvio Read "$BVIO_VAULT/_attachments/image.png")
+    [ -z "$out" ] && pass "_attachments/** — Read allowed" || fail "_attachments/** — Read expected allow"
+    out=$(run_bvio Write "$BVIO_VAULT/_attachments/image.png")
+    [ -z "$out" ] && pass "_attachments/** — Write allowed" || fail "_attachments/** — Write expected allow"
+    out=$(run_bvio Edit "$BVIO_VAULT/_attachments/image.png")
+    [ -z "$out" ] && pass "_attachments/** — Edit allowed" || fail "_attachments/** — Edit expected allow"
+
+    # 6. *.canvas allowed for all tools (content= escape-asymmetry bypass).
+    out=$(run_bvio Read "$BVIO_VAULT/wiki/canvases/main.canvas")
+    [ -z "$out" ] && pass "*.canvas — Read allowed" || fail "*.canvas — Read expected allow"
+    out=$(run_bvio Write "$BVIO_VAULT/wiki/canvases/main.canvas")
+    [ -z "$out" ] && pass "*.canvas — Write allowed" || fail "*.canvas — Write expected allow"
+    out=$(run_bvio Edit "$BVIO_VAULT/wiki/canvases/main.canvas")
+    [ -z "$out" ] && pass "*.canvas — Edit allowed" || fail "*.canvas — Edit expected allow"
+
+    # 7. .raw/.manifest.json Write/Edit allowed (jq+mv mutation bypass).
+    out=$(run_bvio Write "$BVIO_VAULT/.raw/.manifest.json")
+    [ -z "$out" ] && pass ".raw/.manifest.json — Write allowed" || fail ".raw/.manifest.json — Write expected allow"
+    out=$(run_bvio Edit "$BVIO_VAULT/.raw/.manifest.json")
+    [ -z "$out" ] && pass ".raw/.manifest.json — Edit allowed" || fail ".raw/.manifest.json — Edit expected allow"
+
+    # 8. wiki/meta/lint-data-*.json Write/Edit allowed (admin JSON artifact bypass).
+    out=$(run_bvio Write "$BVIO_VAULT/wiki/meta/lint-data-2026-05-17.json")
+    [ -z "$out" ] && pass "lint-data-*.json — Write allowed" || fail "lint-data-*.json — Write expected allow"
+    out=$(run_bvio Edit "$BVIO_VAULT/wiki/meta/lint-data-2026-05-17.json")
+    [ -z "$out" ] && pass "lint-data-*.json — Edit allowed" || fail "lint-data-*.json — Edit expected allow"
+  else
+    echo "  [skip] no vault resolved — skipping vault-path deny/allow assertions"
+  fi
+
+  # 9. Outside-vault path → always allowed (fail-open on non-vault paths).
+  out=$(run_bvio Read "/tmp/smoke-test-external-file.md")
+  [ -z "$out" ] && pass "outside-vault path — Read allowed (pass-through)" \
+    || fail "outside-vault path — expected pass-through; got: $(echo "$out" | jq -c '.hookSpecificOutput.permissionDecision // empty')"
+fi
+
+echo ""
 echo "=== summary ==="
 echo "  pass=$PASS  fail=$FAIL"
 [ "$FAIL" -eq 0 ] || exit 1
