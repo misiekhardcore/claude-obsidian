@@ -7,6 +7,7 @@
 VAULT=$("${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") 2>/dev/null || exit 0
 [ -d "$VAULT" ] || exit 0
 
+# jq is a hard prerequisite for this hook; exit silently if absent.
 command -v jq >/dev/null 2>&1 || exit 0
 
 INPUT=$(cat)
