@@ -1,26 +1,31 @@
 # Vault Operations Reference
 
-Single source of truth for technical patterns and cross-skill vault I/O.
-Refer to this file instead of duplicating patterns in skill bodies.
+Single source of truth for **skill-author operational patterns** — when and why to call each CLI verb, the slugification pipeline, indexing/log/hot-cache protocols, active enforcement, and the canonical bypass list. Skills reference this file from their `## Vault I/O` section instead of restating patterns inline.
 
-## 1. Obsidian CLI Patterns
-All vault operations must use the `obsidian` CLI (routed via `scripts/obsidian-cli.sh`).
+For the CLI mechanics themselves — full verb table, output formats, exit codes, `content=` escape rules, canvas handling, re-spike procedure — see `${CLAUDE_PLUGIN_ROOT}/_shared/cli.md`.
 
-### Standard Verbs
-|Verb|Usage|Output|
-|-|-|-|
-|`read`|`path=wiki/hot.md`|Plain text|
-|`create`|`path=wiki/concepts/foo.md content="..."`|`Created: <path>`|
-|`append`|`file=wiki/log.md content="..."`|`Appended to: <path>`|
-|`prepend`|`file=wiki/index.md content="..."`|`Prepended to: <path>`|
-|`property:set`|`name=updated value=... path=...`|plain text|
-|`property:read`|`name=updated path=...`|plain text (value only)|
-|`properties`|`path=...`|YAML block (all properties)|
+## 1. CLI verbs at a glance
 
-**Multiline Content:** Use `\n` for newlines.
-**Bypass:** Use direct FS `Read`/`Write` only for `.raw/`, `_attachments/images/**`, or `.canvas` files (see `cli.md` §6–7).
+All vault operations must use the `obsidian` CLI (routed via `scripts/obsidian-cli.sh`). The PreToolUse `Bash` hook rewrites bare `obsidian` calls transparently; the PreToolUse `Read|Write|Edit` hook denies direct file-tool access to vault paths (see §5).
+
+Verb selection at a glance:
+
+|Goal|Verb|
+|-|-|
+|Read a vault page|`obsidian read path=<page>`|
+|Create a new page|`obsidian create path=<page> content="..."`|
+|Overwrite a page in full (e.g. `wiki/hot.md`)|`obsidian create path=<page> overwrite=true content="..."`|
+|Prepend to the top (e.g. `wiki/index.md`, `wiki/log.md`)|`obsidian prepend file=<page> content="..."`|
+|Append to the bottom|`obsidian append file=<page> content="..."`|
+|Append to `daily/*.md` (race-safe)|`obsidian create-or-append file=<page> template="..." content="..."`|
+|Set / read / remove a single frontmatter property|`obsidian property:set` / `property:read` / `property:remove`|
+
+`overwrite=true` on `daily/*.md` is forbidden (issue #98 race guard); use `create-or-append` for body and `property:set` for frontmatter.
+
+**Authoritative verb table with output formats and full argument lists:** see `cli.md §3`.
 
 ## 2. The Slugification Pipeline
+
 Never hand-craft slugs. Always use the `slug.sh` script to ensure Unicode normalization and separator collapsing.
 
 ```bash
@@ -31,7 +36,9 @@ slug=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/slug.sh" "<input_string>")
 ## 3. Indexing & Log Patterns
 
 ### Index Section Insertion
+
 Use the read-splice-overwrite pattern via `scripts/index-section-insert.sh`.
+
 - **Target:** `wiki/index.md`
 - **Entry Format:** `- [[<slug>|<Display Name>]] — <one-line description>`
 - **Logic:** Inserts immediately after the matching heading (e.g., `## Concepts`).
@@ -42,21 +49,41 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/index-section-insert.sh" \
 ```
 
 ### Log Prepending
+
 New entries always go to the TOP of `wiki/log.md`.
+
 ```bash
 obsidian prepend file=wiki/log.md content="## [YYYY-MM-DD] <op> | <title>\n- <details>\n\n"
 ```
 
 ## 4. Hot Cache Protocol
+
 Maintain `wiki/hot.md` after every operation.
+
 - **Format:** Follow `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
-- **Operation:** Overwrite existing content to keep it a concise (~500 word) summary of recent state.
+- **Operation:** Overwrite existing content to keep it a concise (~500 word) summary of recent state — `obsidian create path=wiki/hot.md overwrite=true content="..."`.
 
-## 5. Enforcement Gap — Hook Scope
+## 5. Active Enforcement
 
-The `PreToolUse` hook intercepts `Bash` only. It never fires on `Read`, `Write`, `Edit`, `Glob`, or `Grep` tool calls. This means:
+Two PreToolUse hooks together guarantee that every vault I/O routes through the CLI preflight or is an explicitly allowed bypass:
 
-- **Agents and skills must not list `Read`, `Glob`, or `Grep` for vault access.** Without `Bash`, the obsidian CLI hook never applies and the agent can only bypass it.
-- **`Write`/`Edit` tool calls on vault paths bypass the CLI preflight** (app-running check, vault-open check). Vault writes must go through `obsidian create`/`obsidian append` via Bash.
-- **PostToolUse auto-commit covers both paths:** the `Write|Edit` matcher fires when the Write/Edit tool is used; the `Bash` matcher fires (via `log-obsidian-calls.sh`) for mutating obsidian verbs (`create`, `append`, `prepend`, `create-or-append`, `property:set`, `property:remove`, `eval`).
-- **Legitimate bypasses** (direct `Read`/`Write`/`Bash cat`): `.raw/` source files, `_attachments/images/**`, `.canvas` files, `wiki/meta/lint-data-*.json` (JSON administrative artifact written by `lint-scan.sh`; `obsidian read` not verified for non-markdown files) — see `cli.md` §5–7.
+- `hooks/obsidian-cli-rewrite.sh` (matcher `Bash`) rewrites bare `obsidian <verb> ...` calls into `scripts/obsidian-cli.sh` invocations, so vault resolution, the version preflight, and exit-code normalization always apply.
+- `hooks/block-direct-vault-io.sh` (matcher `Read|Write|Edit`) **denies** any file-tool call whose `file_path` resolves inside the vault, except the paths in the bypass list below. The deny reason names the correct CLI verb so the agent self-corrects on the next turn.
+
+`wiki/hot.md` and `wiki/index.md` are **not** exceptions. Both round-trip through the CLI cleanly (`obsidian create overwrite=true`, `obsidian prepend`, `scripts/index-section-insert.sh`).
+
+Both hooks fail-open: missing dependencies, unresolvable vault, or unparseable input always allow the tool call through. Non-vault sessions are never disrupted.
+
+### Canonical bypass list
+
+The only paths where direct `Read` / `Write` / `Edit` on vault files is permitted — because the CLI literally cannot serve the operation:
+
+|Path|Tools|Why CLI can't handle it|
+|-|-|-|
+|`.raw/**`|`Read`|Source documents not indexed by Obsidian; `obsidian read` returns "not found"|
+|`.raw/.manifest.json`|`Write` / `Edit`|Incremental JSON mutation via `jq + mv`; no CLI JSON verb|
+|`_attachments/**`|`Read` / `Write` / `Edit`|Binary files (images, PDFs); no CLI binary verb|
+|`*.canvas`|`Read` / `Write` / `Edit`|`content=` escape asymmetry corrupts canvas JSON (`cli.md §6`)|
+|`wiki/meta/lint-data-*.json`|`Write` / `Edit`|Admin JSON artifact written by `lint-scan.sh`|
+
+Skill and agent specs must not list `Read`, `Write`, or `Edit` for general vault access. When a skill legitimately needs one of the bypassed paths, document the reason inline.
