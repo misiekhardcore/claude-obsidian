@@ -43,6 +43,15 @@
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/obsidian-cli-rewrite.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Read|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/block-direct-vault-io.sh\""
+          }
+        ]
       }
     ],
     "PostToolUse": [
