@@ -9,7 +9,7 @@ Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite v
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md). `Write` here is permitted only for the bypass paths (`*.canvas`, `_attachments/**`); all other vault writes must use the `obsidian` CLI via Bash (hook-enforced).
 
 ## Default Canvas
 
@@ -38,7 +38,7 @@ Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite v
 
 - **`zone [name] [color]`**: Create group node at max_y + 60 (or 280 if no nodes). Width 1000, height 400. Colors: `"1"`=red, `"2"`=orange, `"3"`=yellow, `"4"`=green, `"5"`=cyan, `"6"`=purple.
 
-- **`list`**: `glob wiki/canvases/*.canvas`. For each, read JSON and count nodes by type. Report as: `path . N nodes (X images, Y text, Z file, W group)`.
+- **`list`**: `find wiki/canvases -name "*.canvas"` (via Bash). For each, read JSON and count nodes by type. Report as: `path . N nodes (X images, Y text, Z file, W group)`.
 
 - **`from banana`**: (if banana-claude installed) Check `wiki/canvases/.recent-images.txt` first. Fallback: `find` images modified in last 10 min. Show 5 most recent if none found. Prompt user to confirm additions.
 
