@@ -36,8 +36,10 @@ _attachments/      Images and PDFs
 - **Manifest:** `.raw/.manifest.json` (delta tracking for ingested sources)
 
 ## Vault I/O
-All vault reads and writes go through **Obsidian CLI**, not `Read`/`Write`/`Edit`. A PreToolUse Bash hook routes raw `obsidian <verb> ...` calls through `scripts/obsidian-cli.sh` (resolve vault, preflight, normalize exit codes).
-- **Technical Patterns**: See `_shared/vault-ops.md` for CLI patterns, slugging, and indexing.
+All vault reads and writes go through **Obsidian CLI**, not `Read`/`Write`/`Edit`. Enforcement is active, not advisory: two PreToolUse hooks gate every vault interaction.
+- `hooks/obsidian-cli-rewrite.sh` (matcher `Bash`) rewrites bare `obsidian <verb> ...` calls through `scripts/obsidian-cli.sh` (vault resolution, preflight, exit-code normalization).
+- `hooks/block-direct-vault-io.sh` (matcher `Read|Write|Edit`) **denies** direct file-tool calls on vault paths and returns the correct CLI verb in the deny reason, so the agent self-corrects on the next turn.
+- **Technical Patterns**: See `_shared/vault-ops.md` for CLI patterns, slugging, indexing, active enforcement, and the canonical bypass list.
 
 ```bash
 obsidian read path=wiki/hot.md
@@ -45,7 +47,7 @@ obsidian create path=wiki/concepts/foo.md content="..."
 obsidian append file=wiki/log.md content="..."
 obsidian prepend file=wiki/index.md content="..."
 ```
-`Read` allowed only outside vault (skill refs, external paths). `Write`/`Edit` not used for vault paths.
+`Read` allowed only outside the vault (skill refs, external paths) or on the documented bypass paths in `_shared/vault-ops.md §5`. `Write`/`Edit` likewise restricted to the bypass paths; everything else is hook-denied.
 
 ## Skills Discovery
 
