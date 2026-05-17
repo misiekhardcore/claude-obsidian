@@ -1,6 +1,8 @@
 # CLI Contract
 
-Reference for the Obsidian CLI. All behaviors verified by `scripts/cli-spike.sh` (results in `tests/spike-results/`).
+**Scope.** Authoritative reference for the Obsidian CLI mechanics: invocation, full verb table with output formats, exit codes, `content=` escape rules, canvas handling, and the re-spike procedure. All behaviors verified by `scripts/cli-spike.sh` (results in `tests/spike-results/`).
+
+For skill-author operational patterns (when/why to call each verb, slugging, indexing, hot-cache protocol, active enforcement, canonical bypass list) see `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md`.
 
 Read on demand.
 
@@ -112,14 +114,14 @@ CLI requires Obsidian running; cron context fails at pre-flight (exit 3). See is
 
 ## 5. Documented exceptions
 
-Intentional CLI bypasses (verify call sites before removing):
+For the canonical list of paths where direct `Read` / `Write` / `Edit` on vault files is permitted because the CLI cannot serve the operation, see `vault-ops.md §5`. That list (binary files, canvas, JSON admin artifacts, `.raw/**` reads) is enforced by `hooks/block-direct-vault-io.sh`.
 
-|Path|Why|
+Non-vault exceptions still relevant to the CLI:
+
+|Context|Why|
 |-|-|
-|`.raw/.manifest.json`|JSON mutation via `jq + mv`; no CLI JSON verb|
-|`_attachments/images/**`|Binary writes; no CLI binary verb|
-|Cron writes|Obsidian closed; unreachable (§5)|
-|`bin/setup-vault.sh`, `bin/seed-demo.sh`|Bootstrap before vault registration|
+|Cron writes|Obsidian closed; CLI pre-flight fails (§4). See issue #52.|
+|`bin/setup-vault.sh`, `bin/seed-demo.sh`|Bootstrap runs before vault registration; vault path not yet resolvable.|
 
 ## 6. Canvas file handling
 

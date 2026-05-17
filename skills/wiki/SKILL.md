@@ -8,6 +8,10 @@ allowed-tools: Bash Read
 
 Build and maintain persistent, compounding wiki in Obsidian vault. Wiki is product; chat is interface.
 
+## Vault I/O
+
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+
 ## Architecture
 - **Truth**: Directory map, page-type table, and semantics in `_shared/vault-structure.md`.
 - **Peers**: `notes/` (inbox), `daily/` (log).
