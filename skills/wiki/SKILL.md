@@ -10,7 +10,7 @@ Build and maintain persistent, compounding wiki in Obsidian vault. Wiki is produ
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. Bootstrap (`/wiki init`) scaffolds vault structure via `bin/setup-vault.sh`, which runs before the vault is registered with Obsidian (a documented bootstrap-time bypass). After init, all vault I/O routes through the `obsidian` CLI.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Architecture
 - **Truth**: Directory map, page-type table, and semantics in `_shared/vault-structure.md`.

@@ -10,7 +10,7 @@ Capture raw thoughts verbatim in `notes/` without interrupting work. Triage late
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. CAPTURE writes use `obsidian create` for new notes and `obsidian append` for MATCH-append into an existing note; LIST and PROCESS read via `obsidian read`.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Vault path
 

@@ -8,7 +8,7 @@ allowed-tools: Bash Read
 File conversations into wiki as permanent pages. Determines note type, files it, updates index/log/hot-cache. Wiki compounds; save often.
 
 ## Vault I/O
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Note Type Decision
 Determine the best type from the conversation content:

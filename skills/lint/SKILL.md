@@ -9,7 +9,7 @@ Health check after every 10-15 ingests or weekly. Finds orphans, dead links, fro
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. This skill dispatches `agents/lint.md` for the actual scan; `scripts/lint-scan.sh` produces `wiki/meta/lint-data-*.json` (one of the documented bypasses — admin JSON artifact). The agent reads vault pages via `obsidian read` and writes the report via `obsidian create`.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Scan Scope
 

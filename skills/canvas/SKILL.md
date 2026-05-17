@@ -1,7 +1,7 @@
 ---
 name: canvas
 description: Visual layer of the wiki. Add images, text cards, PDFs, and wiki pages to canvas files with zones.
-allowed-tools: Bash Read
+allowed-tools: Bash Read Write
 ---
 # canvas
 
@@ -9,7 +9,7 @@ Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite v
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. `.canvas` files are one of the documented bypasses (`content=` escape asymmetry corrupts canvas JSON) — read and write them with the `Read` / `Write` tools directly. Image attachments under `_attachments/` are likewise bypassed. Non-canvas pages this skill touches (e.g. `wiki/meta/dashboard.md`) still go through the `obsidian` CLI.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Default Canvas
 

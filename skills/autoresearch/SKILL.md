@@ -14,7 +14,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` for research objectives
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Agent dispatch overview
 

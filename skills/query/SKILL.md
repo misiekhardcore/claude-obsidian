@@ -10,7 +10,7 @@ Wiki has synthesis work done. Read strategically, answer precisely, file answers
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. This skill reads `wiki/hot.md`, `wiki/index.md`, domain hubs, and leaf pages via `obsidian read`; uses `obsidian search` and `obsidian backlinks` for ranking; calls `obsidian properties` for frontmatter scans. All concrete invocations appear inline in the workflow below.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## Query Modes
 

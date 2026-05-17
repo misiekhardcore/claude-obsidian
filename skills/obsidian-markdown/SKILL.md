@@ -7,10 +7,6 @@ allowed-tools: Read
 
 Reference for Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, math. Check `references/syntax-tables.md` for full syntax tables.
 
-## Vault I/O
-
-This skill is a syntax reference; it does not read from or write to the vault. Callers that act on this reference must follow `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for actual vault I/O.
-
 ## Quick Reference
 
 **Wikilinks**: `[[Note Name]]`, `[[Note Name|Display Text]]`, `[[Note Name#Heading]]`, `[[Note Name#^block-id]]`. Case-sensitive; no path needed if unique. Use `[[Folder/Note]]` to disambiguate.

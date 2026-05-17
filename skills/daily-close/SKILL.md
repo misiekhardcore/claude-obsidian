@@ -9,7 +9,8 @@ Synthesize `daily/YYYY-MM-DD.md` into prose summary with optional follow-ups. Re
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. This skill reads the daily file, dated inbox notes, dated wiki pages, `wiki/hot.md`, and `wiki/index.md`, then writes the synthesis back via `obsidian create overwrite=true`. Concrete invocations appear inline in the Pipeline below.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+This skill reads the daily file, dated inbox notes, dated wiki pages, `wiki/hot.md`, and `wiki/index.md`, then writes the synthesis back. Concrete invocations appear inline in the Pipeline below.
 
 ## Vault path
 

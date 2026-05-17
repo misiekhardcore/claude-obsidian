@@ -9,7 +9,7 @@ Obsidian Bases: turn vault notes into queryable views (tables, cards, lists, map
 
 ## Vault I/O
 
-See `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for CLI patterns and the canonical bypass list. `.base` files are YAML text — `obsidian read`, `obsidian create [overwrite=true]`, and the dedicated `obsidian bases` listing verb all work normally.
+[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
 
 ## File Format
 
