@@ -21,23 +21,28 @@ set -u
 
 command -v jq >/dev/null 2>&1 || exit 0
 
-PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VAULT=$("${PLUGIN_ROOT}/scripts/resolve-vault.sh" 2>/dev/null) || exit 0
-[ -n "$VAULT" ] && [ -d "$VAULT" ] || exit 0
-
 INPUT=$(cat)
 TOOL_NAME=$(printf '%s' "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
 FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
 [ -z "$TOOL_NAME" ] && exit 0
 [ -z "$FILE_PATH" ] && exit 0
 
-# -m: allow missing components. -s: do NOT resolve symlinks (the vault may live
-# behind a symlink chain; resolving it can place the file outside what we
-# matched as the vault root). Normalize ".." segments without following links.
-REAL_VAULT=$(realpath -ms "$VAULT"     2>/dev/null || echo "$VAULT")
-REAL_FILE=$(realpath -ms "$FILE_PATH" 2>/dev/null || echo "$FILE_PATH")
+PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VAULT=$("${PLUGIN_ROOT}/scripts/resolve-vault.sh" 2>/dev/null) || exit 0
+[ -n "$VAULT" ] && [ -d "$VAULT" ] || exit 0
 
-# Not inside the vault → allow.
+# Fast literal-prefix check first — most file-tool calls in a session target
+# paths outside the vault; this short-circuits before spawning realpath twice.
+case "$FILE_PATH" in
+  "$VAULT"/*) ;;
+  *) exit 0 ;;
+esac
+
+# Re-check after normalization so paths with ".." segments that escape the
+# vault (e.g. "$VAULT/../tmp/foo") don't get falsely blocked. -ms preserves
+# symlinks (the vault may live behind a symlink chain).
+REAL_VAULT=$(realpath -ms "$VAULT" 2>/dev/null || echo "$VAULT")
+REAL_FILE=$(realpath -ms "$FILE_PATH" 2>/dev/null || echo "$FILE_PATH")
 case "$REAL_FILE" in
   "$REAL_VAULT"/*) ;;
   *) exit 0 ;;
