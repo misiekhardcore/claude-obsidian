@@ -10,7 +10,6 @@ Append timestamped bullet to `daily/YYYY-MM-DD.md`. No MATCH/NEW, no inbox, no t
 ## Vault I/O
 
 [Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
-Local `daily/` directory creation via `mkdir -p` is not a vault page op.
 
 ## Vault path
 
