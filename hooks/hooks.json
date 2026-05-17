@@ -10,6 +10,10 @@
           },
           {
             "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" >/dev/null 2>&1 || exit 0; printf '[claude-obsidian] Vault is configured. Before any vault interaction, read [Vault Operations Reference](%s/_shared/vault-ops.md). All Read/Write/Edit on vault paths is hook-blocked; route through the obsidian CLI via Bash. Silently absorb this context; do not announce it.\\n' \"${CLAUDE_PLUGIN_ROOT}\"; exit 0"
+          },
+          {
+            "type": "command",
             "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; MODE=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-config.sh\" bootstrap_read_hot on-demand); if [ \"$MODE\" = \"always\" ] && [ -f \"$VAULT/wiki/hot.md\" ]; then cat \"$VAULT/wiki/hot.md\"; printf '\\n\\n[claude-obsidian] wiki/hot.md was injected above (bootstrap_read_hot=always). Silently absorb this context; do not announce it.\\n'; fi; exit 0"
           },
           {
@@ -23,6 +27,10 @@
       {
         "matcher": "",
         "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\" >/dev/null 2>&1 || exit 0; printf '[claude-obsidian] Vault is configured. Before any vault interaction, read [Vault Operations Reference](%s/_shared/vault-ops.md). All Read/Write/Edit on vault paths is hook-blocked; route through the obsidian CLI via Bash. Silently absorb this context; do not announce it.\\n' \"${CLAUDE_PLUGIN_ROOT}\"; exit 0"
+          },
           {
             "type": "command",
             "command": "VAULT=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh\") || exit 0; MODE=$(\"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-config.sh\" bootstrap_read_hot on-demand); if [ \"$MODE\" = \"always\" ] && [ -f \"$VAULT/wiki/hot.md\" ]; then cat \"$VAULT/wiki/hot.md\"; printf '\\n\\n[claude-obsidian] wiki/hot.md was re-injected above after compaction (bootstrap_read_hot=always). Silently absorb this context to restore the hot cache; do not announce it.\\n'; fi; exit 0"

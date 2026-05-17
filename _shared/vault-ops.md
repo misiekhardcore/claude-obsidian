@@ -65,10 +65,11 @@ Maintain `wiki/hot.md` after every operation.
 
 ## 5. Active Enforcement
 
-Two PreToolUse hooks together guarantee that every vault I/O routes through the CLI preflight or is an explicitly allowed bypass:
+Three hooks together guarantee that every vault I/O routes through the CLI preflight or is an explicitly allowed bypass, and that agents discover the rules at session start:
 
-- `hooks/obsidian-cli-rewrite.sh` (matcher `Bash`) rewrites bare `obsidian <verb> ...` calls into `scripts/obsidian-cli.sh` invocations, so vault resolution, the version preflight, and exit-code normalization always apply.
-- `hooks/block-direct-vault-io.sh` (matcher `Read|Write|Edit`) **denies** any file-tool call whose `file_path` resolves inside the vault, except the paths in the bypass list below. The deny reason names the correct CLI verb so the agent self-corrects on the next turn.
+- `hooks/obsidian-cli-rewrite.sh` (PreToolUse, matcher `Bash`) rewrites bare `obsidian <verb> ...` calls into `scripts/obsidian-cli.sh` invocations, so vault resolution, the version preflight, and exit-code normalization always apply.
+- `hooks/block-direct-vault-io.sh` (PreToolUse, matcher `Read|Write|Edit`) **denies** any file-tool call whose `file_path` resolves inside the vault, except the paths in the bypass list below. The deny reason names the correct CLI verb so the agent self-corrects on the next turn.
+- A SessionStart / PostCompact injection emits a one-line lazy-load pointer to this file when a vault is configured, so the main-thread agent knows to read it before any vault interaction (~50 tokens; the doc body is loaded only when the agent follows the link).
 
 `wiki/hot.md` and `wiki/index.md` are **not** exceptions. Both round-trip through the CLI cleanly (`obsidian create overwrite=true`, `obsidian prepend`, `scripts/index-section-insert.sh`).
 
