@@ -17,9 +17,19 @@ Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite v
 
 ## Operations
 
+**Reading canvas content**
+
+To read an existing canvas for context, use the read-canvas script rather than loading raw JSON:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/read-canvas.sh" "$VAULT/wiki/canvases/<name>.canvas"
+```
+
+This strips layout noise (x/y/width/height/color/id) and emits structured plain text: groups as `##` sections, node text in order, edges as a flat list. Use raw JSON only when editing (to avoid collisions).
+
 **Status & Create**
 
-- **`/canvas`**: Read `wiki/canvases/main.canvas` (create if missing). Count nodes by type, list zone labels. Report: "Canvas has N nodes: X images, Y text, Z pages. Zones: [list]"
+- **`/canvas`**: Read `wiki/canvases/main.canvas` via read-canvas script (create if missing). Count nodes by type, list zone labels. Report: "Canvas has N nodes: X images, Y text, Z pages. Zones: [list]"
 - **`/canvas new [name]`**: Slugify name, create `wiki/canvases/[slug].canvas`, append to `wiki/meta/dashboard.md`.
 
 **Add to Canvas**
