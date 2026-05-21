@@ -1,22 +1,55 @@
 #!/usr/bin/env bash
 # read-canvas.sh — emit canvas content as structured plain text, stripping layout noise
 #
-# Usage: read-canvas.sh <path-to-canvas-file>
+# Usage: read-canvas.sh [--raw] <path-to-canvas-file>
+#
+# Options:
+#   --raw   Output the full raw JSON (no stripping). Useful when position/ID
+#           data is needed (e.g. before write operations to avoid collisions).
+#
 # Output: plain text with groups as ## sections, edges as flat list at the end
 # Exit codes: 0 success, 1 bad args, 2 file not found, 3 parse error
 
 set -euo pipefail
 
-CANVAS_FILE="${1:-}"
+RAW=0
+CANVAS_FILE=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --raw) RAW=1; shift ;;
+    -*)
+      echo "Usage: read-canvas.sh [--raw] <path-to-canvas-file>" >&2
+      exit 1
+      ;;
+    *) CANVAS_FILE="$1"; shift ;;
+  esac
+done
 
 if [[ -z "$CANVAS_FILE" ]]; then
-  echo "Usage: read-canvas.sh <path-to-canvas-file>" >&2
+  echo "Usage: read-canvas.sh [--raw] <path-to-canvas-file>" >&2
   exit 1
 fi
 
 if [[ ! -f "$CANVAS_FILE" ]]; then
   echo "Error: file not found: $CANVAS_FILE" >&2
   exit 2
+fi
+
+# --raw: emit the full JSON unchanged (useful for write operations that need position data)
+if [[ "$RAW" -eq 1 ]]; then
+  python3 -c "
+import sys, json
+path = sys.argv[1]
+try:
+    with open(path) as f:
+        data = json.load(f)
+except json.JSONDecodeError as e:
+    print(f'Error: failed to parse canvas JSON: {e}', file=sys.stderr)
+    sys.exit(3)
+print(json.dumps(data, indent=2))
+" "$CANVAS_FILE"
+  exit $?
 fi
 
 python3 - "$CANVAS_FILE" <<'PYEOF'

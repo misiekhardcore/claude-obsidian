@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "id": "group-planning-1700000001",
+      "type": "group",
+      "label": "Planning",
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 400,
+      "color": "1"
+    },
+    {
+      "id": "group-execution-1700000002",
+      "type": "group",
+      "label": "Execution",
+      "x": 0,
+      "y": 500,
+      "width": 600,
+      "height": 400,
+      "color": "4"
+    },
+    {
+      "id": "text-ideation-1700000003",
+      "type": "text",
+      "text": "# Ideation\nBrainstorm ideas and goals.",
+      "x": 50,
+      "y": 50,
+      "width": 300,
+      "height": 120
+    },
+    {
+      "id": "text-scoping-1700000004",
+      "type": "text",
+      "text": "Scope the work into tasks.",
+      "x": 50,
+      "y": 200,
+      "width": 300,
+      "height": 120
+    },
+    {
+      "id": "text-implementation-1700000005",
+      "type": "text",
+      "text": "Implement each task.",
+      "x": 50,
+      "y": 550,
+      "width": 300,
+      "height": 120
+    },
+    {
+      "id": "text-review-1700000006",
+      "type": "text",
+      "text": "Review and ship.",
+      "x": 50,
+      "y": 700,
+      "width": 300,
+      "height": 120
+    },
+    {
+      "id": "file-spec-1700000007",
+      "type": "file",
+      "file": "wiki/concepts/spec.md",
+      "x": 700,
+      "y": 100,
+      "width": 300,
+      "height": 100
+    },
+    {
+      "id": "link-ref-1700000008",
+      "type": "link",
+      "url": "https://example.com/docs",
+      "x": 700,
+      "y": 300,
+      "width": 300,
+      "height": 100
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1700000010",
+      "fromNode": "group-planning-1700000001",
+      "toNode": "group-execution-1700000002",
+      "label": "feeds into"
+    },
+    {
+      "id": "edge-1700000011",
+      "fromNode": "text-scoping-1700000004",
+      "toNode": "text-implementation-1700000005"
+    }
+  ]
+}
