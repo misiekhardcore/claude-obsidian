@@ -11,15 +11,19 @@ Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite v
 
 [Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md). `Write` here is permitted only for the bypass paths (`*.canvas`, `_attachments/**`); all other vault writes must use the `obsidian` CLI via Bash (hook-enforced).
 
-## Default Canvas
-
-`wiki/canvases/main.canvas`. See `references/node-templates.md` for default structure.
-
 ## Operations
+
+**Reading canvas content**
+
+To read an existing canvas for context, use the wrapper verb — it strips layout noise and emits structured plain text (groups as `##` sections, edges as a flat resolved list). Use raw JSON only for write operations (position data needed to avoid collisions).
+
+```bash
+obsidian read-canvas path=wiki/canvases/<name>.canvas
+```
 
 **Status & Create**
 
-- **`/canvas`**: Read `wiki/canvases/main.canvas` (create if missing). Count nodes by type, list zone labels. Report: "Canvas has N nodes: X images, Y text, Z pages. Zones: [list]"
+- **`/canvas`**: List `find wiki/canvases -name "*.canvas"`. If exactly one canvas exists, read it via `obsidian read-canvas`. If multiple, list them and ask which one. Report node counts and zone labels.
 - **`/canvas new [name]`**: Slugify name, create `wiki/canvases/[slug].canvas`, append to `wiki/meta/dashboard.md`.
 
 **Add to Canvas**

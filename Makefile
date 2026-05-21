@@ -6,6 +6,7 @@
 test:
 	bash tests/cli-smoke.sh
 	bash tests/regression/daily-append.sh
+	bash tests/regression/read-canvas.sh
 
 
 # AC12: preflight runs before docker build; fails fast (exit 2) if credentials

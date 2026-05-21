@@ -75,6 +75,14 @@
 #             `Appended to: <path>` (file-exists branch).
 #     Exit:   0 success, 1 generic error (e.g. underlying create/append failed).
 #
+#   read-canvas  path=<vault-relative-path>
+#     Reads a .canvas file and emits structured plain text: groups as ##
+#     sections (children sorted top-to-bottom), edges as a flat resolved list.
+#     Strips all layout fields (x/y/width/height/color/id). Callers never have
+#     to know about the underlying read-canvas.sh script.
+#     Output: plain text (see scripts/read-canvas.sh for format spec).
+#     Exit:   0 success, 1 bad args, 2 file not found, 3 parse error.
+#
 # ─── Empirical contract ──────────────────────────────────────────────────────
 # Every behavior above is verified by tests/cli-smoke.sh and backed by the
 # captures in tests/spike-results/. After every Obsidian CLI minor-version
@@ -193,8 +201,30 @@ do_create_or_append() {
   return 0
 }
 
+# do_read_canvas — see header for the contract.
+do_read_canvas() {
+  local path=""
+  for arg in "$@"; do
+    case "$arg" in
+      path=*) path="${arg#path=}" ;;
+      *) echo "Error: read-canvas: unknown argument '$arg'" >&2; return 1 ;;
+    esac
+  done
+  if [ -z "$path" ]; then
+    echo "Error: read-canvas requires path=<vault-relative-path>" >&2
+    return 1
+  fi
+  local abs_path="$VAULT/$path"
+  if [ ! -f "$abs_path" ]; then
+    echo "Error: read-canvas: file not found: $abs_path" >&2
+    return 2
+  fi
+  "$SCRIPT_DIR/read-canvas.sh" "$abs_path"
+}
+
 case "${1:-}" in
   create-or-append) shift; do_create_or_append "$@"; exit $? ;;
+  read-canvas)      shift; do_read_canvas "$@";       exit $? ;;
 esac
 
 # 4. Run the verb. Capture stdout so we can inspect it for error markers.
