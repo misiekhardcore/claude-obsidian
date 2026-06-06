@@ -24,12 +24,25 @@ Abort if output ≠ `VAULT_ROOT`.
 
 ## Process
 
-For each file (up to `MAX_FILES`):
+For each file (up to `MAX_FILES`), use the cheapest read that provides the needed information:
+
 ```bash
-obsidian read path=<vault-relative-path>
+# Level 1: structure only (cheapest) — check headings before reading body
+obsidian outline path=<vault-relative-path>
+
+# Level 2: frontmatter + first section (default for most files)
+obsidian read-head path=<vault-relative-path> lines=30
+
+# Level 3: search within file (when looking for specific content)
+# obsidian grep path=<vault-relative-path> pattern=<term>
+
+# Level 4: full file (only when cheaper reads don't suffice)
+# obsidian read path=<vault-relative-path>
 ```
 
-Extract: frontmatter (`type`, `title`, `status`, `confidence`, `tags`, `related`, `created`, `updated`), first substantive paragraph, any `> [!contradiction]` or `> [!gap]` callouts.
+Start at Level 1 (`outline`) if you're unfamiliar with the file. Escalate only when `outline` or `read-head` don't provide enough context for the structured summary.
+
+Extract: frontmatter (`type`, `title`, `status`, `confidence`, `tags`, `related`, `created`, `updated`), first substantive paragraph, any `> [!contradiction]` or `> [!gap]` callouts. If the head doesn't contain enough information (e.g., the callouts or paragraph are below line 30), fall back to a full `obsidian read` for that specific file.
 
 ## Output
 

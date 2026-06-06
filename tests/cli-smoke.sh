@@ -203,6 +203,125 @@ if [ -n "$SCRATCH_VAULT_PATH" ] && [ -d "$SCRATCH_VAULT_PATH/$VERB_SCRATCH" ]; t
 fi
 
 echo ""
+echo "=== wrapper-only verb — read-head ==="
+
+# 1. read-head on existing file with default lines.
+out=$("$WRAPPER" read-head path=wiki/hot.md 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "read-head existing file"
+line_count=$(echo "$out" | wc -l)
+if [ "$line_count" -le 20 ] 2>/dev/null; then
+  pass "read-head default — $line_count lines (≤20)"
+else
+  fail "read-head default — expected ≤20 lines, got $line_count"
+fi
+
+# 2. read-head with explicit lines=5.
+out=$("$WRAPPER" read-head path=wiki/hot.md lines=5 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "read-head lines=5"
+line_count=$(echo "$out" | wc -l)
+if [ "$line_count" -le 5 ] 2>/dev/null; then
+  pass "read-head lines=5 — $line_count lines (≤5)"
+else
+  fail "read-head lines=5 — expected ≤5 lines, got $line_count"
+fi
+
+# 3. read-head on missing file → error.
+out=$("$WRAPPER" read-head path=wiki/__definitely_not_a_file__.md 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "read-head missing file"
+
+# 4. read-head bad args (no path).
+out=$("$WRAPPER" read-head 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "read-head no args"
+
+# 5. read-head with invalid lines value.
+out=$("$WRAPPER" read-head path=wiki/hot.md lines=-1 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "read-head negative lines"
+
+echo ""
+echo "=== wrapper-only verb — read-tail ==="
+
+# 1. read-tail on existing file with default lines.
+out=$("$WRAPPER" read-tail path=wiki/hot.md 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "read-tail existing file"
+line_count=$(echo "$out" | wc -l)
+if [ "$line_count" -le 20 ] 2>/dev/null; then
+  pass "read-tail default — $line_count lines (≤20)"
+else
+  fail "read-tail default — expected ≤20 lines, got $line_count"
+fi
+
+# 2. read-tail with explicit lines=5.
+out=$("$WRAPPER" read-tail path=wiki/hot.md lines=5 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "read-tail lines=5"
+line_count=$(echo "$out" | wc -l)
+if [ "$line_count" -le 5 ] 2>/dev/null; then
+  pass "read-tail lines=5 — $line_count lines (≤5)"
+else
+  fail "read-tail lines=5 — expected ≤5 lines, got $line_count"
+fi
+
+# 3. read-tail on missing file → error.
+out=$("$WRAPPER" read-tail path=wiki/__definitely_not_a_file__.md 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "read-tail missing file"
+
+# 4. read-tail bad args (no path).
+out=$("$WRAPPER" read-tail 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "read-tail no args"
+
+echo ""
+echo "=== wrapper-only verb — grep ==="
+
+# 1. grep existing file with matching pattern.
+out=$("$WRAPPER" grep path=wiki/hot.md pattern="the" 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "grep matching pattern"
+assert_contains "$out" "the" "grep output contains match"
+
+# 2. grep with no matches → exit 1.
+out=$("$WRAPPER" grep path=wiki/hot.md pattern="__xyznonexistent__" 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "grep no matches"
+
+# 3. grep with context.
+out=$("$WRAPPER" grep path=wiki/hot.md pattern="the" context=1 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "grep with context"
+# With context=1, output should be at least as many lines as plain grep
+plain_count=$(echo "$out" | wc -l)
+[ "$plain_count" -ge 1 ] && pass "grep context=1 — output non-empty ($plain_count lines)" \
+  || fail "grep context=1 — expected output, got empty"
+
+# 4. grep bad args (no pattern).
+out=$("$WRAPPER" grep path=wiki/hot.md 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "grep no pattern"
+
+# 5. grep missing file → error.
+out=$("$WRAPPER" grep path=wiki/__nope__.md pattern="test" 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "grep missing file"
+
+echo ""
+echo "=== wrapper-only verb — grep-files ==="
+
+# 1. grep-files with matching pattern (wiki/ scope is default).
+# Use ignore-case=true because CI seeds wiki/hot.md with "Hot cache" (capital H).
+out=$("$WRAPPER" grep-files pattern="hot" dir=wiki ignore-case=true 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "grep-files matching pattern"
+# Output should contain vault-relative paths
+case "$out" in
+  *wiki/*) pass "grep-files output contains vault-relative paths" ;;
+  *)       fail "grep-files expected vault-relative paths, got: $(echo "$out" | head -3)" ;;
+esac
+
+# 2. grep-files no matches → exit 1.
+out=$("$WRAPPER" grep-files pattern="__xyznonexistentzzz__" 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "grep-files no matches"
+
+# 3. grep-files bad dir → exit 2.
+out=$("$WRAPPER" grep-files pattern="test" dir=__nope__ 2>/dev/null); rc=$?
+assert_exit 2 "$rc" "grep-files bad dir"
+
+# 4. grep-files no pattern → error.
+out=$("$WRAPPER" grep-files 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "grep-files no pattern"
+
+echo ""
 echo "=== rewrite-hook — PreToolUse Bash auto-rewrite ==="
 
 REWRITE_HOOK="$PLUGIN_ROOT/hooks/obsidian-cli-rewrite.sh"
