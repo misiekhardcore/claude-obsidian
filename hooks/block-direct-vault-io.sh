@@ -77,6 +77,7 @@ esac
 REASON="Direct ${TOOL_NAME} on vault path '${REL}' is blocked by the claude-obsidian active-enforcement hook. Route this through the Obsidian CLI via Bash so the vault-open preflight, exit-code normalization, and daily-file race guard apply.
 
 Use one of:
+  obsidian outline path=${REL}                                 (heading tree — cheapest)
   obsidian read path=${REL}                                    (full read)
   obsidian read-head path=${REL} [lines=N]                     (first N lines — saves context)
   obsidian read-tail path=${REL} [lines=N]                     (last N lines — saves context)

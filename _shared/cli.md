@@ -161,11 +161,50 @@ All verbs listed below are native Obsidian CLI commands unless marked **wrapper-
 obsidian eval code="await app.vault.adapter.write('path/to/file', '<full content>');"
 ```
 
-### 3.2 Context-saving read verbs (wrapper-only)
+### 3.2 Context-saving read strategies
 
-These verbs return partial file content to save LLM context without sacrificing access to vault information.
+These verbs return partial file content to save LLM context without sacrificing access to vault information. Some are wrapper-only (synthesized by `obsidian-cli.sh`), others are native CLI verbs deployed strategically.
 
-#### `read-head`
+**Decision tree for reading a file:**
+1. Need just the structure? → `outline` (cheapest: only headings)
+2. Need frontmatter + intro? → `read-head` (default 20 lines)
+3. Need specific content? → `grep` (matching lines only)
+4. Need the latest entries? → `read-tail` (last N lines, for log/daily files)
+5. Need the full file? → `read` (most expensive — full content)
+
+#### `outline` (native CLI)
+
+Returns the heading tree of a file — a table of contents without any body text. ~5-15 lines for most wiki pages vs 94 avg for a full read. Supports multiple output formats. This is the **cheapest way to understand a file's structure**.
+
+```bash
+# Default tree format — hierarchical, easy to scan
+obsidian outline path=wiki/concepts/orchestration-control-loop.md
+# → ## Overview
+# → ## Architecture
+# → ### Control Flow
+# → ## Trade-offs
+
+# JSON format — useful for programmatic inspection
+obsidian outline path=wiki/concepts/foo.md format=json
+
+# Markdown format — renders as actual markdown headings
+obsidian outline path=wiki/concepts/foo.md format=md
+
+# Count headings only (cheapest possible probe)
+obsidian outline path=wiki/concepts/foo.md total
+```
+
+|Aspect|Behavior|
+|-|-|
+|`path=` / `file=`|Required. Vault-relative path or file name.|
+|`format=tree\|md\|json`|Optional. Default: `tree` (indented hierarchy). `json` for structured, `md` for rendered.|
+|`total`|Optional. Return heading count only.|
+|Output|Heading tree or count.|
+|Exit|0 success; 1 error.|
+
+**When to use:** Before deciding to read a full page, run `outline` to check if the file actually covers what you need. If the section headings don't match the question, skip the full read.
+
+#### `read-head` (wrapper-only)
 
 Read first N lines of a vault file. Includes both frontmatter and body content (the raw file from `obsidian read`, piped through `head`). Default N=20 covers the frontmatter block plus the first paragraph for most wiki pages — ~200 tokens vs ~1,000+ for a full read.
 
