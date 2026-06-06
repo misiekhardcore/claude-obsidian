@@ -238,6 +238,37 @@ out=$("$WRAPPER" read-head path=wiki/hot.md lines=-1 2>/dev/null); rc=$?
 assert_exit 1 "$rc" "read-head negative lines"
 
 echo ""
+echo "=== wrapper-only verb — read-tail ==="
+
+# 1. read-tail on existing file with default lines.
+out=$("$WRAPPER" read-tail path=wiki/hot.md 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "read-tail existing file"
+line_count=$(echo "$out" | wc -l)
+if [ "$line_count" -le 20 ] 2>/dev/null; then
+  pass "read-tail default — $line_count lines (≤20)"
+else
+  fail "read-tail default — expected ≤20 lines, got $line_count"
+fi
+
+# 2. read-tail with explicit lines=5.
+out=$("$WRAPPER" read-tail path=wiki/hot.md lines=5 2>/dev/null); rc=$?
+assert_exit 0 "$rc" "read-tail lines=5"
+line_count=$(echo "$out" | wc -l)
+if [ "$line_count" -le 5 ] 2>/dev/null; then
+  pass "read-tail lines=5 — $line_count lines (≤5)"
+else
+  fail "read-tail lines=5 — expected ≤5 lines, got $line_count"
+fi
+
+# 3. read-tail on missing file → error.
+out=$("$WRAPPER" read-tail path=wiki/__definitely_not_a_file__.md 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "read-tail missing file"
+
+# 4. read-tail bad args (no path).
+out=$("$WRAPPER" read-tail 2>/dev/null); rc=$?
+assert_exit 1 "$rc" "read-tail no args"
+
+echo ""
 echo "=== wrapper-only verb — grep ==="
 
 # 1. grep existing file with matching pattern.

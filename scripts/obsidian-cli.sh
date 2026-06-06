@@ -85,6 +85,13 @@
 #     Output: first N lines of the file (may be empty for blank files).
 #     Exit:   0 success, 1 via underlying read error.
 #
+#   read-tail  path=<vault-relative-path> [lines=N]
+#     Reads the last N lines of a vault file. Useful for append-only files
+#     (wiki/log.md, daily/*.md) where the newest content is at the bottom.
+#     Default N=20. Underlying implementation: `obsidian read | tail -n N`.
+#     Output: last N lines of the file.
+#     Exit:   0 success, 1 via underlying read error.
+#
 #   grep  path=<vault-relative-path> pattern=<substring-or-regex> [context=N] [ignore-case=true]
 #     Searches within a single vault file. Returns matching lines with
 #     optional surrounding context. Uses `obsidian read | grep` underneath so
@@ -250,6 +257,29 @@ do_read_head() {
   return "$rc"
 }
 
+# do_read_tail — see header for the contract.
+do_read_tail() {
+  local path="" lines="20"
+  for arg in "$@"; do
+    case "$arg" in
+      path=*)  path="${arg#path=}" ;;
+      lines=*) lines="${arg#lines=}" ;;
+      *) echo "Error: read-tail: unknown argument '$arg'" >&2; return 1 ;;
+    esac
+  done
+  if [ -z "$path" ]; then
+    echo "Error: read-tail requires path=<vault-relative-path>" >&2
+    return 1
+  fi
+  if ! [[ "$lines" =~ ^[0-9]+$ ]] || [ "$lines" -lt 1 ]; then
+    echo "Error: read-tail: lines must be a positive integer" >&2
+    return 1
+  fi
+  run_obs read "path=$path" 2>/dev/null | tail -n "$lines"
+  local rc="${PIPESTATUS[0]}"
+  return "$rc"
+}
+
 # do_grep — see header for the contract.
 do_grep() {
   local path="" pattern="" context="0" ignore_case=""
@@ -364,6 +394,7 @@ do_read_canvas() {
 case "${1:-}" in
   create-or-append) shift; do_create_or_append "$@"; exit $? ;;
   read-head)        shift; do_read_head "$@";        exit $? ;;
+  read-tail)        shift; do_read_tail "$@";        exit $? ;;
   grep)             shift; do_grep "$@";             exit $? ;;
   grep-files)       shift; do_grep_files "$@";       exit $? ;;
   read-canvas)      shift; do_read_canvas "$@";       exit $? ;;

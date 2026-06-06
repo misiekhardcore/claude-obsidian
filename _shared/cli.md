@@ -50,6 +50,7 @@ Locked by empirical spike. Do not override without documented reason.
 |`commands`|plain text|
 |`outline`|plain text|
 |`read-head`|wrapper-only; see §3.1|
+|`read-tail`|wrapper-only; see §3.1|
 |`grep`|wrapper-only; see §3.1|
 |`grep-files`|wrapper-only; see §3.1|
 |`create-or-append`|wrapper-only; see §3.1|
@@ -68,7 +69,7 @@ These verbs return partial file content to save LLM context without sacrificing 
 
 #### `read-head`
 
-Read first N lines of a vault file (frontmatter + intro). Default N=20 covers frontmatter plus the first paragraph for most wiki pages — ~200 tokens vs ~1,000+ for a full read.
+Read first N lines of a vault file. Includes both frontmatter and body content (the raw file from `obsidian read`, piped through `head`). Default N=20 covers the frontmatter block plus the first paragraph for most wiki pages — ~200 tokens vs ~1,000+ for a full read.
 
 ```bash
 obsidian read-head path=wiki/concepts/foo.md
@@ -79,7 +80,23 @@ obsidian read-head path=wiki/hot.md lines=10
 |-|-|
 |`path=`|Required. Vault-relative path.|
 |`lines=N`|Optional. Positive integer. Default: 20.|
-|Output|First N lines of the file (plain text).|
+|Output|First N lines of the raw file — frontmatter (`---` block) + body.|
+|Exit|0 success; 1 error (bad args, missing file via underlying read).|
+
+#### `read-tail`
+
+Read last N lines of a vault file. Returns raw file content (both frontmatter and body) from the bottom. Useful for append-only files (`wiki/log.md`, `daily/*.md`) where the newest content is at the bottom. Default N=20.
+
+```bash
+obsidian read-tail path=wiki/log.md
+obsidian read-tail path=daily/2026-06-06.md lines=10
+```
+
+|Aspect|Behavior|
+|-|-|
+|`path=`|Required. Vault-relative path.|
+|`lines=N`|Optional. Positive integer. Default: 20.|
+|Output|Last N lines of the raw file — may include frontmatter for short files, body-only for long files.|
 |Exit|0 success; 1 error (bad args, missing file via underlying read).|
 
 #### `grep`
