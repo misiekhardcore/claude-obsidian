@@ -26,7 +26,7 @@ See `${CLAUDE_PLUGIN_ROOT}/_shared/cli-reference.md` for full exit-code table an
 
 ## 3. Verb reference
 
-All verbs listed below are native Obsidian CLI commands unless marked **wrapper-only** (synthesized by `scripts/obsidian-cli.sh`). The upstream CLI always exits 0; the wrapper normalizes exit codes per §2.
+The upstream CLI always exits 0; the wrapper normalizes exit codes per §2. Verbs marked with ⚡ are **wrapper-only** (synthesized by `scripts/obsidian-cli.sh`).
 
 ### 3.1 Verb table (grouped by category)
 
@@ -35,9 +35,12 @@ All verbs listed below are native Obsidian CLI commands unless marked **wrapper-
 |Verb|Args|Output|Notes|
 |-|-|-|-|
 |`read`|`file=` / `path=`|plain text|Full file content|
+|`read-head` ⚡|`path=`, [`lines=N`]|first N lines|Wrapper-only. First N lines of a file (default 20). See §3.2.|
+|`read-tail` ⚡|`path=`, [`lines=N`]|last N lines|Wrapper-only. Last N lines of a file (default 20). See §3.2.|
 |`create`|`path=`, `content=`, [`template=`, `overwrite`, `open`, `newtab`]|`Created: <path>`|`overwrite` flag (no `=`) for full replacement|
 |`append`|`file=` / `path=`, `content=`, [`inline`]|`Appended to: <path>`|`inline` omits trailing newline|
 |`prepend`|`file=` / `path=`, `content=`, [`inline`]|`Prepended to: <path>`|`inline` omits trailing newline|
+|`create-or-append` ⚡|`file=`, `template=`, `content=`|`Created and appended: <path>` / `Appended to: <path>`|Wrapper-only. Atomic create-or-append for daily/*.md (issue #98 race guard). See §3.3.|
 |`delete`|`file=` / `path=`, [`permanent`]|confirmation text|`permanent` skips trash|
 |`move`|`file=` / `path=`, `to=`|confirmation text|Destination folder or path|
 |`rename`|`file=` / `path=`, `name=`|confirmation text|New filename only|
@@ -67,9 +70,11 @@ All verbs listed below are native Obsidian CLI commands unless marked **wrapper-
 |-|-|-|-|
 |`search`|`query=`, [`path=`, `limit=`, `total`, `case`, `format=`]|json|`format=text\|json` (default text). Full-text search across vault.|
 |`search:context`|`query=`, [`path=`, `limit=`, `case`, `format=`]|plain text|Search with matching line context|
+|`grep` ⚡|`path=`, `pattern=`, [`context=N`, `ignore-case=true`]|matching lines|Wrapper-only. Search within a single file via `obsidian read \| grep`. See §3.2.|
+|`grep-files` ⚡|`pattern=`, [`dir=`, `context=N`, `ignore-case=true`]|matching lines with paths|Wrapper-only. Cross-file grep on filesystem (read-only). See §3.2.|
+|`outline`|`file=` / `path=`, [`total`, `format=`]|plain text|`format=tree\|md\|json` (default tree). Headings as tree/md/json.|
 |`tags`|`file=` / `path=`, [`total`, `counts`, `sort=count`, `format=`, `active`]|plain text|`format=json\|tsv\|csv` (default tsv)|
 |`tag`|`name=`, [`total`, `verbose`]|plain text|Tag info + occurrence count|
-|`outline`|`file=` / `path=`, [`total`, `format=`]|plain text|`format=tree\|md\|json` (default tree). Headings as tree/md/json.|
 
 #### File & folder listing
 
@@ -140,18 +145,8 @@ All verbs listed below are native Obsidian CLI commands unless marked **wrapper-
 
 |Verb|Args|Output|Notes|
 |-|-|-|-|
-|`files`|`dir=<path>`, `ext=`, `format=json`|`[{"path": "..."}]`|Used for listing .canvas files (see §6).|
-
-**Wrapper-only verbs** — these are not part of the upstream CLI; the wrapper synthesizes them:
-
-|Verb|See §|Purpose|
-|-|-|-|
-|`read-head`|§3.2|First N lines of a file (context-saving)|
-|`read-tail`|§3.2|Last N lines of a file (context-saving)|
-|`grep`|§3.2|Search within a single file (context-saving)|
-|`grep-files`|§3.2|Cross-file grep (context-saving)|
-|`create-or-append`|§3.3|Atomic append to daily/*.md (issue #98 race guard)|
-|`read-canvas`|§6|Structured .canvas file reader|
+|`files`|`dir=<path>`, `ext=`, `format=json`|`[{"path": "..."}]`|List .canvas files (see §6).|
+|`read-canvas` ⚡|`path=`|structured plain text|Wrapper-only. Reads .canvas as structured text (groups as ##, edges resolved). See §6.|
 
 **Multiline `content=`:** `\n` and `\t` round-trip correctly. Use `\n` for newlines.
 
