@@ -24,36 +24,134 @@ All vault operations through `scripts/obsidian-cli.sh` (PreToolUse hook rewrites
 
 See `${CLAUDE_PLUGIN_ROOT}/_shared/cli-reference.md` for full exit-code table and escape hatches.
 
-## 3. Format defaults
+## 3. Verb reference
 
-Locked by empirical spike. Do not override without documented reason.
+All verbs listed below are native Obsidian CLI commands unless marked **wrapper-only** (synthesized by `scripts/obsidian-cli.sh`). The upstream CLI always exits 0; the wrapper normalizes exit codes per §2.
 
-|Verb|Output format|
-|-|-|
-|`read`|plain text|
-|`create`|`Created: <path>`|
-|`append`|`Appended to: <path>`|
-|`prepend`|`Prepended to: <path>`|
-|`backlinks`|json: `[{"file": "<path>"}]`|
-|`unresolved`|json: `[{"link": "..."}]`|
-|`search`|json|
-|`search:context`|plain text|
-|`orphans`|plain text (no json support)|
-|`deadends`|plain text (no json support)|
-|`tasks`|plain text (no json support)|
-|`tags`|plain text (no json support)|
-|`properties`|plain text (no json support)|
-|`property:read`|plain text (single value)|
-|`property:set`|plain text|
-|`property:remove`|plain text|
-|`bases`|plain text|
-|`commands`|plain text|
-|`outline`|plain text|
-|`read-head`|wrapper-only; see §3.1|
-|`read-tail`|wrapper-only; see §3.1|
-|`grep`|wrapper-only; see §3.1|
-|`grep-files`|wrapper-only; see §3.1|
-|`create-or-append`|wrapper-only; see §3.1|
+### 3.1 Verb table (grouped by category)
+
+#### Content read/write
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`read`|`file=` / `path=`|plain text|Full file content|
+|`create`|`path=`, `content=`, [`template=`, `overwrite`, `open`, `newtab`]|`Created: <path>`|`overwrite` flag (no `=`) for full replacement|
+|`append`|`file=` / `path=`, `content=`, [`inline`]|`Appended to: <path>`|`inline` omits trailing newline|
+|`prepend`|`file=` / `path=`, `content=`, [`inline`]|`Prepended to: <path>`|`inline` omits trailing newline|
+|`delete`|`file=` / `path=`, [`permanent`]|confirmation text|`permanent` skips trash|
+|`move`|`file=` / `path=`, `to=`|confirmation text|Destination folder or path|
+|`rename`|`file=` / `path=`, `name=`|confirmation text|New filename only|
+
+#### Frontmatter
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`property:read`|`name=`, `file=` / `path=`|plain text (single value)|Read one property|
+|`property:set`|`name=`, `value=`, `file=` / `path=`, [`type=`]|plain text|`type=text\|list\|number\|checkbox\|date\|datetime`|
+|`property:remove`|`name=`, `file=` / `path=`|plain text||
+|`properties`|`file=` / `path=`, [`name=`, `total`, `sort=count`, `counts`, `format=`]|plain text (yaml default)|`format=yaml\|json\|tsv`|
+
+#### Cross-reference (links)
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`backlinks`|`file=` / `path=`, [`counts`, `total`, `format=`]|`[{"file": "<path>"}]`|`format=json\|tsv\|csv` (default tsv)|
+|`links`|`file=` / `path=`, [`total`]|plain text (wikilinks)|Outgoing links from a file|
+|`unresolved`|[`counts`, `total`, `verbose`, `format=`]|`[{"link": "..."}]`|`format=json\|tsv\|csv` (default tsv)|
+|`orphans`|[`total`, `all`]|plain text (one path/line)|Files with no incoming links|
+|`deadends`|[`total`, `all`]|plain text (one path/line)|Files with no outgoing links|
+
+#### Search & discovery
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`search`|`query=`, [`path=`, `limit=`, `total`, `case`, `format=`]|json|`format=text\|json` (default text). Full-text search across vault.|
+|`search:context`|`query=`, [`path=`, `limit=`, `case`, `format=`]|plain text|Search with matching line context|
+|`tags`|`file=` / `path=`, [`total`, `counts`, `sort=count`, `format=`, `active`]|plain text|`format=json\|tsv\|csv` (default tsv)|
+|`tag`|`name=`, [`total`, `verbose`]|plain text|Tag info + occurrence count|
+|`outline`|`file=` / `path=`, [`total`, `format=`]|plain text|`format=tree\|md\|json` (default tree). Headings as tree/md/json.|
+
+#### File & folder listing
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`files`|[`folder=`, `ext=`, `total`]|plain text (one path/line)|List vault files. Already mentioned in §6 for canvas listing.|
+|`folders`|[`folder=`, `total`]|plain text (one path/line)|List vault folders|
+|`file`|`file=` / `path=`|plain text (info block)|Created/modified timestamps, size, etc.|
+|`folder`|`path=`, [`info=files\|folders\|size`]|plain text|Folder stats. `info=` returns only that field.|
+
+#### Daily notes
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`daily:path`|—|plain text (path string)|Get today's daily note path|
+|`daily:read`|—|plain text|Read today's daily note content|
+|`daily:append`|`content=`, [`inline`, `open`, `paneType=`]|`Appended to: <path>`|Append to daily note|
+|`daily:prepend`|`content=`, [`inline`, `open`, `paneType=`]|`Prepended to: <path>`|Prepend to daily note|
+
+#### Vault info & navigation
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`vault`|[`info=name\|path\|files\|folders\|size`]|plain text|Vault-level stats. `info=` returns only that field.|
+|`vaults`|[`total`, `verbose`]|plain text|List known vaults|
+|`version`|—|plain text|Obsidian version string|
+|`aliases`|`file=` / `path=`, [`total`, `verbose`, `active`]|plain text|File aliases|
+|`recents`|[`total`]|plain text (one path/line)|Recently opened files|
+|`wordcount`|`file=` / `path=`, [`words`, `characters`]|plain text (number)|Word/char count|
+
+#### Task management
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`tasks`|`file=` / `path=`, [`total`, `done`, `todo`, `status=`, `verbose`, `format=`, `active`, `daily`]|plain text|`format=json\|tsv\|csv` (default text)|
+|`task`|`ref=`, `file=` / `path=`, `line=`, [`toggle`, `done`, `todo`, `status=`]|plain text|Show/update a specific task by ref or line. `daily` flag for daily note.|
+
+#### Plugin & extension
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`plugins`|[`filter=core\|community`, `versions`, `format=`]|plain text|`format=json\|tsv\|csv` (default tsv)|
+|`plugins:enabled`|[`filter=core\|community`]|plain text||
+|`plugin`|`id=`|plain text|Plugin info|
+|`plugin:enable`|`id=`, [`filter=`]|plain text||
+|`plugin:disable`|`id=`, [`filter=`]|plain text||
+|`templates`|[`total`]|plain text|List templates|
+|`template:read`|`name=`, [`resolve`, `title=`]|plain text|Template content, optionally with variables resolved|
+|`bookmarks`|[`total`, `verbose`, `format=`]|plain text|`format=json\|tsv\|csv` (default tsv)|
+|`bookmark`|`file=` / `folder=` / `search=` / `url=`, [`subpath=`, `title=`]|confirmation text|Add a bookmark|
+
+#### Maintenance & admin
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`commands`|[`filter=`]|plain text|List available command IDs|
+|`command`|`id=`|depends on command|Execute command by ID (escape hatch #1)|
+|`eval`|`code=`|JS return value|Execute JavaScript (escape hatch #2 — last resort)|
+|`reload`|—|no output|Reload the vault|
+|`hotkeys`|[`total`, `verbose`, `format=`, `all`]|plain text|`format=json\|tsv\|csv` (default tsv)|
+|`diff`|`file=` / `path=`, [`from=`, `to=`, `filter=local\|sync`]|plain text|Diff local/sync versions|
+|`history`|`file=` / `path=`|plain text|List file history versions|
+|`history:read`|`file=` / `path=`, `version=`|plain text|Read a specific history version|
+|`history:restore`|`file=` / `path=`, `version=`|confirmation text|Restore a history version|
+|`sync:status`|—|plain text|Show sync status|
+
+#### Canvas
+
+|Verb|Args|Output|Notes|
+|-|-|-|-|
+|`files`|`dir=<path>`, `ext=`, `format=json`|`[{"path": "..."}]`|Used for listing .canvas files (see §6).|
+
+**Wrapper-only verbs** — these are not part of the upstream CLI; the wrapper synthesizes them:
+
+|Verb|See §|Purpose|
+|-|-|-|
+|`read-head`|§3.2|First N lines of a file (context-saving)|
+|`read-tail`|§3.2|Last N lines of a file (context-saving)|
+|`grep`|§3.2|Search within a single file (context-saving)|
+|`grep-files`|§3.2|Cross-file grep (context-saving)|
+|`create-or-append`|§3.3|Atomic append to daily/*.md (issue #98 race guard)|
+|`read-canvas`|§6|Structured .canvas file reader|
 
 **Multiline `content=`:** `\n` and `\t` round-trip correctly. Use `\n` for newlines.
 
@@ -63,7 +161,7 @@ Locked by empirical spike. Do not override without documented reason.
 obsidian eval code="await app.vault.adapter.write('path/to/file', '<full content>');"
 ```
 
-### 3.1 Context-saving read verbs (wrapper-only)
+### 3.2 Context-saving read verbs (wrapper-only)
 
 These verbs return partial file content to save LLM context without sacrificing access to vault information.
 
@@ -135,7 +233,7 @@ obsidian grep-files pattern="orchestration" dir=wiki/concepts ignore-case=true
 |Output|Matching lines with vault-relative filename prefix.|
 |Exit|0 matches found; 1 no matches; 2 bad args (dir not found).|
 
-### 3.2 `create-or-append` (wrapper-only)
+### 3.3 `create-or-append` (wrapper-only)
 
 Atomic "create or append" (prevents read-modify-overwrite races per issue #98).
 
@@ -155,9 +253,9 @@ obsidian create-or-append \
 |Output (exists)|`Appended to: <path>`|
 |Exit|0 success; 1 on error|
 
-Does NOT read body or touch frontmatter. Use `property:set` (§3.3) for `updated:` mutations.
+Does NOT read body or touch frontmatter. Use `property:set` (§3.4) for `updated:` mutations.
 
-### 3.3 Native property verbs
+### 3.4 Native property verbs
 
 Read, write, or remove a single frontmatter property without touching the file body.
 
@@ -183,6 +281,168 @@ obsidian properties path=wiki/concepts/foo.md
 |`properties`|—|`file=` or `path=`, `name=`, `total`, `sort=count`, `counts`, `format=yaml\|json\|tsv`|
 
 **Re-spike after CLI version bump:** add `property:*` cases to `scripts/cli-spike.sh` and capture results.
+
+### 3.5 File life-cycle verbs
+
+Delete, move, or rename vault files. These are destructive — use with care.
+
+```bash
+# Delete (to trash by default)
+obsidian delete path=wiki/concepts/stale-draft.md
+
+# Permanent delete (skip trash)
+obsidian delete path=_spike-scratch/temp.md permanent
+
+# Move to a different folder
+obsidian move path=notes/quick-thought.md to=wiki/concepts/
+
+# Rename in place
+obsidian rename path=wiki/concepts/old-name.md name=new-name
+```
+
+|Verb|Required args|Optional args|
+|-|-|-|
+|`delete`|`file=` or `path=`|`permanent` (skip trash)|
+|`move`|`file=` or `path=`, `to=`|—|
+|`rename`|`file=` or `path=`, `name=`|—|
+
+### 3.6 Discovery & info verbs
+
+These verbs help agents understand vault structure, find files, and inspect metadata without reading full file bodies.
+
+**List files:** `obsidian files` lists vault paths. Filter by folder or extension. Combines with `jq` for structured queries:
+
+```bash
+# List all markdown files in a folder
+obsidian files folder=wiki/concepts ext=md
+
+# Count files in vault
+obsidian files total
+
+# List all files as JSON (one object per line) → filter with jq
+obsidian files folder=wiki/sources format=json | jq -r '.[].path'
+```
+
+**File info:** `obsidian file` returns creation/modified timestamps and size:
+
+```bash
+obsidian file path=wiki/concepts/foo.md
+# → path: wiki/concepts/foo.md
+#    created: 2026-01-15 10:30
+#    modified: 2026-06-01 14:22
+#    size: 2842 bytes
+#    extension: md
+```
+
+**Folder info:** `obsidian folder` returns folder stats:
+
+```bash
+# All info
+obsidian folder path=wiki/concepts
+
+# Single stat
+obsidian folder path=wiki/concepts info=files
+```
+
+**Outgoing links:** `obsidian links` lists wikilinks from a file:
+
+```bash
+obsidian links path=wiki/concepts/foo.md
+# → [[bar]]
+#    [[baz|Display Name]]
+```
+
+**Word count:** `obsidian wordcount` for lint and token estimation:
+
+```bash
+# Full stats
+obsidian wordcount path=wiki/hot.md
+# → Words: 420, Characters: 2800
+
+# Single stat
+obsidian wordcount path=wiki/hot.md words
+```
+
+**Vault info:** `obsidian vault` for top-level context:
+
+```bash
+obsidian vault
+obsidian vault info=files
+obsidian vault info=size
+```
+
+### 3.7 Daily-note verbs
+
+Native CLI verbs for daily-note operations, exposed because daily notes get enough traffic to warrant dedicated commands. These operate on the **current day's** daily note (resolved by Obsidian's daily-note plugin setting, typically `daily/YYYY-MM-DD.md`).
+
+```bash
+# Get today's daily note path (resolve the date-based filename)
+path=$(obsidian daily:path)
+# → daily/2026-06-06.md
+
+# Read today's daily note
+obsidian daily:read
+
+# Append to today's daily note
+obsidian daily:append content="- 14:00 finished the CLI reference update"
+
+# Prepend to today's daily note (newest entries at top)
+obsidian daily:prepend content="- 14:00 finished the CLI reference update"
+```
+
+`daily:append` and `daily:prepend` are convenience wrappers around `append`/`prepend` that automatically resolve `file=` to the current daily note. They are safe for single-agent use but do NOT have the create-or-append race guard (issue #98) — for daily-file appends in multi-agent or cron contexts, prefer `create-or-append` (§3.3).
+
+**`daily:path` is preferred over hard-coding `daily/$(date +%Y-%m-%d).md`** because it honours Obsidian's daily-note format setting (some vaults use `YYYYMMDD` or other formats).
+
+### 3.8 Task verbs
+
+List or update tasks across the vault or within a specific file.
+
+```bash
+# List all incomplete tasks
+obsidian tasks todo
+
+# List tasks from daily note
+obsidian tasks daily
+
+# List tasks in a specific file, grouped with line numbers
+obsidian tasks path=daily/2026-06-06.md verbose
+
+# Toggle a task by reference (path:line)
+obsidian task ref="daily/2026-06-06.md:15" toggle
+
+# Mark a task done by path + line
+obsidian task path=daily/2026-06-06.md line=15 done
+
+# Set a custom status character
+obsidian task path=daily/2026-06-06.md line=15 status="/"
+```
+
+|Verb|Args|Notes|
+|-|-|-|
+|`tasks`|`file=` / `path=`, `total`, `done`, `todo`, `status=`, `verbose`, `format=json\|tsv\|csv`, `active`, `daily`|List tasks. Default format: text (one line per task). `format=json` for structured output.|
+|`task`|`ref=`, `file=` / `path=`, `line=`, `toggle`, `done`, `todo`, `status=`, `daily`|Show or update a single task. `ref` is `path:line` format. One action per call.|
+
+### 3.9 Maintenance verbs
+
+```bash
+# Reload vault after external changes
+obsidian reload
+
+# List registered command IDs (useful for `command id=`)
+obsidian commands filter=app:
+
+# Execute a named command (escape hatch #1)
+obsidian command id=app:open-vault
+
+# List templates
+obsidian templates
+
+# Read template content (optionally with variables resolved)
+obsidian template:read name=concept resolve title="My Concept"
+```
+
+**Re-spike after CLI version bump:** add new verbs to `scripts/cli-spike.sh` and capture results.
 
 ## 4. Cron-time behavior
 

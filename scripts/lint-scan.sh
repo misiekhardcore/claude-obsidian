@@ -131,7 +131,7 @@ done
 # Canvas files are JSON; wikilinks live in node text fields. obsidian's CLI
 # verbs (deadends, unresolved) do not cover canvas, so we parse files directly.
 # Documented bypass: canvas JSON requires direct file reads because no structured
-# CLI verb exists for canvas wikilink extraction (see _shared/cli.md §7).
+# CLI verb exists for canvas wikilink extraction (see _shared/cli.md §6).
 
 # Build resolver pool from filesystem (basenames without extension).
 # Used only for canvas link verification; .md dead-link checking uses obsidian unresolved.
