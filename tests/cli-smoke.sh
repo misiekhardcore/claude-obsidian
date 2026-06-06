@@ -300,7 +300,8 @@ echo ""
 echo "=== wrapper-only verb — grep-files ==="
 
 # 1. grep-files with matching pattern (wiki/ scope is default).
-out=$("$WRAPPER" grep-files pattern="hot" dir=wiki 2>/dev/null); rc=$?
+# Use ignore-case=true because CI seeds wiki/hot.md with "Hot cache" (capital H).
+out=$("$WRAPPER" grep-files pattern="hot" dir=wiki ignore-case=true 2>/dev/null); rc=$?
 assert_exit 0 "$rc" "grep-files matching pattern"
 # Output should contain vault-relative paths
 case "$out" in
