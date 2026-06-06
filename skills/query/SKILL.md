@@ -48,7 +48,7 @@ After candidates are read:
 
 5. **Step leaf → hub when broader topic context is needed.** If a candidate page is a leaf and the answer needs the wider topic, run `obsidian backlinks path=<leaf> format=json` and read the entries whose frontmatter `type: domain`. That file is the leaf's containing hub. Hub membership is forward-only (hubs link to leaves; leaves never declare membership), so backlinks of `type: domain` are the canonical leaf→hub traversal. Below the hub threshold no hub exists — that is expected, not a gap.
 6. **Step synthesis → trail.** Whenever a candidate page has `type: synthesis` (a `Research: [Topic]` page produced by `/autoresearch`), always check for a trail: run `obsidian backlinks path=<synthesis-path> format=json` and filter the entries to those whose frontmatter `type: trail`. The trail is the curated reading order for that research run, with one-line annotations explaining each step's argument role — much cheaper than reconstructing the path from `related:` traversal. See **Trail Discovery** below for the multi-trail rule.
-7. **Read** the candidate pages. Follow wikilinks to depth-2 for key entities. No deeper.
+7. **Read** the candidate pages. Use `obsidian read-head path=<page> lines=30` to get frontmatter + first paragraph first — this is usually enough to determine relevance. Only fall back to full `obsidian read path=<page>` when the head doesn't contain sufficient detail. Follow wikilinks to depth-2 for key entities. No deeper.
 8. **Synthesize** the answer in chat. Cite sources with wikilinks: `(Source: [[Page Name]])`.
 9. **Offer to file** the answer: "This analysis seems worth keeping. Should I save it as `wiki/questions/answer-name.md`?"
 10. If the question reveals a **gap**: say "I don't have enough on X. Want to find a source?"
@@ -61,7 +61,8 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
 2. **Read every relevant domain hub.** List `wiki/domains/*/​_index.md`; read each hub whose tag intersects the question. Hubs are the cheapest path to a curated, pre-ranked answer set.
 3. Identify all relevant leaves across `concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/` — both the leaves linked from the hubs and any extra leaves the hubs missed (use `obsidian search` for completeness).
 4. **Pull backlinks for every candidate.** Run `obsidian backlinks path=<page> format=json` on each candidate to surface canonical pages with high inbound but sparse outbound `related:`, and to find the `type: domain` hubs and `type: trail` reading orders that backlink each candidate. Read any hubs not already covered in step 2. For trails, follow the multi-trail rule in **Trail Discovery** below.
-5. **Gather pages via agent dispatch.** When the candidate list has more than 5 pages, group them into logical clusters (by tag, hub, or topic area) and dispatch one `agents/gather.md` per cluster **in parallel** rather than reading all pages on the main thread.
+5. **Read candidate pages efficiently.** For each page, start with `obsidian read-head path=<page> lines=30` to get frontmatter + summary. Read the full page only when the head doesn't provide enough detail.
+6. **Gather pages via agent dispatch.** When the candidate list has more than 5 pages, group them into logical clusters (by tag, hub, or topic area) and dispatch one `agents/gather.md` per cluster **in parallel** rather than reading all pages on the main thread. The gather agent uses `read-head` by default to save context.
 
    Before spawning agents, verify CWD:
 
@@ -76,13 +77,13 @@ Use for synthesis questions, comparisons, or "tell me everything about X."
    - `MAX_FILES` — 20
 
    Wait for all gather agents to finish. Collect their structured summaries. Use these summaries
-   as the page-content input for synthesis (step 7).
+   as the page-content input for synthesis (step 8).
 
    When the candidate list has 5 or fewer pages, read them inline — no agent needed.
 
-6. If wiki coverage is thin, offer to supplement with web search.
-7. Synthesize a comprehensive answer with full citations.
-8. Always file the result back as a wiki page. Deep answers are too valuable to lose.
+7. If wiki coverage is thin, offer to supplement with web search.
+8. Synthesize a comprehensive answer with full citations.
+9. Always file the result back as a wiki page. Deep answers are too valuable to lose.
 
 ## Token Discipline
 

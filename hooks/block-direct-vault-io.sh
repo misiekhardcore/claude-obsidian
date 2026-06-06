@@ -77,13 +77,17 @@ esac
 REASON="Direct ${TOOL_NAME} on vault path '${REL}' is blocked by the claude-obsidian active-enforcement hook. Route this through the Obsidian CLI via Bash so the vault-open preflight, exit-code normalization, and daily-file race guard apply.
 
 Use one of:
-  obsidian read path=${REL}                                  (reads)
+  obsidian read path=${REL}                                    (full read)
+  obsidian read-head path=${REL} [lines=N]                     (first N lines — saves context)
+  obsidian grep path=${REL} pattern=\"...\" [context=N]         (search within file — saves context)
   obsidian create path=${REL} content=\"...\"                  (new pages)
   obsidian create path=${REL} overwrite=true content=\"...\"   (full overwrite, e.g. wiki/hot.md)
   obsidian prepend file=${REL} content=\"...\"                 (prepend, e.g. wiki/index.md, wiki/log.md)
   obsidian append  file=${REL} content=\"...\"                 (append)
   obsidian create-or-append file=${REL} template=\"...\" content=\"...\"  (daily/*.md only — issue #98 guard)
   obsidian property:set name=... value=... path=${REL}        (single frontmatter property)
+
+For cross-file search: obsidian grep-files pattern=\"...\" [dir=wiki]
 
 Documented bypasses (where direct file-tool use is still permitted because the CLI cannot serve them): _attachments/**, *.canvas, .raw/.manifest.json, wiki/meta/lint-data-*.json, and Read on .raw/**. See _shared/vault-ops.md §5."
 

@@ -49,6 +49,9 @@ Locked by empirical spike. Do not override without documented reason.
 |`bases`|plain text|
 |`commands`|plain text|
 |`outline`|plain text|
+|`read-head`|wrapper-only; see §3.1|
+|`grep`|wrapper-only; see §3.1|
+|`grep-files`|wrapper-only; see §3.1|
 |`create-or-append`|wrapper-only; see §3.1|
 
 **Multiline `content=`:** `\n` and `\t` round-trip correctly. Use `\n` for newlines.
@@ -59,7 +62,63 @@ Locked by empirical spike. Do not override without documented reason.
 obsidian eval code="await app.vault.adapter.write('path/to/file', '<full content>');"
 ```
 
-### 3.1 `create-or-append` (wrapper-only)
+### 3.1 Context-saving read verbs (wrapper-only)
+
+These verbs return partial file content to save LLM context without sacrificing access to vault information.
+
+#### `read-head`
+
+Read first N lines of a vault file (frontmatter + intro). Default N=20 covers frontmatter plus the first paragraph for most wiki pages — ~200 tokens vs ~1,000+ for a full read.
+
+```bash
+obsidian read-head path=wiki/concepts/foo.md
+obsidian read-head path=wiki/hot.md lines=10
+```
+
+|Aspect|Behavior|
+|-|-|
+|`path=`|Required. Vault-relative path.|
+|`lines=N`|Optional. Positive integer. Default: 20.|
+|Output|First N lines of the file (plain text).|
+|Exit|0 success; 1 error (bad args, missing file via underlying read).|
+
+#### `grep`
+
+Search within a single vault file. Returns matching lines without loading the full file into LLM context. Uses `obsidian read | grep` underneath.
+
+```bash
+obsidian grep path=wiki/hot.md pattern="agent" context=2
+obsidian grep path=wiki/index.md pattern="orphan" ignore-case=true
+```
+
+|Aspect|Behavior|
+|-|-|
+|`path=`|Required. Vault-relative path.|
+|`pattern=`|Required. Extended regex (grep -E syntax).|
+|`context=N`|Optional. Lines of surrounding context. Default: 0.|
+|`ignore-case=true`|Optional. Case-insensitive match. Default: false.|
+|Output|Matching lines (grep format).|
+|Exit|0 matches found; 1 no matches or error.|
+
+#### `grep-files`
+
+Search for a pattern across multiple vault files. Uses filesystem grep directly (read-only, low risk) — much faster than per-file `obsidian read`. Default scope is `wiki/`. Limited to 50 matches to prevent flooding context.
+
+```bash
+obsidian grep-files pattern="hot cache" context=1
+obsidian grep-files pattern="orchestration" dir=wiki/concepts ignore-case=true
+```
+
+|Aspect|Behavior|
+|-|-|
+|`pattern=`|Required. Extended regex (grep -E syntax).|
+|`dir=`|Optional. Vault-relative directory. Default: `wiki`.|
+|`context=N`|Optional. Lines of surrounding context. Default: 0.|
+|`ignore-case=true`|Optional. Case-insensitive match. Default: false.|
+|Output|Matching lines with vault-relative filename prefix.|
+|Exit|0 matches found; 1 no matches; 2 bad args (dir not found).|
+
+### 3.2 `create-or-append` (wrapper-only)
 
 Atomic "create or append" (prevents read-modify-overwrite races per issue #98).
 
@@ -79,9 +138,9 @@ obsidian create-or-append \
 |Output (exists)|`Appended to: <path>`|
 |Exit|0 success; 1 on error|
 
-Does NOT read body or touch frontmatter. Use `property:set` (§3.2) for `updated:` mutations.
+Does NOT read body or touch frontmatter. Use `property:set` (§3.3) for `updated:` mutations.
 
-### 3.2 Native property verbs
+### 3.3 Native property verbs
 
 Read, write, or remove a single frontmatter property without touching the file body.
 

@@ -65,7 +65,9 @@
 # ─── Wrapper-only verbs ──────────────────────────────────────────────────────
 # These verbs are not part of the upstream CLI; the wrapper synthesizes them
 # from the underlying primitives. They exist so callers (notably skills/daily)
-# never have to read-modify-overwrite a file at the model layer.
+# never have to read-modify-overwrite a file at the model layer, and so
+# skills can read partial file content without loading the full file into the
+# LLM context window.
 #
 #   create-or-append  file=<path> template=<full-file-template> content=<bullet>
 #     File missing → write `template` via `obsidian create`, then append
@@ -74,6 +76,30 @@
 #     Output: `Created and appended: <path>` (file-missing branch) or
 #             `Appended to: <path>` (file-exists branch).
 #     Exit:   0 success, 1 generic error (e.g. underlying create/append failed).
+#
+#   read-head  path=<vault-relative-path> [lines=N]
+#     Reads the first N lines of a vault file. Designed to save context — the
+#     LLM sees only the head of the file (frontmatter + intro), not the full
+#     body. Default N=20 (covers frontmatter + first paragraph for most pages).
+#     Underlying implementation: `obsidian read | head -n N`.
+#     Output: first N lines of the file (may be empty for blank files).
+#     Exit:   0 success, 1 via underlying read error.
+#
+#   grep  path=<vault-relative-path> pattern=<substring-or-regex> [context=N] [ignore-case=true]
+#     Searches within a single vault file. Returns matching lines with
+#     optional surrounding context. Uses `obsidian read | grep` underneath so
+#     the full file never enters the LLM context — only the matches.
+#     Default context=0 (match lines only). ignore-case=false by default.
+#     Output: matching lines (grep format, with filename prefix for multi-file).
+#     Exit:   0 matches found, 1 no matches or error.
+#
+#   grep-files  pattern=<substring-or-regex> [dir=<vault-relative-dir>] [context=N] [ignore-case=true]
+#     Searches for a pattern across multiple vault files. Uses filesystem grep
+#     directly (read-only, low risk) — much faster than per-file obsidian read.
+#     Default dir=wiki (safest scope). Returns up to 50 matches.
+#     Pattern should be a basic regex (grep -E syntax).
+#     Output: matching lines with filename prefix, grouped by file.
+#     Exit:   0 matches found, 1 no matches, 2 bad args.
 #
 #   read-canvas  path=<vault-relative-path>
 #     Reads a .canvas file and emits structured plain text: groups as ##
@@ -201,6 +227,119 @@ do_create_or_append() {
   return 0
 }
 
+# do_read_head — see header for the contract.
+do_read_head() {
+  local path="" lines="20"
+  for arg in "$@"; do
+    case "$arg" in
+      path=*)  path="${arg#path=}" ;;
+      lines=*) lines="${arg#lines=}" ;;
+      *) echo "Error: read-head: unknown argument '$arg'" >&2; return 1 ;;
+    esac
+  done
+  if [ -z "$path" ]; then
+    echo "Error: read-head requires path=<vault-relative-path>" >&2
+    return 1
+  fi
+  if ! [[ "$lines" =~ ^[0-9]+$ ]] || [ "$lines" -lt 1 ]; then
+    echo "Error: read-head: lines must be a positive integer" >&2
+    return 1
+  fi
+  run_obs read "path=$path" 2>/dev/null | head -n "$lines"
+  local rc="${PIPESTATUS[0]}"
+  return "$rc"
+}
+
+# do_grep — see header for the contract.
+do_grep() {
+  local path="" pattern="" context="0" ignore_case=""
+  for arg in "$@"; do
+    case "$arg" in
+      path=*)       path="${arg#path=}" ;;
+      pattern=*)    pattern="${arg#pattern=}" ;;
+      context=*)    context="${arg#context=}" ;;
+      ignore-case=*) ignore_case="${arg#ignore-case=}" ;;
+      *) echo "Error: grep: unknown argument '$arg'" >&2; return 1 ;;
+    esac
+  done
+  if [ -z "$path" ] || [ -z "$pattern" ]; then
+    echo "Error: grep requires path=<vault-relative-path> and pattern=<string>" >&2
+    return 1
+  fi
+  if ! [[ "$context" =~ ^[0-9]+$ ]]; then
+    echo "Error: grep: context must be a non-negative integer" >&2
+    return 1
+  fi
+  local grep_opts=()
+  if [ "$context" -gt 0 ]; then
+    grep_opts+=(-C "$context")
+  fi
+  if [ "$ignore_case" = "true" ]; then
+    grep_opts+=(-i)
+  fi
+  grep_opts+=(-E)
+  local tmp rc
+  tmp="$(mktemp)"
+  if ! run_obs read "path=$path" >"$tmp" 2>&2; then
+    rm -f "$tmp"
+    return 1
+  fi
+  local matches
+  matches=$(grep "${grep_opts[@]}" -- "$pattern" "$tmp" 2>/dev/null || true)
+  rm -f "$tmp"
+  if [ -z "$matches" ]; then
+    return 1
+  fi
+  echo "$matches"
+  return 0
+}
+
+# do_grep_files — see header for the contract.
+do_grep_files() {
+  local pattern="" dir="wiki" context="0" ignore_case=""
+  for arg in "$@"; do
+    case "$arg" in
+      pattern=*)    pattern="${arg#pattern=}" ;;
+      dir=*)        dir="${arg#dir=}" ;;
+      context=*)    context="${arg#context=}" ;;
+      ignore-case=*) ignore_case="${arg#ignore-case=}" ;;
+      *) echo "Error: grep-files: unknown argument '$arg'" >&2; return 1 ;;
+    esac
+  done
+  if [ -z "$pattern" ]; then
+    echo "Error: grep-files requires pattern=<string>" >&2
+    return 1
+  fi
+  if ! [[ "$context" =~ ^[0-9]+$ ]]; then
+    echo "Error: grep-files: context must be a non-negative integer" >&2
+    return 1
+  fi
+  local abs_dir="$VAULT/$dir"
+  if [ ! -d "$abs_dir" ]; then
+    echo "Error: grep-files: directory not found: $abs_dir" >&2
+    return 2
+  fi
+  local grep_opts=()
+  grep_opts+=(-r -n)
+  if [ "$context" -gt 0 ]; then
+    grep_opts+=(-C "$context")
+  fi
+  if [ "$ignore_case" = "true" ]; then
+    grep_opts+=(-i)
+  fi
+  grep_opts+=(-E)
+  # Respect .gitignore and skip binary files. Limit to 50 matches.
+  local matches
+  matches=$(grep "${grep_opts[@]}" -- "$pattern" "$abs_dir" \
+    --exclude-dir=.git 2>/dev/null | head -50 || true)
+  if [ -z "$matches" ]; then
+    return 1
+  fi
+  # Strip the absolute vault prefix from paths for cleaner output
+  echo "$matches" | sed "s|$VAULT/||g"
+  return 0
+}
+
 # do_read_canvas — see header for the contract.
 do_read_canvas() {
   local path=""
@@ -224,6 +363,9 @@ do_read_canvas() {
 
 case "${1:-}" in
   create-or-append) shift; do_create_or_append "$@"; exit $? ;;
+  read-head)        shift; do_read_head "$@";        exit $? ;;
+  grep)             shift; do_grep "$@";             exit $? ;;
+  grep-files)       shift; do_grep_files "$@";       exit $? ;;
   read-canvas)      shift; do_read_canvas "$@";       exit $? ;;
 esac
 

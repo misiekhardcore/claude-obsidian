@@ -24,12 +24,17 @@ Abort if output ≠ `VAULT_ROOT`.
 
 ## Process
 
-For each file (up to `MAX_FILES`):
+For each file (up to `MAX_FILES`), read the head (frontmatter + first paragraph) unless the full content is needed:
+
 ```bash
-obsidian read path=<vault-relative-path>
+# Preferred: read first 30 lines (covers frontmatter + first section)
+obsidian read-head path=<vault-relative-path> lines=30
+
+# Only if read-head doesn't provide enough context:
+# obsidian read path=<vault-relative-path>
 ```
 
-Extract: frontmatter (`type`, `title`, `status`, `confidence`, `tags`, `related`, `created`, `updated`), first substantive paragraph, any `> [!contradiction]` or `> [!gap]` callouts.
+Extract: frontmatter (`type`, `title`, `status`, `confidence`, `tags`, `related`, `created`, `updated`), first substantive paragraph, any `> [!contradiction]` or `> [!gap]` callouts. If the head doesn't contain enough information (e.g., the callouts or paragraph are below line 30), fall back to a full `obsidian read` for that specific file.
 
 ## Output
 
