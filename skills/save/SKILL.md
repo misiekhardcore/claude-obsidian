@@ -24,15 +24,19 @@ Determine the best type from the conversation content:
 If the user specifies a type, use that. Default to `synthesis`.
 
 ## Save Cycle
+
+All five steps are mandatory. Never stop after step 3 — steps 4 and 5 must always run, even when invoked from another skill.
+
 1. **Scan & Extract**: Identify valuable content; rewrite in declarative present tense (not "the user asked").
 2. **Identify**: Confirm Note Title → derive `slug` via `slug.sh` → determine Type.
 3. **Create**: `obsidian create path=wiki/<folder>/slug.md content="frontmatter + body"`
-4. **Index**: Insert entry into `wiki/index.md` using `scripts/index-section-insert.sh` based on Type → Section mapping:
+4. **Index** (required): Insert entry into `wiki/index.md` using `scripts/index-section-insert.sh` based on Type → Section mapping:
    - `concept` → `## Concepts`
-   - `source` → `## Sources`
    - `decision` → `## Plans & Decisions`
+   - `session` → `## Plans & Decisions`
+   - `source` → `## Sources`
    - `synthesis` → `## Questions`
-5. **Log & Cache**: Prepend to `wiki/log.md` and overwrite `wiki/hot.md` (per `_shared/vault-ops.md`).
+5. **Log & Cache** (required): Prepend to `wiki/log.md` and overwrite `wiki/hot.md` (per `_shared/vault-ops.md`).
 
 ## Frontmatter Template
 ```yaml
