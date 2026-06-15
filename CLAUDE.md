@@ -39,7 +39,7 @@ _attachments/      Images and PDFs
 All vault reads and writes go through **Obsidian CLI**, not `Read`/`Write`/`Edit`. Enforcement is active, not advisory: two PreToolUse hooks gate every vault interaction.
 - `hooks/obsidian-cli-rewrite.sh` (matcher `Bash`) rewrites bare `obsidian <verb> ...` calls through `scripts/obsidian-cli.sh` (vault resolution, preflight, exit-code normalization).
 - `hooks/block-direct-vault-io.sh` (matcher `Read|Write|Edit`) **denies** direct file-tool calls on vault paths and returns the correct CLI verb in the deny reason, so the agent self-corrects on the next turn.
-- **Technical Patterns**: See `_shared/vault-ops.md` for CLI patterns, slugging, indexing, active enforcement, and the canonical bypass list.
+- **Technical Patterns**: See `Skill("vault-ops")` for CLI patterns, slugging, indexing, active enforcement, and the canonical bypass list.
 
 ```bash
 obsidian read path=wiki/hot.md
@@ -47,7 +47,7 @@ obsidian create path=wiki/concepts/foo.md content="..."
 obsidian append file=wiki/log.md content="..."
 obsidian prepend file=wiki/index.md content="..."
 ```
-`Read` allowed only outside the vault (skill refs, external paths) or on the documented bypass paths in `_shared/vault-ops.md §5`. `Write`/`Edit` likewise restricted to the bypass paths; everything else is hook-denied.
+`Read` allowed only outside the vault (skill refs, external paths) or on the documented bypass paths in `Skill("vault-ops")`. `Write`/`Edit` likewise restricted to the bypass paths; everything else is hook-denied.
 
 ## Skills Discovery
 
@@ -91,7 +91,7 @@ Skills dispatch sub-agents to parallelize heavy lifting and avoid context bloat:
 - **`autoresearch`** → `agents/research-round.md` + `agents/source-synth.md` (search/fetch/synthesis)
 - **`query`** → `agents/gather.md` (parallel page reads when list > 5 pages)
 
-Orchestrators verify CWD before spawning: `cd "${VAULT_ROOT}" && pwd`. Agents write wiki state; orchestrators coalesce results and update cross-cutting state (index, log). **Parallel agents never update `wiki/hot.md`** — only the orchestrator does (see `_shared/hot-cache-protocol.md`).
+Orchestrators verify CWD before spawning: `cd "${VAULT_ROOT}" && pwd`. Agents write wiki state; orchestrators coalesce results and update cross-cutting state (index, log). **Parallel agents never update `wiki/hot.md`** — only the orchestrator does (see `Skill("hot-cache-protocol")`).
 
 ## Ingest Rules
 
@@ -103,7 +103,7 @@ Vault I/O via **Obsidian CLI** (shipped with 1.12.7+). See `_shared/setup.md` fo
 ## Documentation Standards
 All skill and reference docs must follow a **content-dense, declarative structure**:
 - **No procedural lists**: Replace "Step 1... Step 2..." with a "Cycle" or "Pipeline" specification.
-- **No redundant I/O**: Reference `_shared/vault-ops.md` instead of explaining CLI syntax.
+- **No redundant I/O**: Reference `Skill("vault-ops")` instead of explaining CLI syntax.
 - **Topical centralization**: Consolidate fragmented `references/` folders into `_shared/`.
 - **Declarative logic**: Focus on *what* the outcome is and *which* shared pattern to use, not *how* the tool works.
 

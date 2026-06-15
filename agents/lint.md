@@ -10,7 +10,7 @@ Scan vault and produce comprehensive lint report. Receives: vault path, scope (f
 
 ## Step 1 — Locate scan data
 
-The orchestrator runs `lint-scan.sh` before dispatching this agent. Read the scan data via direct FS read (documented bypass — see `_shared/vault-ops.md` §5):
+The orchestrator runs `lint-scan.sh` before dispatching this agent. Read the scan data via direct FS read (documented bypass — see `Skill("vault-ops")`):
 
 ```bash
 cat "${vault_path}/wiki/meta/lint-data-$(date +%Y-%m-%d).json"

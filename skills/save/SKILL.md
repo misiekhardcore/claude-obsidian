@@ -8,7 +8,7 @@ allowed-tools: Bash Read
 File conversations into wiki as permanent pages. Determines note type, files it, updates index/log/hot-cache. Wiki compounds; save often.
 
 ## Vault I/O
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Note Type Decision
 Determine the best type from the conversation content:
@@ -36,7 +36,7 @@ All five steps are mandatory. Never stop after step 3 — steps 4 and 5 must alw
    - `session` → `## Plans & Decisions`
    - `source` → `## Sources`
    - `synthesis` → `## Questions`
-5. **Log & Cache** (required): Prepend to `wiki/log.md` and overwrite `wiki/hot.md` (per `_shared/vault-ops.md`).
+5. **Log & Cache** (required): Prepend to `wiki/log.md` and overwrite `wiki/hot.md` (per `Skill("vault-ops")`).
 
 ## Frontmatter Template
 ```yaml

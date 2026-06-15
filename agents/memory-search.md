@@ -13,7 +13,7 @@ Reads `QUESTION` from the input field. If missing, abort with "memory-search: no
 
 ## Vault I/O
 
-All vault reads use `scripts/obsidian-cli.sh`. Reference `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` for protocol.
+All vault reads use `scripts/obsidian-cli.sh`. Invoke `Skill("vault-ops")` for protocol.
 
 ## CWD verification (required)
 
@@ -68,7 +68,7 @@ If the question needs deeper synthesis than a quick lookup provides, append:
 
 ## References
 
-- `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` — vault I/O protocol
+- `Skill("vault-ops")` — vault I/O protocol
 - `scripts/obsidian-cli.sh` — CLI wrapper for all vault reads
 - `agents/gather.md` — bulk reading (>5 candidates)
 - `skills/memory-search/SKILL.md` — user-facing equivalent of this agent

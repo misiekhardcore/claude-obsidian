@@ -15,7 +15,7 @@ Check `.raw/.manifest.json` before ingesting any file to avoid re-processing.
 - **Bypass**: Skip if user says "force ingest" or "re-ingest".
 
 ## Vault I/O
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 
 ## Ingestion Flows
@@ -41,7 +41,7 @@ Check `.raw/.manifest.json` before ingesting any file to avoid re-processing.
 4. **Reconcile**:
    - Update `wiki/index.md` for all `Created` pages.
    - Update `wiki/hot.md`.
-   - Append to `wiki/log.md` (per `_shared/vault-ops.md`).
+   - Append to `wiki/log.md` (per `Skill("vault-ops")`).
 
 ### Batch Ingest
 1. **Fan-out**: Dispatch one `agents/ingest.md` per source in parallel.
