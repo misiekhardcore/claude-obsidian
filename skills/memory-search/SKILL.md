@@ -1,11 +1,11 @@
 ---
-name: vault-search
-description: Look up project knowledge from the Obsidian wiki vault — decisions, bugs, concepts, prior work. Uses obsidian CLI for fast retrieval instead of grep.
-when_to_use: When the user asks about project history, prior decisions, bugs, patterns, or anything documented in the vault. Also when asked "check the vault" or "what does the wiki say?"
+name: memory-search
+description: Look up project knowledge from the wiki memory — decisions, bugs, concepts, prior work. Uses obsidian CLI for fast retrieval instead of grep.
+when_to_use: When the user asks about project history, prior decisions, bugs, patterns, or anything documented in the vault. Also when asked "check the vault", "check memory", or "what does the wiki say?"
 allowed-tools: Bash
 ---
 
-# vault-search
+# memory-search
 
 Quick vault lookups using obsidian CLI. For full synthesis with filing-back, use the `query` skill.
 
