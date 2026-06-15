@@ -25,7 +25,6 @@
     "canvas",
     "visual"
   ],
-  "commands": "./commands/",
   "userConfig": {
     "vault_path": {
       "title": "Vault path",
