@@ -1,4 +1,4 @@
-.PHONY: test e2e e2e-build e2e-clean e2e-preflight
+.PHONY: test e2e e2e-build e2e-clean e2e-preflight changelog
 
 # Deterministic test tier — wrapper smoke + AC1 regression for #98. Both
 # scripts skip with exit 0 when Obsidian is not running, so this target is
@@ -45,3 +45,7 @@ e2e: e2e-preflight e2e-build
 
 e2e-clean:
 	docker image rm claude-obsidian-e2e:latest 2>/dev/null || true
+
+changelog:
+	sed -i '/^## \[Unreleased\]/,/^## \[/{/^## \[Unreleased\]/d;/^## \[/!d}' CHANGELOG.md
+	git cliff --unreleased --prepend CHANGELOG.md

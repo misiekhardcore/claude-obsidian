@@ -58,10 +58,20 @@ jobs:
           jq --arg v "$v" '.metadata.version = $v | .plugins[0].version = $v' .claude-plugin/marketplace.json > "$tmp"
           mv "$tmp" .claude-plugin/marketplace.json
 
+      - name: Install Node dependencies
+        run: |
+          npm ci
+
+      - name: Update CHANGELOG.md
+        run: |
+          set -euo pipefail
+          sed -i '/^## \[Unreleased\]/,/^## \[/{/^## \[Unreleased\]/d;/^## \[/!d}' CHANGELOG.md
+          git cliff --tag "${{ steps.bump.outputs.tag }}" --prepend CHANGELOG.md
+
       - name: Commit, tag, push
         run: |
           set -euo pipefail
-          git add .claude-plugin/plugin.json .claude-plugin/marketplace.json
+          git add .claude-plugin/plugin.json .claude-plugin/marketplace.json CHANGELOG.md
           git commit -m "chore: release ${{ steps.bump.outputs.tag }}"
           git tag -a "${{ steps.bump.outputs.tag }}" -m "${{ steps.bump.outputs.tag }}"
           git push origin HEAD
@@ -80,11 +90,15 @@ jobs:
             "${{ steps.bump.outputs.tag }}"
           echo "artifact=$file" >> "$GITHUB_ENV"
 
+      - name: Generate release body
+        run: |
+          git cliff --latest --strip header > /tmp/release-body.md
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${{ steps.bump.outputs.tag }}" \
             --title "${{ steps.bump.outputs.tag }}" \
-            --generate-notes \
+            --notes-file /tmp/release-body.md \
             "$artifact"
