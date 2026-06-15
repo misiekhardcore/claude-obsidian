@@ -1,6 +1,6 @@
 # claude-obsidian
 
-Agent + user instructions for the claude-obsidian plugin. `AGENTS.md` is a symlink to this file.
+Agent + user instructions for the claude-obsidian plugin. See `AGENTS.md` for agent-specific documentation.
 
 ## Vault Assumptions
 

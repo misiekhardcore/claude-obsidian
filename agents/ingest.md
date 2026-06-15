@@ -4,7 +4,8 @@ description: Processes one source fully (read, extract entities/concepts, file p
 model: sonnet
 maxTurns: 30
 tools: Read, Bash
-disallowedTools: WebFetch WebSearch
+disallowedTools: Agent, WebFetch, WebSearch
+background: true
 ---
 Process one source document fully and integrate into wiki. Receives: source path (`.raw/`), vault path, user emphasis.
 

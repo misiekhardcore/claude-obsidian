@@ -4,7 +4,8 @@ description: Synthesizes one fetched source (URL or `.raw/` file) into wiki page
 model: sonnet
 maxTurns: 20
 tools: Bash
-disallowedTools: WebFetch WebSearch Glob Grep
+disallowedTools: Agent, WebFetch, WebSearch, Glob, Grep
+background: true
 ---
 Turn one fetched source into structured wiki pages. Report created/updated pages to orchestrator.
 

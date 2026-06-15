@@ -4,7 +4,8 @@ description: Comprehensive wiki health check. Scans for orphans, dead links, fro
 model: sonnet
 maxTurns: 40
 tools: Write, Bash
-disallowedTools: WebFetch WebSearch
+disallowedTools: Agent, WebFetch, WebSearch
+background: true
 ---
 Scan vault and produce comprehensive lint report. Receives: vault path, scope (full or specific folder).
 
