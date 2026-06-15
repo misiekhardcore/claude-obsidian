@@ -1,61 +1,24 @@
 ---
 name: defuddle
 description: Strip ads, nav, boilerplate from web pages. Saves 40-60% tokens. Use before URL ingestion.
-when_to_use: Use before ingesting a URL to strip ads, navigation, and boilerplate.
+when_to_use: Before ingesting a URL to strip ads, navigation, and boilerplate.
+model: haiku
+effort: low
+user-invocable: true
 allowed-tools: Read Bash
 ---
-# defuddle
+Extract clean markdown from web pages. Optional but saves 40-60% tokens and produces cleaner wiki pages.
 
-Extract meaningful content from web pages: drop ads, nav, cookie banners, footers, related articles. Optional but recommended (saves 40-60% tokens, cleaner wiki pages).
+## I/O
+- Input: URL or local HTML file path.
+- Output: Cleaned markdown to stdout or `.raw/` file.
 
-## Install
+## Process
+1. **Check**: Run `defuddle --version`. If not installed, fall back to WebFetch.
+2. **Clean**: `defuddle <url|path>` for stdout, or redirect to `.raw/articles/slug-YYYY-MM-DD.md`.
+3. **Archive**: Prepend frontmatter (`source_url`, `fetched`) to saved file for ingest readiness.
 
-```bash
-npm install -g defuddle-cli
-```
-
-Verify: `defuddle --version`
-
-## Usage
-
-### Clean a URL directly
-
-```bash
-defuddle https://example.com/article
-```
-
-Outputs clean markdown to stdout.
-
-### Save to .raw/
-
-```bash
-defuddle https://example.com/article > .raw/articles/article-slug-$(date +%Y-%m-%d).md
-```
-
-### Add frontmatter header after saving
-
-After running defuddle, prepend the source URL and fetch date:
-
-```bash
-SLUG="article-slug-$(date +%Y-%m-%d)"
-{ echo "---"; echo "source_url: https://example.com/article"; echo "fetched: $(date +%Y-%m-%d)"; echo "---"; echo ""; defuddle https://example.com/article; } > .raw/articles/$SLUG.md
-```
-
-### Clean a local HTML file
-
-```bash
-defuddle page.html
-```
-
-## When to Use
-
-Use: articles/blogs/docs from URLs with surrounding content, long articles on token budget.
-Skip: clean markdown/PDF, dashboards/apps/structured data, defuddle not installed + short article.
-
-## Fallback
-
-If not installed: use WebFetch directly. Content is less clean but workable.
-
-## Integration with /ingest
-
-`/ingest` calls defuddle automatically if available when given a URL. Manual path: run save command above, then `ingest .raw/articles/[slug].md`.
+## Rules
+- Use for articles/blogs/docs with surrounding content. Skip for clean markdown/PDF, dashboards, structured data.
+- If not installed, use WebFetch directly — less clean but workable.
+- `/ingest` calls defuddle automatically when available.
