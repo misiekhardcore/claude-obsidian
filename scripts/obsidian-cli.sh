@@ -59,7 +59,7 @@
 # ─── Documented exceptions (bypasses are intentional) ────────────────────────
 #   • .raw/.manifest.json           — bookkeeping for raw inbox; not a wiki page
 #   • _attachments/images/**        — binary writes; CLI has no binary verb
-#   • cron-time writes when Obsidian is closed — see commands/cron.md
+  #   • cron-time writes when Obsidian is closed
 #   • bin/setup-vault.sh, bin/seed-demo.sh — operate before vault registration
 #
 # ─── Wrapper-only verbs ──────────────────────────────────────────────────────
