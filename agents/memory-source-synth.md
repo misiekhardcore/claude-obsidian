@@ -3,8 +3,9 @@ name: memory-source-synth
 description: Synthesizes one fetched source (URL or `.raw/` file) into wiki pages. Extracts entities, concepts, summary. Reports created/updated. Used by `autoresearch` (Round 1) and `research-round` (depth branches). Orchestrator handles index/log/hot-cache after all agents finish.
 model: sonnet
 maxTurns: 20
-tools: Bash
-disallowedTools: Agent, Edit, WebFetch, WebSearch, Glob, Grep
+permissions: 
+  - bash: 'allow'
+disallowedTools: Agent Edit WebFetch WebSearch Glob Grep
 background: true
 ---
 Turn one fetched source into structured wiki pages. Report created/updated pages to orchestrator.
