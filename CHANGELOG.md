@@ -5,14 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2026-06-16
+### Added
+
+- Align SKILL.md with CWF conventions
+- Add git-cliff changelog handling
+
 ### Changed
 
+- Phase 1: Restructure braindump skill
+- Phase 1: Restructure notes skill
+- Phase 1: Restructure daily + daily-close skills
+- Phase 1: Restructure obsidian-bases skill
+- Phase 1: Restructure ingest skill
+- Phase 1: Restructure query skill to CWF conventions
+- Phase 0c+0d+0e: seed-brief contract + protocol skill promotions
+- Update permissions structure and disallowed tools for agents
+- Update agent names and descriptions for clarity and consistency
+- Phase 0a+0b: Agent file setup
+- Remove NOTES.md from tracking
+- Remove commands/ directory (dead pattern)
+- Phase 1: Review-only skills — defuddle, save, wiki, lint (CWF conventions)
+- Phase 1: Restructure canvas skill to CWF conventions
+- Add memory-search skill + agent for obsidian CLI memory lookups
 - Add read-head, grep, and grep-files wrapper verbs for context-saving vault reads
 - Switch license from MIT to PolyForm Noncommercial 1.0.0
 
 ### Fixed
 
+- Align with agents-flow — use npx git-cliff, add --unreleased flag
 - Clarify mandatory steps and update index mapping for note types
 ## [1.8.0] - 2026-05-21
 ### Added
@@ -122,7 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Quote {{today}} so prettier doesn't split it into { { today } }
+- Quote {{today}} so prettier doesn't split it into {{today}}
 - Handle empty backlinks output before piping to jq
 - Pass vault= after verb, not before
 
