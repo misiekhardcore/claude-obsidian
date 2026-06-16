@@ -1,5 +1,5 @@
 ---
-name: source-synth
+name: memory-source-synth
 description: Synthesizes one fetched source (URL or `.raw/` file) into wiki pages. Extracts entities, concepts, summary. Reports created/updated. Used by `autoresearch` (Round 1) and `research-round` (depth branches). Orchestrator handles index/log/hot-cache after all agents finish.
 model: sonnet
 maxTurns: 20
