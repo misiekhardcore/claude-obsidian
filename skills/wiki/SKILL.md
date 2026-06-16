@@ -14,13 +14,13 @@ Build and maintain persistent, compounding wiki in Obsidian vault. Wiki is produ
 - Output: Vault structure, wiki pages, or sub-skill dispatch.
 
 ## Process
-1. **Route**: Map user request to sub-skill — `/wiki init` → wiki, "ingest" → `Skill("ingest")`, "query this" → `Skill("query")`, "lint" → `Skill("lint")`, "/save" → `Skill("save")`, "/note" → `Skill("notes")`, "/autoresearch" → `Skill("autoresearch")`, "/canvas" → `Skill("canvas")`, "/daily" → `Skill("daily")`, "/daily-close" → `Skill("daily-close")`.
+1. **Route**: Map user request to sub-skill per the operations routing table in `references/architecture.md`.
 2. **INIT**: `bash "${CLAUDE_PLUGIN_ROOT}/bin/wiki-init.sh" "${user_config.vault_path}"` — idempotent vault bootstrap.
-3. **SCAFFOLD**: Ask "What is this vault for?" → create folders (`concepts/`, `entities/`, `sources/`, `solutions/`, `comparisons/`, `questions/`), `index.md`, `log.md`, `hot.md`, `notes/`, `daily/`, `_templates/`, `.obsidian/snippets/`, vault `CLAUDE.md`.
-4. **PROMOTE**: `/wiki promote <tag>` → collect leaves with matching tag → bail if <5 leaves or hub exists → create hub at `wiki/domains/<tag>/_index.md` → register in index.
+3. **SCAFFOLD**: Per `references/scaffold.md` — 10-step procedure (folders, seed files, git init).
+4. **PROMOTE**: Per `references/promote.md` — tag resolution, leaf collection, hub creation, index registration.
 5. **Maintain**: Update hot cache and index/log after every operation.
 
 ## Rules
 - Never modify `.raw/`.
 - Forward-only hubs: promote roads, not gardens.
-- Cross-project: add vault reference pointer to other projects' CLAUDE.md.
+- Cross-project: add vault reference pointer per `references/architecture.md`.

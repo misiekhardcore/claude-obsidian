@@ -1,23 +1,26 @@
-# Lint Conventions
+# Naming & Style Conventions
 
-## Naming Conventions
+## Filenames
 
-Enforce during lint:
+- Lowercase kebab-case only
+- Max 40 chars via slug.sh
 
-| Element | Convention | Example |
-|-|-|-|
-| Filenames | Title Case with spaces | `Machine Learning.md` |
-| Folders | lowercase with dashes | `wiki/data-models/` |
-| Tags | lowercase, hierarchical | `#domain/architecture` |
-| Wikilinks | match filename exactly | `[[Machine Learning]]` |
+## Folders
 
-Filenames must be unique across the vault. Wikilinks work without paths only if filenames are unique.
+- Lowercase plural: `concepts/`, `entities/`, `sources/`
 
-## Writing Style Check
+## Tags
 
-Flag pages that violate the style guide:
+- Lowercase kebab-case
+- No spaces
 
-- Not declarative present tense (e.g. "X basically does Y" instead of "X does Y")
-- Missing source citations where claims are made
-- Uncertainty not flagged with `> [!gap]`
-- Contradictions not flagged with `> [!contradiction]`
+## Wikilinks
+
+- `[[page-name]]` — no surrounding spaces inside brackets
+- No URL-as-wikilink (`[[https://...]]` — flagged as anti-pattern)
+
+## Frontmatter
+
+- Flat YAML per `_shared/frontmatter.md`
+- `type`, `title`, `created`, `updated`, `tags` required
+- `confidence`, `evidence`, `related`, `sources` for polished pages only

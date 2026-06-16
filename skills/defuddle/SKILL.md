@@ -15,8 +15,8 @@ Extract clean markdown from web pages. Optional but saves 40-60% tokens and prod
 
 ## Process
 1. **Check**: Run `defuddle --version`. If not installed, fall back to WebFetch.
-2. **Clean**: `defuddle <url|path>` for stdout, or redirect to `.raw/articles/slug-YYYY-MM-DD.md`.
-3. **Archive**: Prepend frontmatter (`source_url`, `fetched`) to saved file for ingest readiness.
+2. **Clean**: `defuddle <url|path>` for stdout, or redirect to `.raw/articles/slug-YYYY-MM-DD.md`. See `references/install-usage.md` for all command variants and when-to-use guidance.
+3. **Archive**: Prepend frontmatter (`source_url`, `fetched`) to saved file per `references/install-usage.md`.
 
 ## Rules
 - Use for articles/blogs/docs with surrounding content. Skip for clean markdown/PDF, dashboards, structured data.
