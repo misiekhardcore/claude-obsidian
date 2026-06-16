@@ -1,34 +1,6 @@
-# Canvas Node Templates
+# Node Templates
 
-## Default Canvas (main.canvas)
-
-```json
-{
-  "nodes": [
-    {
-      "id": "title",
-      "type": "text",
-      "text": "# Visual Reference\n\nDrop images, PDFs, and notes here.",
-      "x": -400,
-      "y": -300,
-      "width": 400,
-      "height": 120,
-      "color": "6"
-    },
-    {
-      "id": "zone-default",
-      "type": "group",
-      "label": "General",
-      "x": -400,
-      "y": -140,
-      "width": 800,
-      "height": 400,
-      "color": "4"
-    }
-  ],
-  "edges": []
-}
-```
+All operations report position and zone.
 
 ## Text Node
 
@@ -49,7 +21,7 @@
 {
   "id": "note-[timestamp]",
   "type": "file",
-  "file": "wiki/concepts/LLM Wiki Pattern.md",
+  "file": "wiki/concepts/example.md",
   "x": [auto], "y": [auto],
   "width": 300, "height": 100
 }
@@ -70,8 +42,8 @@
 }
 ```
 
-Valid colors: `"1"`=red, `"2"`=orange, `"3"`=yellow, `"4"`=green, `"5"`=cyan, `"6"`=purple
+Colors: `"1"`=red, `"2"`=orange, `"3"`=yellow, `"4"`=green, `"5"`=cyan, `"6"`=purple.
 
 ## Image/PDF Nodes
 
-Images/PDFs follow same pattern as text nodes. Images: width/height per aspect ratio (see `canvas-spec.md`). PDFs: fixed 400×520.
+Follow the same JSON pattern as text nodes. Images: width/height per aspect ratio (see `_shared/canvas-spec.md`). PDFs: fixed 400×520.
