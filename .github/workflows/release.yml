@@ -62,11 +62,12 @@ jobs:
         run: |
           npm ci
 
-      - name: Update CHANGELOG.md
+      - name: Update CHANGELOG
         run: |
           set -euo pipefail
+          tag="${{ steps.bump.outputs.tag }}"
           sed -i '/^## \[Unreleased\]/,/^## \[/{/^## \[Unreleased\]/d;/^## \[/!d}' CHANGELOG.md
-          git cliff --tag "${{ steps.bump.outputs.tag }}" --prepend CHANGELOG.md
+          npx git-cliff --tag "$tag" --unreleased --prepend CHANGELOG.md
 
       - name: Commit, tag, push
         run: |
@@ -92,7 +93,8 @@ jobs:
 
       - name: Generate release body
         run: |
-          git cliff --latest --strip header > /tmp/release-body.md
+          set -euo pipefail
+          npx git-cliff --latest --strip header --output /tmp/release-body.md
 
       - name: Create GitHub release
         env:
