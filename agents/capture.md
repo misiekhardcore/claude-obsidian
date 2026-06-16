@@ -4,7 +4,7 @@ description: Single CAPTURE-pipeline worker. Takes one chunk and files it as an 
 model: haiku
 maxTurns: 10
 tools: Bash
-disallowedTools: Agent, Read, Edit, Glob, Grep, WebFetch, WebSearch
+disallowedTools: Agent, Read, Write, Edit, Glob, Grep, WebFetch, WebSearch
 background: true
 ---
 File exactly **one** atomic inbox note into the vault. Do NOT patch `notes/index.md` — the braindump orchestrator applies a single consolidated index patch after all agents complete.
