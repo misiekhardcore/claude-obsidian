@@ -4,7 +4,8 @@ description: Answer a question by searching the wiki memory. Dispatched by orche
 model: haiku
 maxTurns: 20
 tools: Bash
-disallowedTools: Write Edit Glob Grep WebFetch WebSearch
+disallowedTools: Agent, Write, Edit, Glob, Grep, WebFetch, WebSearch
+background: true
 ---
 
 Answer a question from the Obsidian vault. Read-only. No writes.
