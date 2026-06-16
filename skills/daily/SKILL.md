@@ -15,7 +15,7 @@ Append timestamped bullet to `daily/YYYY-MM-DD.md`. Use `/daily` for time-anchor
 - Output: Bullet appended to `<vault>/daily/YYYY-MM-DD.md`.
 
 ## Process
-1. **Extract**: Arguments — verbatim text + optional image paths. If images present, read `_shared/image-capture.md`.
+1. **Extract**: Arguments — verbatim text + optional image paths. If images present, invoke `Skill("image-capture")`.
 2. **Resolve**: Vault path per `_shared/capture-pipeline.md` §1. Abort if unconfigured.
 3. **Compute**: `YYYY-MM-DD` and `HH:MM` from current time.
 4. **Append**: `obsidian create-or-append file=<vault>/daily/YYYY-MM-DD.md template="..." content="<bullet>"`.

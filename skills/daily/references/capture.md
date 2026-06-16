@@ -6,7 +6,7 @@ Everything after the trigger phrase. Scan for image-path tokens (any token that 
 
 ## Step 2: Image routing
 
-If image paths present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md`. Use that file to determine image-specific bullet text and attachment handling. Then continue with steps 3–8 for the normal daily append flow.
+If image paths present → invoke `Skill("image-capture")`. Use that skill to determine image-specific bullet text and attachment handling. Then continue with steps 3–8 for the normal daily append flow.
 
 ## Step 3: Resolve vault
 
