@@ -35,12 +35,12 @@ The upstream CLI always exits 0; the wrapper normalizes exit codes per §2. Verb
 |Verb|Args|Output|Notes|
 |-|-|-|-|
 |`read`|`file=` / `path=`|plain text|Full file content|
-|`read-head` |`path=`, [`lines=N`]|first N lines|Wrapper-only. First N lines of a file (default 20). See §3.2.|
-|`read-tail` |`path=`, [`lines=N`]|last N lines|Wrapper-only. Last N lines of a file (default 20). See §3.2.|
+|`read-head`|`path=`, [`lines=N`]|first N lines|Wrapper-only. First N lines of a file (default 20). See §3.2.|
+|`read-tail`|`path=`, [`lines=N`]|last N lines|Wrapper-only. Last N lines of a file (default 20). See §3.2.|
 |`create`|`path=`, `content=`, [`template=`, `overwrite`, `open`, `newtab`]|`Created: <path>`|`overwrite` flag (no `=`) for full replacement|
 |`append`|`file=` / `path=`, `content=`, [`inline`]|`Appended to: <path>`|`inline` omits trailing newline|
 |`prepend`|`file=` / `path=`, `content=`, [`inline`]|`Prepended to: <path>`|`inline` omits trailing newline|
-|`create-or-append` |`file=`, `template=`, `content=`|`Created and appended: <path>` / `Appended to: <path>`|Wrapper-only. Atomic create-or-append for daily/*.md (issue #98 race guard). See §3.3.|
+|`create-or-append`|`file=`, `template=`, `content=`|`Created and appended: <path>` / `Appended to: <path>`|Wrapper-only. Atomic create-or-append for daily/*.md (issue #98 race guard). See §3.3.|
 |`delete`|`file=` / `path=`, [`permanent`]|confirmation text|`permanent` skips trash|
 |`move`|`file=` / `path=`, `to=`|confirmation text|Destination folder or path|
 |`rename`|`file=` / `path=`, `name=`|confirmation text|New filename only|
@@ -70,8 +70,8 @@ The upstream CLI always exits 0; the wrapper normalizes exit codes per §2. Verb
 |-|-|-|-|
 |`search`|`query=`, [`path=`, `limit=`, `total`, `case`, `format=`]|json|`format=text\|json` (default text). Full-text search across vault.|
 |`search:context`|`query=`, [`path=`, `limit=`, `case`, `format=`]|plain text|Search with matching line context|
-|`grep` |`path=`, `pattern=`, [`context=N`, `ignore-case=true`]|matching lines|Wrapper-only. Search within a single file via `obsidian read \|grep`. See §3.2.|
-|`grep-files` |`pattern=`, [`dir=`, `context=N`, `ignore-case=true`]|matching lines with paths|Wrapper-only. Cross-file grep on filesystem (read-only). See §3.2.|
+|`grep`|`path=`, `pattern=`, [`context=N`, `ignore-case=true`]|matching lines|Wrapper-only. Search within a single file via `obsidian read \|grep`. See §3.2.|
+|`grep-files`|`pattern=`, [`dir=`, `context=N`, `ignore-case=true`]|matching lines with paths|Wrapper-only. Cross-file grep on filesystem (read-only). See §3.2.|
 |`outline`|`file=` / `path=`, [`total`, `format=`]|plain text|`format=tree\|md\|json` (default tree). Headings as tree/md/json.|
 |`tags`|`file=` / `path=`, [`total`, `counts`, `sort=count`, `format=`, `active`]|plain text|`format=json\|tsv\|csv` (default tsv)|
 |`tag`|`name=`, [`total`, `verbose`]|plain text|Tag info + occurrence count|
@@ -146,7 +146,7 @@ The upstream CLI always exits 0; the wrapper normalizes exit codes per §2. Verb
 |Verb|Args|Output|Notes|
 |-|-|-|-|
 |`files`|`dir=<path>`, `ext=`, `format=json`|`[{"path": "..."}]`|List .canvas files (see §6).|
-|`read-canvas` |`path=`|structured plain text|Wrapper-only. Reads .canvas as structured text (groups as ##, edges resolved). See §6.|
+|`read-canvas`|`path=`|structured plain text|Wrapper-only. Reads .canvas as structured text (groups as ##, edges resolved). See §6.|
 
 **Multiline `content=`:** `\n` and `\t` round-trip correctly. Use `\n` for newlines.
 
