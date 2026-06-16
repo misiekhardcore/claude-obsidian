@@ -1,3 +1,8 @@
+---
+name: vault-ops
+description: Vault operations protocol — CLI verbs, slugging, indexing, active enforcement, bypass list. Reference for skill I/O.
+user-invocable: false
+---
 # Vault Operations Reference
 
 Single source of truth for **skill-author operational patterns** — when and why to call each CLI verb, the slugification pipeline, indexing/log/hot-cache protocols, active enforcement, and the canonical bypass list. Skills reference this file from their `## Vault I/O` section instead of restating patterns inline.
@@ -60,7 +65,7 @@ obsidian prepend file=wiki/log.md content="## [YYYY-MM-DD] <op> | <title>\n- <de
 
 Maintain `wiki/hot.md` after every operation.
 
-- **Format:** Follow `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+- **Format:** Follow `Skill("hot-cache-protocol")`.
 - **Operation:** Overwrite existing content to keep it a concise (~500 word) summary of recent state — `obsidian create path=wiki/hot.md overwrite=true content="..."`.
 
 ## 5. Active Enforcement
