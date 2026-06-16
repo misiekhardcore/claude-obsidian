@@ -8,7 +8,7 @@ disallowedTools: Agent, Write, Edit, Glob, Grep, WebFetch, WebSearch
 background: true
 ---
 
-Answer a question from the Obsidian vault. Read-only. No writes.
+Answer a question from the Obsidian memory vault. Read-only. No writes.
 
 Reads `QUESTION` from the input field. If missing, abort with "memory-search: no QUESTION provided."
 

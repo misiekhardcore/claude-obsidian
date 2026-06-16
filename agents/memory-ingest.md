@@ -1,5 +1,5 @@
 ---
-name: ingest
+name: memory-ingest
 description: Processes one source fully (read, extract entities/concepts, file pages, report). Dispatched for batch ingestion when multiple sources need parallel processing.
 model: sonnet
 maxTurns: 30
