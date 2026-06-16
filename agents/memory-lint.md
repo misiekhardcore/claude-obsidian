@@ -1,10 +1,13 @@
 ---
-name: lint
+name: memory-lint
 description: Comprehensive wiki health check. Scans for orphans, dead links, frontmatter gaps, empty sections. Generates structured report. Dispatched on "lint wiki", "health check", "audit", "clean up".
 model: sonnet
 maxTurns: 40
-tools: Write, Bash
-disallowedTools: WebFetch WebSearch
+permissions: 
+  - write: 'allow'
+  - bash: 'allow'
+disallowedTools: Agent Edit WebFetch WebSearch
+background: true
 ---
 Scan vault and produce comprehensive lint report. Receives: vault path, scope (full or specific folder).
 

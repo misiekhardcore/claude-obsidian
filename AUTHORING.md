@@ -7,7 +7,6 @@ _shared/          Cross-skill reference docs
 scripts/          Utility scripts (obsidian-cli.sh, resolve-vault.sh)
 skills/<name>/    One skill per dir (SKILL.md entrypoint + references/)
 agents/           Sub-agent definitions
-commands/         Slash-command shims
 hooks/            Claude Code hooks (hooks.json + .sh)
 _templates/       Templater templates + authoring guidance
 ```

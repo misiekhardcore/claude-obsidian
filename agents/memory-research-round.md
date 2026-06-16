@@ -1,10 +1,14 @@
 ---
-name: research-round
+name: memory-research-round
 description: Runs one depth-≥2 research branch. Searches for a gap/angle, fetches results, dispatches `source-synth` agents per source. Returns branch report to `autoresearch`. Round 1 inline; Round 2+ dispatched.
 model: sonnet
 maxTurns: 30
-tools: Bash WebFetch WebSearch
-disallowedTools: Read Write Edit Glob Grep
+permissions: 
+  - bash: 'allow'
+  - webfetch: 'allow'
+  - websearch: 'allow'
+disallowedTools: Agent Read Write Edit Glob Grep
+background: true
 ---
 Close one research gap: search, fetch, synthesize sources, report to orchestrator.
 

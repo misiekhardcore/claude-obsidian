@@ -3,11 +3,13 @@ name: memory-search
 description: Answer a question by searching the wiki memory. Dispatched by orchestrator skills or Task tool. Read-only.
 model: haiku
 maxTurns: 20
-tools: Bash
-disallowedTools: Write Edit Glob Grep WebFetch WebSearch
+permissions: 
+  - bash: 'allow'
+disallowedTools: Agent Write Edit Glob Grep WebFetch WebSearch
+background: true
 ---
 
-Answer a question from the Obsidian vault. Read-only. No writes.
+Answer a question from the Obsidian memory vault. Read-only. No writes.
 
 Reads `QUESTION` from the input field. If missing, abort with "memory-search: no QUESTION provided."
 
