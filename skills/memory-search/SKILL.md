@@ -4,7 +4,6 @@ description: Look up project knowledge from the wiki memory — decisions, bugs,
 when_to_use: When the user asks about project history, prior decisions, bugs, patterns, or anything documented in the vault. Also when asked "check the vault", "check memory", or "what does the wiki say?"
 allowed-tools: Bash
 ---
-
 # memory-search
 
 Quick vault lookups using obsidian CLI. For full synthesis with filing-back, use the `query` skill.

@@ -16,7 +16,7 @@
 # Requires Obsidian to be running — the CLI cannot reach a closed vault.
 #
 # Usage (example crontab — weekly, Sunday 03:00):
-#   0 3 * * 0 /absolute/path/to/claude-obsidian/bin/wiki-lint-cron.sh
+#   0 3 * * 0 /absolute/path/to/agents-memo/bin/wiki-lint-cron.sh
 
 set -e
 

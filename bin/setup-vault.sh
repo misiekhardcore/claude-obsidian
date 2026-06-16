@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# claude-obsidian vault setup script
+# agents-memo vault setup script
 # Run this ONCE before opening Obsidian for the first time.
 # Usage: bin/setup-vault.sh /path/to/vault
 
@@ -29,7 +29,7 @@ fi
 
 DEFAULTS_DIR="${CLAUDE_PLUGIN_ROOT}/_obsidian-defaults"
 
-echo "Setting up claude-obsidian vault at: $VAULT"
+echo "Setting up agents-memo vault at: $VAULT"
 
 # ── 1. Create directories ─────────────────────────────────────────────────────
 mkdir -p "$OBSIDIAN/snippets"

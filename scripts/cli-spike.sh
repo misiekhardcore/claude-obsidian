@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# CLI spike: empirically probe the Obsidian CLI surface used by claude-obsidian.
+# CLI spike: empirically probe the Obsidian CLI surface used by agents-memo.
 #
 # Captures stdout, stderr, and exit code for every in-scope verb. Output goes to
 # tests/spike-results/<group>-<verb>-<case>.{out,err,exit}.

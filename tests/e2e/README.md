@@ -36,7 +36,7 @@ Bump in the Dockerfile and rebuild — no `latest` tags.
 From the repository root:
 
 ```bash
-docker build -f tests/e2e/Dockerfile -t claude-obsidian-e2e:local .
+docker build -f tests/e2e/Dockerfile -t agents-memo-e2e:local .
 ```
 
 Cold build: ~2–3 min. Warm rebuild (entrypoint changes only): <1s.
@@ -47,7 +47,7 @@ Cold build: ~2–3 min. Warm rebuild (entrypoint changes only): <1s.
 docker run --rm \
   -e ENTRYPOINT_TYPE=ci \
   -v "$(pwd):/opt/plugin-src:ro" \
-  claude-obsidian-e2e:local
+  agents-memo-e2e:local
 ```
 
 Expected output (tail):
@@ -83,7 +83,7 @@ docker run --rm \
   -e ENTRYPOINT_TYPE=local \
   -v "$(pwd):/opt/plugin-src:ro" \
   -v "$HOME/.claude/.credentials.json:/root/.claude/.credentials.json:ro" \
-  claude-obsidian-e2e:latest
+  agents-memo-e2e:latest
 ```
 
 `make e2e-preflight` fails fast (exit 2) before any build if `~/.claude/.credentials.json` is missing or carries neither a non-empty `claudeAiOauth.accessToken` (OAuth login from `claude login`) nor a non-empty `api_key` (AC12).
@@ -109,7 +109,7 @@ docker run --rm -it \
   -e ENTRYPOINT_TYPE=ci \
   -v "$(pwd):/opt/plugin-src:ro" \
   --entrypoint /bin/bash \
-  claude-obsidian-e2e:local
+  agents-memo-e2e:local
 ```
 
 Inside the container:

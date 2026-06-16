@@ -23,7 +23,7 @@ jobs:
         with:
           context: .
           file: tests/e2e/Dockerfile
-          tags: claude-obsidian-e2e:latest
+          tags: agents-memo-e2e:latest
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -48,4 +48,4 @@ jobs:
             --security-opt seccomp=unconfined \
             -e ENTRYPOINT_TYPE=ci \
             -v "${GITHUB_WORKSPACE}:/opt/plugin-src:ro" \
-            claude-obsidian-e2e:latest
+            agents-memo-e2e:latest

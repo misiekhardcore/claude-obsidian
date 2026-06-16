@@ -74,7 +74,7 @@ case "$TOOL_NAME" in
     ;;
 esac
 
-REASON="Direct ${TOOL_NAME} on vault path '${REL}' is blocked by the claude-obsidian active-enforcement hook. Route this through the Obsidian CLI via Bash so the vault-open preflight, exit-code normalization, and daily-file race guard apply.
+REASON="Direct ${TOOL_NAME} on vault path '${REL}' is blocked by the agents-memo active-enforcement hook. Route this through the Obsidian CLI via Bash so the vault-open preflight, exit-code normalization, and daily-file race guard apply.
 
 Use one of:
   obsidian outline path=${REL}                                 (heading tree — cheapest)

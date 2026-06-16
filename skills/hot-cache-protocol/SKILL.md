@@ -22,7 +22,7 @@ When kept under the 500-word budget, `wiki/hot.md` costs ~500 tokens to read —
 
 ## Auto-Read Gating
 
-`claude-obsidian.bootstrap_read_hot` setting (set via `/plugin manage` or `~/.claude/settings.local.json`):
+`agents-memo.bootstrap_read_hot` setting (set via `/plugin manage` or `~/.claude/settings.local.json`):
 
 |Value|Hook behavior|Skill behavior|
 |-|-|-|

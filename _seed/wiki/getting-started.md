@@ -11,9 +11,9 @@ related:
   - [[index]]
   - [[hot]]
 ---
-# Getting Started with claude-obsidian
+# Getting Started with agents-memo
 
-Welcome. This vault is your compounding knowledge base — a persistent second brain built with Claude and Obsidian.
+Welcome. This vault is your compounding knowledge base — a persistent second brain built with an Obsidian vault and an AI coding agent.
 
 Every source you add gets processed into 8–15 cross-referenced wiki pages. Every question you ask pulls from everything that's been ingested. Knowledge compounds like interest.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Resolve a plugin config value in priority order:
-#   1. ~/.claude/settings.local.json  (pluginConfigs[*claude-obsidian*].options.<key>)
+#   1. ~/.claude/settings.local.json  (pluginConfigs[*agents-memo*].options.<key>)
 #   2. ~/.claude/settings.json        (same key, userSettings scope)
 #   3. $2 default (if provided)
 # Usage: resolve-config.sh <key> [default]
@@ -16,7 +16,7 @@ read_config_from_settings() {
   local file="$1"
   [ -f "$file" ] || return 0
   if command -v jq >/dev/null 2>&1; then
-    jq -r --arg key "$KEY" '(.pluginConfigs // {}) | to_entries[] | select(.key | contains("claude-obsidian")) | .value.options[$key] // empty' "$file" 2>/dev/null | head -1
+    jq -r --arg key "$KEY" '(.pluginConfigs // {}) | to_entries[] | select(.key | contains("agents-memo")) | .value.options[$key] // empty' "$file" 2>/dev/null | head -1
   elif command -v python3 >/dev/null 2>&1; then
     SETTINGS_FILE="$file" CONFIG_KEY="$KEY" python3 -c '
 import json, os
@@ -25,7 +25,7 @@ try:
         d = json.load(f)
     key = os.environ["CONFIG_KEY"]
     for k, v in d.get("pluginConfigs", {}).items():
-        if "claude-obsidian" in k:
+        if "agents-memo" in k:
             val = v.get("options", {}).get(key, "")
             if val:
                 print(val)

@@ -1,6 +1,6 @@
-# claude-obsidian
+# agents-memo
 
-Agent + user instructions for the claude-obsidian plugin.
+Agent + user instructions for the agents-memo plugin.
 
 ## Vault Assumptions
 
@@ -12,7 +12,7 @@ This vault is designed for **agent-only** use with **single-user, single-machine
 
 ## Plugin Setup
 
-1. Set `claude-obsidian.vault_path` (or Claude checks CWD for `wiki/` folder).
+1. Set `agents-memo.vault_path` (or Claude checks CWD for `wiki/` folder).
 2. Run `/wiki init` to bootstrap vault structure.
 
 ## Vault Structure
@@ -113,8 +113,6 @@ Path: /path/to/vault
 When needed: (1) read wiki/hot.md first, (2) read wiki/index.md, (3) drill into domain pages.
 Do NOT read for general coding questions.
 ```
-
----
 
 # Agent Architecture
 

@@ -1,6 +1,6 @@
-# claude-obsidian — session init
+# agents-memo — session init
 
-This session has an Obsidian vault configured by the `claude-obsidian` plugin. The vault is a knowledge base, not a code directory.
+This session has an Obsidian vault configured by the `agents-memo` plugin. The vault is a knowledge base, not a code directory.
 
 ## When to engage the vault
 

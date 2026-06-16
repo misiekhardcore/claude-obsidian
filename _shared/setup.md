@@ -3,7 +3,7 @@
 Guide for bootstrapping and configuring the Obsidian vault for agent use.
 
 ## 1. Obsidian CLI Installation
-Claude-obsidian uses Obsidian CLI (1.12.7+).
+agents-memo uses Obsidian CLI (1.12.7+).
 - **Prerequisite**: Obsidian must be running with the vault open.
 - **Linux (Flatpak)**: Invoke via `flatpak run md.obsidian.Obsidian --cli`. Recommended alias: `alias obsidian='flatpak run md.obsidian.Obsidian --cli'`.
 - **Registration**: Register the vault once per machine:

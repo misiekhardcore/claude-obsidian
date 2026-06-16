@@ -26,7 +26,7 @@ e2e-preflight:
 	  exit 2; }
 
 e2e-build:
-	docker build -f tests/e2e/Dockerfile -t claude-obsidian-e2e:latest .
+	docker build -f tests/e2e/Dockerfile -t agents-memo-e2e:latest .
 
 # Full local tier: preflight → build → run with credentials + working tree.
 # On Linux hosts add --security-opt apparmor=unconfined if Obsidian crashes
@@ -41,10 +41,10 @@ e2e: e2e-preflight e2e-build
 	  -e ENTRYPOINT_TYPE=local \
 	  -v "$(PWD):/opt/plugin-src:ro" \
 	  -v "$$HOME/.claude/.credentials.json:/root/.claude/.credentials.json:ro" \
-	  claude-obsidian-e2e:latest
+	  agents-memo-e2e:latest
 
 e2e-clean:
-	docker image rm claude-obsidian-e2e:latest 2>/dev/null || true
+	docker image rm agents-memo-e2e:latest 2>/dev/null || true
 
 changelog:
 	sed -i '/^## \[Unreleased\]/,/^## \[/{/^## \[Unreleased\]/d;/^## \[/!d}' CHANGELOG.md

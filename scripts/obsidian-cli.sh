@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# obsidian-cli.sh — wrapper for the Obsidian CLI used by every claude-obsidian skill.
+# obsidian-cli.sh — wrapper for the Obsidian CLI used by every agents-memo skill.
 #
 # Resolves the vault, derives the vault name (basename), pre-flights
 # `obsidian version`, runs the verb, and normalizes the upstream CLI's

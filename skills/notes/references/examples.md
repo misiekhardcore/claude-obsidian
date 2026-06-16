@@ -35,16 +35,16 @@ assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
 **List, filtered:**
 
 ```text
-user> /note list --project=claude-obsidian
+user> /note list --project=agents-memo
 assistant>
 Pending notes (2):
 
-- [ ] 2026-04-25 [claude-obsidian] /note process should reuse confidence threshold
-- [ ] 2026-04-24 [claude-obsidian] inbox count missing from /wiki status
+- [ ] 2026-04-25 [agents-memo] /note process should reuse confidence threshold
+- [ ] 2026-04-24 [agents-memo] inbox count missing from /wiki status
 
 Deferred (1):
 
-- [~] 2026-04-12 [claude-obsidian] consider auto-tagging from CWD remote name
+- [~] 2026-04-12 [agents-memo] consider auto-tagging from CWD remote name
 ```
 
 **Process:**
@@ -52,7 +52,7 @@ Deferred (1):
 ```text
 user> /note process
 assistant>
-[1/3] 2026-04-25 [claude-obsidian]
+[1/3] 2026-04-25 [agents-memo]
 title: /note process should reuse confidence threshold from save
 body:
 > /note process should reuse confidence threshold from save

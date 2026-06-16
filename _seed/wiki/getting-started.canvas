@@ -32,7 +32,7 @@
 		{"id":"m-canvas","type":"text","text":"**/canvas**\n*visual graph*","x":-600,"y":1460,"width":200,"height":80,"color":"6"},
 		{"id":"m-lint","type":"text","text":"**wiki-lint**\n*orphans · dead links*","x":-360,"y":1460,"width":200,"height":80,"color":"6"},
 		{"id":"you","type":"text","text":"## You","x":-840,"y":-140,"width":120,"height":60,"color":"2"},
-		{"id":"title","type":"text","text":"# How claude-obsidian works\n\nFollow the arrows: capture → process → wiki → retrieve. The hot cache auto-loads each session.","x":-840,"y":-340,"width":740,"height":150,"color":"6"}
+		{"id":"title","type":"text","text":"# How agents-memo works\n\nFollow the arrows: capture → process → wiki → retrieve. The hot cache auto-loads each session.","x":-840,"y":-340,"width":740,"height":150,"color":"6"}
 	],
 	"edges":[
 		{"id":"e1","fromNode":"you","fromSide":"bottom","toNode":"c-drop","toSide":"top"},

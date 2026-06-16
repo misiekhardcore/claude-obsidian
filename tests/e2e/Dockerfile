@@ -1,4 +1,4 @@
-# claude-obsidian E2E harness image (CI fast tier — local full tier shares it).
+# agents-memo E2E harness image (CI fast tier — local full tier shares it).
 #
 # Cache-optimized layer order: base OS → Node + Claude Code → Obsidian →
 # plugin discovery wiring → entrypoints. Rare changes go first so frequent
@@ -102,8 +102,8 @@ RUN curl -fsSL \
 # component, so it does not need to track the published
 # plugin.json/marketplace.json version. Using a synthetic value avoids drift
 # when the plugin's real version is bumped.
-ENV PLUGIN_NAME=claude-obsidian \
-    MARKETPLACE_NAME=claude-obsidian \
+ENV PLUGIN_NAME=agents-memo \
+    MARKETPLACE_NAME=agents-memo \
     PLUGIN_VERSION=0.0.0-e2e \
     PLUGIN_SRC=/opt/plugin-src \
     VAULT_PATH=/tmp/vault
@@ -115,25 +115,25 @@ RUN mkdir -p "/root/.claude/plugins/cache/${MARKETPLACE_NAME}/${PLUGIN_NAME}" \
  && ln -s "${PLUGIN_SRC}" \
         "/root/.claude/plugins/marketplaces/${MARKETPLACE_NAME}" \
  && printf '%s\n' '{' \
-        '  "enabledPlugins": { "claude-obsidian@claude-obsidian": true },' \
+        '  "enabledPlugins": { "agents-memo@agents-memo": true },' \
         '  "pluginConfigs": {' \
-        '    "claude-obsidian@claude-obsidian": {' \
+        '    "agents-memo@agents-memo": {' \
         '      "options": { "vault_path": "/tmp/vault" }' \
         '    }' \
         '  },' \
         '  "hooks": {}' \
         '}' > /root/.claude/settings.json \
  && printf '%s\n' '{' \
-        '  "claude-obsidian": {' \
-        '    "source": { "source": "local", "repo": "claude-obsidian" },' \
-        '    "installLocation": "/root/.claude/plugins/marketplaces/claude-obsidian",' \
+        '  "agents-memo": {' \
+        '    "source": { "source": "local", "repo": "agents-memo" },' \
+        '    "installLocation": "/root/.claude/plugins/marketplaces/agents-memo",' \
         '    "lastUpdated": "2026-01-01T00:00:00Z"' \
         '  }' \
         '}' > /root/.claude/plugins/known_marketplaces.json \
  && printf '%s\n' '{' \
         '  "version": 2,' \
         '  "plugins": {' \
-        '    "claude-obsidian@claude-obsidian": [' \
+        '    "agents-memo@agents-memo": [' \
         '      {' \
         '        "scope": "user",' \
         "        \"installPath\": \"/root/.claude/plugins/cache/${MARKETPLACE_NAME}/${PLUGIN_NAME}/${PLUGIN_VERSION}\"," \

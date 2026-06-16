@@ -7,7 +7,7 @@ Resolve `<vault_root>` via `scripts/resolve-vault.sh` (canonical implementation)
 Resolution order:
 1. Legacy explicit path passed as `$1`
 2. CWD if it contains `wiki/`
-3. `claude-obsidian.vault_path` setting
+3. `agents-memo.vault_path` setting
 
 ```bash
 VAULT=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-vault.sh") || {

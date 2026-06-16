@@ -194,8 +194,8 @@ run_claude() {
 # aliases. The harness uses the namespaced form so the test doesn't depend
 # on bare-alias support landing first.
 echo ""
-echo "entrypoint-local: step 8a — /claude-obsidian:wiki init"
-run_claude "/claude-obsidian:wiki init"
+echo "entrypoint-local: step 8a — /agents-memo:wiki init"
+run_claude "/agents-memo:wiki init"
 bash /e2e/assertions/vault-shape.sh "$VAULT_PATH"
 
 # ── Step 8b: ingest fixture → frontmatter + index-mutated assertions (AC5) ───
@@ -225,18 +225,18 @@ fi
 
 # ── Steps 8c–8e: /daily ×3 → daily-shape assertion (AC6) ─────────────────────
 echo ""
-echo "entrypoint-local: step 8c — /claude-obsidian:daily first entry"
-run_claude "/claude-obsidian:daily E2E harness test entry one"
-echo "entrypoint-local: step 8d — /claude-obsidian:daily second entry"
-run_claude "/claude-obsidian:daily E2E harness test entry two"
-echo "entrypoint-local: step 8e — /claude-obsidian:daily third entry"
-run_claude "/claude-obsidian:daily E2E harness test entry three"
+echo "entrypoint-local: step 8c — /agents-memo:daily first entry"
+run_claude "/agents-memo:daily E2E harness test entry one"
+echo "entrypoint-local: step 8d — /agents-memo:daily second entry"
+run_claude "/agents-memo:daily E2E harness test entry two"
+echo "entrypoint-local: step 8e — /agents-memo:daily third entry"
+run_claude "/agents-memo:daily E2E harness test entry three"
 bash /e2e/assertions/daily-shape.sh "$VAULT_PATH"
 
 # ── Step 8f: /daily-close → section-header assertion (AC7) ───────────────────
 echo ""
-echo "entrypoint-local: step 8f — /claude-obsidian:daily-close"
-run_claude "/claude-obsidian:daily-close"
+echo "entrypoint-local: step 8f — /agents-memo:daily-close"
+run_claude "/agents-memo:daily-close"
 DAILY_FILE="$VAULT_PATH/daily/$(date +%F).md"
 bash /e2e/assertions/section-header.sh "$DAILY_FILE" "## Summary"
 

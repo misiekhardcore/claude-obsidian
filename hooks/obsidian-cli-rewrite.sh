@@ -89,7 +89,7 @@ jq -n \
     "hookSpecificOutput": {
       "hookEventName": "PreToolUse",
       "permissionDecision": "allow",
-      "permissionDecisionReason": "obsidian-cli auto-rewrite (claude-obsidian)",
+      "permissionDecisionReason": "obsidian-cli auto-rewrite (agents-memo)",
       "updatedInput": $updated
     }
   }'

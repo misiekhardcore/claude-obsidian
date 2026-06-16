@@ -17,11 +17,11 @@ Plugins consist of three file types. Organize by concern, load on-demand, promot
 
 ### Three-Tier Architecture
 
-| File Type | Location | Role | Loaded when |
-|---|---|---|---|
-| **Entry point** | `SKILL.md` | Thin orchestrator. Describes I/O, routes to references. ≤150 lines. | Skill invoked |
-| **Reference module** | `skills/<name>/references/<concern>.md` | Owns one phase or topic. Heavy content (schemas, tables, detailed logic). | Point of need: when the phase becomes active |
-| **Shared library** | `_shared/<concern>.md` | Cross-skill protocol or reusable concern. Promote when ≥3 skills need it. | Point of need; when first skill activates that concern |
+|File Type|Location|Role|Loaded when|
+|-|-|-|-|
+|**Entry point**|`SKILL.md`|Thin orchestrator. Describes I/O, routes to references. ≤150 lines.|Skill invoked|
+|**Reference module**|`skills/<name>/references/<concern>.md`|Owns one phase or topic. Heavy content (schemas, tables, detailed logic).|Point of need: when the phase becomes active|
+|**Shared library**|`_shared/<concern>.md`|Cross-skill protocol or reusable concern. Promote when ≥3 skills need it.|Point of need; when first skill activates that concern|
 
 ### Principles
 
@@ -88,7 +88,7 @@ PreToolUse hook transparently rewrites raw `obsidian <verb> ...` calls. For erro
 |`effort`|`low`\|`medium`\|`high`\|`xhigh`\|`max` — effort level override.|
 |`argument-hint`|Shown in autocomplete (e.g. `[topic]`). Add to any command that takes an argument.|
 |`context`|Accepted value: `fork`. Runs the skill in an isolated subagent instead of inline.|
-|`agent`|Used with `context: fork`. Names the agent type to dispatch (e.g., `claude-obsidian:ingest`).|
+|`agent`|Used with `context: fork`. Names the agent type to dispatch (e.g., `agents-memo:ingest`).|
 |`model`|`sonnet`, `opus`, `haiku`, or full model ID.|
 |`user-invocable`|`false` hides skill from `/` menu (orchestrator-only skills).|
 
@@ -96,16 +96,16 @@ PreToolUse hook transparently rewrites raw `obsidian <verb> ...` calls. For erro
 
 Skills in this repo operate on **vault contents only**: `wiki/`, `notes/`, `daily/`, `.raw/`, `wiki/meta/`.
 
-**Out-of-scope here** — plugin-authoring audits (SKILL.md quality, AUTHORING.md accuracy, `_shared/` content) belong in the **`claude-workflow:/prune` Authoring Lane** (`misiekhardcore/claude-workflow:skills/prune/SKILL.md`).
+**Out-of-scope here** — plugin-authoring audits (SKILL.md quality, AUTHORING.md accuracy, `_shared/` content) belong in the **`agents-flow:/prune` Authoring Lane** (`misiekhardcore/agents-flow:skills/prune/SKILL.md`).
 
-**Sibling convention**: `misiekhardcore/claude-workflow:_templates/AUTHORING.md` is the parallel authoring guide for that plugin.
+**Sibling convention**: `misiekhardcore/agents-flow:_templates/AUTHORING.md` is the parallel authoring guide for that plugin.
 
 **Worked example — "audit SKILL.md content":**
 
 |Direction|Action|
 |-|-|
 |**Do**|Run `/prune` in `claude-workflow` — the Authoring Lane audits skill files.|
-|**Don't**|Open a `wiki-lint` issue in `claude-obsidian` — vault skills do not inspect skill source files.|
+|**Don't**|Open a `wiki-lint` issue in `agents-memo` — vault skills do not inspect skill source files.|
 
 ## Agent Frontmatter
 

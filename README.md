@@ -1,6 +1,6 @@
-# claude-obsidian
+# agents-memo
 
-Obsidian wiki plugin for Claude Code — personal knowledge vault with LLM-assisted ingestion, research, and retrieval.
+Obsidian wiki plugin for AI coding agents — personal knowledge vault with LLM-assisted ingestion, research, and retrieval.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'background':'#000','primaryColor':'#ffffff','primaryTextColor':'#000000','primaryBorderColor':'#000000','lineColor':'#000000','textColor':'#000000','titleColor':'#000000','clusterBkg':'#f3f4f6','clusterBorder':'#000000','edgeLabelBackground':'#ffffff'}}}%%
@@ -79,8 +79,8 @@ flowchart
 
 **Plugin installation:**
 ```bash
-claude plugin marketplace add misiekhardcore/claude-obsidian
-claude plugin install claude-obsidian@claude-obsidian
+claude plugin marketplace add misiekhardcore/agents-memo
+claude plugin install agents-memo@agents-memo
 ```
 
 **Vault registration:**
@@ -141,7 +141,7 @@ Lint is **opt-in via OS scheduler** (cron, systemd timers, launchd). Use `bin/wi
 
 **Example crontab (weekly, Sunday 03:00):**
 ```cron
-0 3 * * 0 /absolute/path/to/claude-obsidian/bin/wiki-lint-cron.sh
+0 3 * * 0 /absolute/path/to/agents-memo/bin/wiki-lint-cron.sh
 ```
 
 **systemd user timer:**
@@ -160,5 +160,5 @@ Pre-commit hook applies formatting via `lint-staged` to staged files.
 
 ## More
 
-- Plugin homepage: <https://github.com/misiekhardcore/claude-obsidian>
+- Plugin homepage: <https://github.com/misiekhardcore/agents-memo>
 - Agent-facing docs (skills, vault structure, ingest rules): [`CLAUDE.md`](CLAUDE.md)

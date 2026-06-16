@@ -1,14 +1,14 @@
 {
-  "name": "claude-obsidian",
+  "name": "agents-memo",
   "version": "2.0.0",
-  "description": "Claude + Obsidian knowledge companion. Sets up a persistent, compounding wiki vault. Covers memory management, session notetaking, knowledge organization, and agent context across projects.",
+  "description": "Personal knowledge vault. Sets up a persistent, compounding wiki vault with LLM-assisted ingestion, research, and retrieval. Covers memory management, session notetaking, knowledge organization, and agent context across projects.",
   "author": {
     "name": "Michał Konopski",
     "url": "https://github.com/misiekhardcore"
   },
   "license": "MIT",
-  "homepage": "https://github.com/misiekhardcore/claude-obsidian",
-  "repository": "https://github.com/misiekhardcore/claude-obsidian",
+  "homepage": "https://github.com/misiekhardcore/agents-memo",
+  "repository": "https://github.com/misiekhardcore/agents-memo",
   "keywords": [
     "obsidian",
     "knowledge-base",

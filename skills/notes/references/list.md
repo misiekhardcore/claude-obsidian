@@ -16,6 +16,6 @@
 
    Glyphs: `[ ]` pending, `[~]` deferred. Always include both sections; show `(none)` under an empty section.
 
-3. **Filter `--project=<basename>`** — only show notes whose `source_project` matches. Honour the same flag in natural-language form (`"show my inbox for claude-obsidian"`).
+3. **Filter `--project=<basename>`** — only show notes whose `source_project` matches. Honour the same flag in natural-language form (`"show my inbox for agents-memo"`).
 
 `/note list` includes pending + deferred. `/note process` iterates pending only by default; pass `--include-deferred` to walk both.

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "skills": {
+    "paths": ["./skills"]
+  },
+  "instructions": ["./AGENTS.md"],
+  "references": {
+    "memory": {
+      "path": "~/Projects/claude-memory",
+      "description": "Obsidian wiki vault containing all project knowledge"
+    }
+  }
+}
