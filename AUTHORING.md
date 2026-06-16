@@ -104,7 +104,7 @@ Skills in this repo operate on **vault contents only**: `wiki/`, `notes/`, `dail
 
 |Direction|Action|
 |-|-|
-|**Do**|Run `/prune` in `claude-workflow` — the Authoring Lane audits skill files.|
+|**Do**|Run `/prune` in `agents-flow` — the Authoring Lane audits skill files.|
 |**Don't**|Open a `wiki-lint` issue in `agents-memo` — vault skills do not inspect skill source files.|
 
 ## Agent Frontmatter

@@ -42,7 +42,7 @@
     "link": "Claude Code Hook Template Variable Expansion Scope"
   },
   {
-    "link": "claude-obsidian (plugin)"
+    "link": "agents-memo (plugin)"
   },
   {
     "link": "ClaudeFast Agent Teams Guide"
@@ -132,7 +132,7 @@
     "link": "Research: allowed-tools best practice for multi-agent workflow plugins"
   },
   {
-    "link": "Research: Multiskill Workflow Structure in claude-workflow"
+    "link": "Research: Multiskill Workflow Structure in agents-flow"
   },
   {
     "link": "Research: Subagents vs TeamCreate Decision Rubric"

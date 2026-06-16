@@ -58,11 +58,11 @@ out=$(bash "$SLUG" "Short title under forty chars")
 assert_eq "short-title-under-forty-chars" "$out" "AC2: ≤40 chars used whole"
 
 # AC3a — slug > 40 chars: word-boundary truncation at last "-" before char 40.
-# Input slug "claude-workflow-uses-git-cli-instead-of-wt-for-worktrees" (56 chars)
-# Char-40 head is "claude-workflow-uses-git-cli-instead-of-" (ends with -);
-# stripping shortest "-*" leaves "claude-workflow-uses-git-cli-instead-of" (39).
-out=$(bash "$SLUG" "claude-workflow uses git CLI instead of wt for worktrees")
-assert_eq "claude-workflow-uses-git-cli-instead-of" "$out" "AC3a: word-boundary truncation"
+# Input slug "agents-flow-uses-git-cli-instead-of-wt-for-worktrees" (56 chars)
+# Char-40 head is "agents-flow-uses-git-cli-instead-of-" (ends with -);
+# stripping shortest "-*" leaves "agents-flow-uses-git-cli-instead-of" (39).
+out=$(bash "$SLUG" "agents-flow uses git CLI instead of wt for worktrees")
+assert_eq "agents-flow-uses-git-cli-instead-of" "$out" "AC3a: word-boundary truncation"
 [ "${#out}" -le 40 ] && pass "AC3a: result ≤ 40 chars (${#out})" \
                     || fail "AC3a: result > 40 chars (${#out})"
 

@@ -10,10 +10,10 @@ assistant> Captured to notes/2026-04-25-inbox-count-missing-from-wiki-status.md
 **Capture (NEW, filler stripped from title):**
 
 ```text
-user> /note we need to check why claude-workflow is not using 'wt' for worktrees but the git cli directly
-# title summarised to "claude-workflow uses git CLI instead of wt for worktrees"
+user> /note we need to check why agents-flow is not using 'wt' for worktrees but the git cli directly
+# title summarised to "agents-flow uses git CLI instead of wt for worktrees"
 # slug exceeds 40 chars; truncated at last `-` before char 40
-assistant> Captured to notes/2026-04-26-claude-workflow-uses-git-cli-instead.md
+assistant> Captured to notes/2026-04-26-agents-flow-uses-git-cli-instead.md
 ```
 
 **Capture (MATCH-append, scope unchanged):**

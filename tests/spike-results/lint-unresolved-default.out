@@ -12,7 +12,7 @@ Andrej Karpathy
 Beam Multi-Agent Orchestration Patterns
 Caroline Mazurek
 Claude Code Hook Template Variable Expansion Scope
-claude-obsidian (plugin)
+agents-memo (plugin)
 ClaudeFast Agent Teams Guide
 comparisons/Wiki vs RAG
 Compounding Knowledge
@@ -42,7 +42,7 @@ questions/Research VS Code Webview Testing and Screenshots
 Research Claude Code Token Optimization
 Research VS Code Webview Testing and Screenshots
 Research: allowed-tools best practice for multi-agent workflow plugins
-Research: Multiskill Workflow Structure in claude-workflow
+Research: Multiskill Workflow Structure in agents-flow
 Research: Subagents vs TeamCreate Decision Rubric
 Research: VS Code Webview Testing and Screenshots
 sophia (project)
