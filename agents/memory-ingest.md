@@ -3,8 +3,10 @@ name: memory-ingest
 description: Processes one source fully (read, extract entities/concepts, file pages, report). Dispatched for batch ingestion when multiple sources need parallel processing.
 model: sonnet
 maxTurns: 30
-tools: Read, Bash
-disallowedTools: Agent, Edit, Glob, Grep, WebFetch, WebSearch
+permissions: 
+  - read: 'allow'
+  - bash: 'allow'
+disallowedTools: Agent Edit Glob Grep WebFetch WebSearch
 background: true
 ---
 Process one source document fully and integrate into wiki. Receives: source path (`.raw/`), vault path, user emphasis.
