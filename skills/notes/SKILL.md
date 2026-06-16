@@ -24,3 +24,4 @@ Capture raw thoughts verbatim in `notes/` without interrupting work. Wiki is pol
 - On MATCH-append, separator is blank line + `---` + blank line.
 - No tags/types/confirmations beyond the PROCESS action prompt.
 - Single URL in capture → offer `/ingest` redirect.
+- See `references/examples.md` for end-to-end examples of all subcommands.
