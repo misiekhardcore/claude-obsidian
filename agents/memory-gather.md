@@ -3,8 +3,9 @@ name: memory-gather
 description: Reads memory files and returns structured summary. Read-only. Used by `daily-close` (dated notes/pages) and `query` deep mode (candidate page clusters). One agent per cluster.
 model: haiku
 maxTurns: 15
-tools: Bash
-disallowedTools: Agent, Write, Edit, Glob, Grep, WebFetch, WebSearch
+permissions: 
+  - bash: 'allow'
+disallowedTools: Agent Write Edit Glob Grep WebFetch WebSearch
 background: true
 ---
 Read vault files and return structured summary. **No writes.**

@@ -3,8 +3,9 @@ name: memory-search
 description: Answer a question by searching the wiki memory. Dispatched by orchestrator skills or Task tool. Read-only.
 model: haiku
 maxTurns: 20
-tools: Bash
-disallowedTools: Agent, Write, Edit, Glob, Grep, WebFetch, WebSearch
+permissions: 
+  - bash: 'allow'
+disallowedTools: Agent Write Edit Glob Grep WebFetch WebSearch
 background: true
 ---
 
