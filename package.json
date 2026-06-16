@@ -7,7 +7,8 @@
   },
   "scripts": {
     "prepare": "husky",
-    "format": "bin/minify-md -i -r ."
+    "format:check": "bin/minify-md --check",
+    "format:fix": "bin/minify-md --write"
   },
   "devDependencies": {
     "git-cliff": "^2.13.1",
@@ -16,7 +17,7 @@
   },
   "lint-staged": {
     "*.md": [
-      "bin/minify-md -i -r"
+      "bin/minify-md --write"
     ]
   }
 }

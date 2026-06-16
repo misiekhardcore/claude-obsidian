@@ -1,209 +1,273 @@
 #!/usr/bin/env python3
-"""Minify markdown skill files to reduce token count.
+"""Minify agent-facing markdown files.
 
-Transforms applied (outside code blocks):
-  - Frontmatter: remove unnecessary quotes from scalar values
-  - Frontmatter: unquote and compact {{placeholders}} and [[wikilinks]]
-  - Body: compact {{ spaced }} → {{compact}} and [[ spaced ]] → [[compact]]
-  - Tables: strip cell padding whitespace
-  - Horizontal rules: strip decorative --- / *** / ___ lines
-  - Blank lines: collapse 3+ consecutive to 2
-  - Lines: strip trailing whitespace
-  - Emoji: remove unicode emoji characters
-
-Usage:
-  skill-minify file.md              # print minified to stdout
-  skill-minify -i file.md ...       # modify in-place, print stats
-  cat file.md | skill-minify        # stdin → stdout
+Reduces token count in agent instruction files by:
+- compacting table padding and separator rows
+- collapsing excess blank lines
+- unquoting safe YAML frontmatter scalars
+- normalising double-brace/bracket spacing
 """
 
+from __future__ import annotations
+
+import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
+from typing import Iterable
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+EXCLUDED_PARTS = {'.git', '.github', 'node_modules', 'dist'}
+TABLE_ROW_RE = re.compile(r'^(\s*)\|(.*)\|\s*$')
 # Characters that force quoting in YAML plain scalars
-_UNSAFE_START = re.compile(r'^[\{\[\`\>\|\'\"&!%@?,]|^-(?= )|^:(?= |$)')
+UNSAFE_FRONTMATTER_START_RE = re.compile(r'^[\[{`>|\'"&!%@?,]|^-(?= )|^:(?= |$)')
 # Sequences that force quoting anywhere in a plain scalar
-_UNSAFE_INLINE = re.compile(r': | #|:\s*$')
-
-_EMOJI = re.compile(
-    r'[\U0001F300-\U0001FAFF'   # misc symbols, emoticons, transport, supplemental
-    r'☀-➿'            # misc symbols, dingbats
-    r'︀-️'            # variation selectors
-    r'‍'                   # zero-width joiner (used in emoji sequences)
-    r'⃣'                   # combining enclosing keycap
-    r']+',
-    flags=re.UNICODE,
+UNSAFE_FRONTMATTER_INLINE_RE = re.compile(r': | #|:\s*$')
+YAML_AMBIGUOUS_PLAIN_SCALAR_RE = re.compile(
+    r'^(?:'
+    r'~|null|true|false|y|yes|n|no|on|off'
+    r'|[-+]?\.(?:inf|nan)'
+    r'|[-+]?0b[0-1_]+'
+    r'|[-+]?0x[0-9a-f_]+'
+    r'|[-+]?0o?[0-7_]+'
+    r'|[-+]?(?:0|[1-9][0-9_]*)'
+    r'|[-+]?(?:[0-9][0-9_]*\.[0-9_]+|\.[0-9_]+)(?:[eE][-+]?[0-9]+)?'
+    r'|[-+]?[0-9][0-9_]*(?:[eE][-+]?[0-9]+)'
+    r'|[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+'
+    r'|[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*'
+    r'|\d{4}-\d{2}-\d{2}'
+    r'|\d{4}-\d{2}-\d{2}(?:[Tt]|[ \t]+)\d{2}:\d{2}:\d{2}(?:\.[0-9]+)?(?:[ \t]*(?:Z|[-+]\d{2}(?::\d{2})?))?'
+    r')$',
+    re.IGNORECASE,
 )
 
-_FENCE = re.compile(r'^(`{3,}|~{3,})')
+FENCE_RE = re.compile(r'^(?:`{3,}|~{3,})')
 
 # {{ spaced placeholder }} or { { spaced } } → {{compact}}
-_TMPL = re.compile(r'\{\s*\{\s*(.*?)\s*\}\s*\}')
+DOUBLE_BRACE_RE = re.compile(r'\{\s*\{\s*(.*?)\s*\}\s*\}')
 # [[ spaced wikilink ]] → [[compact]]
-_WIKI = re.compile(r'\[\s*\[\s*(.*?)\s*\]\s*\]')
+DOUBLE_BRACKET_RE = re.compile(r'\[\s*\[\s*(.*?)\s*\]\s*\]')
 
 
-def _compact_tokens(text: str) -> str:
-    text = _TMPL.sub(lambda m: '{{' + m.group(1) + '}}', text)
-    text = _WIKI.sub(lambda m: '[[' + m.group(1) + ']]', text)
+def compact_inline_tokens(text: str) -> str:
+    text = DOUBLE_BRACE_RE.sub(lambda match: '{{' + match.group(1) + '}}', text)
+    text = DOUBLE_BRACKET_RE.sub(lambda match: '[[' + match.group(1) + ']]', text)
     return text
 
 
-def _can_unquote(value: str) -> bool:
+def can_unquote_frontmatter(value: str) -> bool:
     if not value:
         return True
     # Always safe to unquote compact placeholders/wikilinks
     if re.fullmatch(r'\{\{[^}]*\}\}', value) or re.fullmatch(r'\[\[[^\]]*\]\]', value):
         return True
-    if _UNSAFE_START.match(value):
+    if YAML_AMBIGUOUS_PLAIN_SCALAR_RE.fullmatch(value):
         return False
-    if _UNSAFE_INLINE.search(value):
+    if (
+        UNSAFE_FRONTMATTER_START_RE.search(value)
+        or UNSAFE_FRONTMATTER_INLINE_RE.search(value)
+    ):
         return False
     return True
 
 
-def _unquote_frontmatter(fm: str) -> str:
-    result = []
-    for line in fm.splitlines(keepends=True):
-        line = _compact_tokens(line)
+def minify_frontmatter(frontmatter: str) -> str:
+    result: list[str] = []
+
+    for line in frontmatter.splitlines(keepends=True):
+        if not line.strip():
+            continue
+
+        line = compact_inline_tokens(line)
+
         # key: "value"
-        m = re.match(r'^(\s*[\w-]+\s*:\s*)(["\'])(.*)\2(\s*\n?)$', line, re.DOTALL)
-        if m:
-            prefix, inner, tail = m.group(1), m.group(3), m.group(4)
-            inner = _compact_tokens(inner)
-            if _can_unquote(inner):
-                line = prefix + inner + tail
+        quoted_key_match = re.match(r'^(\s*[\w-]+\s*:\s*)(["\'])(.*)\2(\s*\n?)$', line, re.DOTALL)
+        if quoted_key_match:
+            prefix, _, value, suffix = quoted_key_match.groups()
+            value = compact_inline_tokens(value)
+            if can_unquote_frontmatter(value):
+                line = prefix + value + suffix
         else:
-            # - "list item value"
-            m = re.match(r'^(\s*-\s*)(["\'])(.*)\2(\s*\n?)$', line, re.DOTALL)
-            if m:
-                prefix, inner, tail = m.group(1), m.group(3), m.group(4)
-                inner = _compact_tokens(inner)
-                if _can_unquote(inner):
-                    line = prefix + inner + tail
+        # - "list item value"
+            quoted_list_match = re.match(r'^(\s*-\s*)(["\'])(.*)\2(\s*\n?)$', line, re.DOTALL)
+            if quoted_list_match:
+                prefix, _, value, suffix = quoted_list_match.groups()
+                value = compact_inline_tokens(value)
+                if can_unquote_frontmatter(value):
+                    line = prefix + value + suffix
         result.append(line)
     return ''.join(result)
 
 
-def _compress_table_row(line: str) -> str:
-    m = re.match(r'^(\s*)(\|.*\|)\s*$', line)
-    if not m:
+def minify_table_row(line: str) -> str:
+    match = TABLE_ROW_RE.match(line)
+    if not match:
         return line
-    indent, row = m.group(1), m.group(2)
-    cells = row[1:-1].split('|')  # strip outer pipes, split on inner
-    is_sep = all(re.fullmatch(r'\s*:?-+:?\s*', c) for c in cells)
-    if is_sep:
-        cells = [re.sub(r'-+', '-', re.sub(r'\s', '', c)) for c in cells]
+
+    indent, row = match.groups()
+    cells = row.split('|')
+
+    if all(re.fullmatch(r'\s*:?-+:?\s*', cell or ' ') for cell in cells):
+        compact_cells = [re.sub(r'-+', '-', re.sub(r'\s+', '', cell)) for cell in cells]
     else:
-        cells = [c.strip() for c in cells]
-    return indent + '|' + '|'.join(cells) + '|'
+        compact_cells = [cell.strip() for cell in cells]
+    return indent + '|' + '|'.join(compact_cells) + '|'
 
 
-def minify(content: str) -> str:
-    # --- split off frontmatter ---
+def split_frontmatter(content: str) -> tuple[str, str]:
     fm_match = re.match(r'^(---\n)(.*?)(^---\n)', content, re.DOTALL | re.MULTILINE)
     if fm_match:
         fm_open  = fm_match.group(1)
-        fm_body  = _unquote_frontmatter(fm_match.group(2))
+        fm_body  = minify_frontmatter(fm_match.group(2))
         fm_close = fm_match.group(3)
         body     = content[fm_match.end():]
     else:
         fm_open = fm_body = fm_close = ''
         body = content
+    frontmatter = fm_open + fm_body + fm_close
+    return frontmatter, body
 
-    # --- process body lines ---
-    out = []
+
+def minify_body(body: str) -> str:
+    output: list[str] = []
     in_fence = False
     for line in body.splitlines():
         stripped = line.strip()
-        if _FENCE.match(stripped):
+
+        if FENCE_RE.match(stripped):
             in_fence = not in_fence
-            out.append(line.rstrip())
+            output.append(line.rstrip())
             continue
 
         if in_fence:
-            out.append(line.rstrip())  # preserve code block content, just strip trailing ws
+            output.append(line.rstrip())
             continue
 
         line = line.rstrip()
 
-        if re.fullmatch(r'\s*([*\-_])(\s*\1){2,}\s*', line):
+        if re.match(r'\s*\|', line):
+            line = minify_table_row(line)
+
+        line = compact_inline_tokens(line)
+
+
+        output.append(line)
+
+    compact_body = '\n'.join(output)
+    compact_body = re.sub(r'\n{3,}', '\n\n', compact_body)
+    compact_body = compact_body.strip('\n') + '\n'
+
+    return compact_body
+
+
+def minify_markdown(content: str) -> str:
+    frontmatter, body = split_frontmatter(content)
+    minified_frontmatter = ''
+
+
+    return frontmatter + minify_body(body)
+
+
+def discover_files() -> list[Path]:
+    files: set[Path] = set()
+
+    for path in REPO_ROOT.rglob('*.md'):
+        if any(excluded in path.parts for excluded in EXCLUDED_PARTS):
+            continue
+        files.add(path)
+
+    return sorted(files)
+
+
+def normalize_paths(paths: Iterable[str]) -> list[Path]:
+    normalized: list[Path] = []
+
+    for raw_path in paths:
+        path = Path(raw_path)
+        if not path.is_absolute():
+            path = (Path.cwd() / path).resolve()
+        if path.is_dir():
+            normalized.extend(file for file in sorted(path.rglob('*.md')))
+        normalized.append(path.resolve())
+
+    deduplicated = []
+    seen: set[Path] = set()
+    for path in normalized:
+        if path in seen:
+            continue
+        seen.add(path)
+        deduplicated.append(path)
+
+    return [path for path in deduplicated if path.exists()]
+
+
+def check_git_tracked(path: Path) -> bool:
+    try:
+        completed = subprocess.run(
+            ['git', 'ls-files', '--error-unmatch', path.relative_to(REPO_ROOT).as_posix()],
+            cwd=REPO_ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except ValueError:
+        return False
+
+    return completed.returncode == 0
+
+
+def is_agent_facing_markdown(path: Path) -> bool:
+    if path.name not in ('AGENTS.md', 'SKILL.md'):
+        return False
+    if any(excluded in path.parts for excluded in EXCLUDED_PARTS):
+        return False
+    return True
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--check', action='store_true', help='fail if any file is not minified')
+    mode.add_argument('--write', action='store_true', help='rewrite files in place')
+    parser.add_argument('paths', nargs='*', help='optional subset of files or directories to process')
+    args = parser.parse_args()
+
+    paths = normalize_paths(args.paths) if args.paths else discover_files()
+    untracked_paths = [path for path in paths if not check_git_tracked(path)]
+    if untracked_paths:
+        for path in untracked_paths:
+            print(f'skipping untracked file: {path.relative_to(REPO_ROOT).as_posix()}', file=sys.stderr)
+        paths = [path for path in paths if path not in untracked_paths]
+
+    changed_paths: list[str] = []
+
+    for path in paths:
+        original = path.read_text(encoding='utf-8')
+        minified = minify_markdown(original)
+
+        if minified == original:
             continue
 
-        if re.match(r'\s*\|', line):
-            line = _compress_table_row(line)
+        relative_path = path.relative_to(REPO_ROOT).as_posix()
+        changed_paths.append(relative_path)
 
-        line = _compact_tokens(line)
-        line = _EMOJI.sub('', line)
+        if args.write:
+            path.write_text(minified, encoding='utf-8')
 
-        out.append(line)
+    if args.check and changed_paths:
+        print('Agent-facing markdown files are not minified:', file=sys.stderr)
+        for relative_path in changed_paths:
+            print(f'  - {relative_path}', file=sys.stderr)
+        print('Run: bin/minify-md --write', file=sys.stderr)
+        return 1
 
-    body = '\n'.join(out)
-    body = re.sub(r'\n{3,}', '\n\n', body)
-    body = body.strip('\n') + '\n'
+    if args.write and changed_paths:
+        for relative_path in changed_paths:
+            print(f'minified {relative_path}', file=sys.stderr)
 
-    return fm_open + fm_body + fm_close + body
-
-
-def _stats(original: str, result: str, path: str = '') -> str:
-    delta = len(original) - len(result)
-    pct   = delta / len(original) * 100 if original else 0
-    label = f'{path}: ' if path else ''
-    return f'{label}{len(original)} → {len(result)} bytes ({pct:.1f}% saved)'
-
-
-def _process_file(p: Path, inplace: bool) -> tuple[int, int]:
-    original = p.read_text('utf-8')
-    result   = minify(original)
-    if inplace:
-        if result != original:
-            p.write_text(result, 'utf-8')
-    else:
-        sys.stdout.write(result)
-    print(_stats(original, result, str(p)), file=sys.stderr)
-    return len(original), len(result)
-
-
-def main() -> None:
-    args = sys.argv[1:]
-    inplace   = '-i' in args
-    recursive = '-r' in args
-    for flag in ('-i', '-r'):
-        if flag in args:
-            args.remove(flag)
-
-    if not args:
-        content = sys.stdin.read()
-        result  = minify(content)
-        sys.stdout.write(result)
-        print(_stats(content, result), file=sys.stderr)
-        return
-
-    files: list[Path] = []
-    for path_str in args:
-        p = Path(path_str)
-        if not p.exists():
-            print(f'skip: {p} not found', file=sys.stderr)
-        elif p.is_dir():
-            if recursive:
-                files.extend(sorted(p.rglob('*.md')))
-            else:
-                print(f'skip: {p} is a directory (use -r to recurse)', file=sys.stderr)
-        else:
-            files.append(p)
-
-    total_orig = total_result = 0
-    for f in files:
-        orig, res = _process_file(f, inplace)
-        total_orig  += orig
-        total_result += res
-
-    if len(files) > 1:
-        delta = total_orig - total_result
-        pct   = delta / total_orig * 100 if total_orig else 0
-        print(f'total: {total_orig} → {total_result} bytes ({pct:.1f}% saved, {len(files)} files)', file=sys.stderr)
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
