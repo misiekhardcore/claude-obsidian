@@ -46,7 +46,7 @@ obsidian read-canvas path=wiki/canvases/<name>.canvas
 
 - **`from banana`**: (if banana-claude installed) Check `wiki/canvases/.recent-images.txt` first. Fallback: `find` images modified in last 10 min. Show 5 most recent if none found. Prompt user to confirm additions.
 
-All operations report position and zone. Node templates: `references/node-templates.md`.
+All operations report position and zone. Node templates: `_shared/canvas-node-templates.md`.
 
 ## Implementation Details
 
