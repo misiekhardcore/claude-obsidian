@@ -1,19 +1,19 @@
 {
-      "name": "agents-memo",
+  "name": "agents-memo",
   "owner": {
     "name": "Michał Konopski",
     "email": "misiekhardcore@gmail.com"
   },
   "metadata": {
     "description": "agents-memo: Obsidian based, agents knowledge memory. Sets up a persistent, compounding wiki vault with LLM-assisted ingestion, research, and retrieval. Covers memory management, session notetaking, knowledge organization, and agent context across projects.",
-    "version": "2.0.0"
+    "version": "2.1.0"
   },
   "plugins": [
     {
-  "name": "agents-memo",
+      "name": "agents-memo",
       "source": "./",
       "description": "Obsidian based, agents knowledge memory. Sets up a persistent, compounding wiki vault with LLM-assisted ingestion, research, and retrieval. Covers memory management, session notetaking, knowledge organization, and agent context across projects.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Michał Konopski",
         "url": "https://github.com/misiekhardcore"
