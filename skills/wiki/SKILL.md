@@ -10,7 +10,7 @@ Build and maintain persistent, compounding wiki in Obsidian vault. Wiki is produ
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Architecture
 - **Truth**: Directory map, page-type table, and semantics in `_shared/vault-structure.md`.
@@ -19,7 +19,7 @@ Build and maintain persistent, compounding wiki in Obsidian vault. Wiki is produ
 - **Sources**: `.raw/` folders are hidden and immutable.
 
 ## Hot Cache
-`wiki/hot.md`: ~500-word summary of recent context. Protocol in `_shared/hot-cache-protocol.md`.
+`wiki/hot.md`: ~500-word summary of recent context. Protocol in `Skill("hot-cache-protocol")`.
 
 ## Operations Routing
 Route user requests to the correct sub-skill:

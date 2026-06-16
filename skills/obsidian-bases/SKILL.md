@@ -9,7 +9,7 @@ Obsidian Bases: turn vault notes into queryable views (tables, cards, lists, map
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## File Format
 

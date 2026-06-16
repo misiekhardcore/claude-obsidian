@@ -2,7 +2,7 @@
 
 **Scope.** Authoritative reference for the Obsidian CLI mechanics: invocation, full verb table with output formats, exit codes, `content=` escape rules, canvas handling, and the re-spike procedure. All behaviors verified by `scripts/cli-spike.sh` (results in `tests/spike-results/`).
 
-For skill-author operational patterns (when/why to call each verb, slugging, indexing, hot-cache protocol, active enforcement, canonical bypass list) see `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md`.
+For skill-author operational patterns (when/why to call each verb, slugging, indexing, hot-cache protocol, active enforcement, canonical bypass list) invoke `Skill("vault-ops")`.
 
 Read on demand.
 
@@ -484,7 +484,7 @@ CLI requires Obsidian running; cron context fails at pre-flight (exit 3). See is
 
 ## 5. Documented exceptions
 
-For the canonical list of paths where direct `Read` / `Write` / `Edit` on vault files is permitted because the CLI cannot serve the operation, see `vault-ops.md §5`. That list (binary files, canvas, JSON admin artifacts, `.raw/**` reads) is enforced by `hooks/block-direct-vault-io.sh`.
+For the canonical list of paths where direct `Read` / `Write` / `Edit` on vault files is permitted because the CLI cannot serve the operation, see `Skill("vault-ops")`. That list (binary files, canvas, JSON admin artifacts, `.raw/**` reads) is enforced by `hooks/block-direct-vault-io.sh`.
 
 Non-vault exceptions still relevant to the CLI:
 

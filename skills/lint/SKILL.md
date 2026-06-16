@@ -9,7 +9,7 @@ Health check after every 10-15 ingests or weekly. Finds orphans, dead links, fro
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Scan Scope
 
@@ -51,4 +51,4 @@ Show report first; ask "Auto-fix or review each?" Safe: missing frontmatter, stu
 
 ## After Lint & Report Rotation
 
-If auto-fixes modified pages: update hot.md per `_shared/hot-cache-protocol.md`. Prune old artifacts: `bash $CLAUDE_PLUGIN_ROOT/scripts/prune-lint-reports.sh` (keeps 3 most recent).
+If auto-fixes modified pages: update hot.md per `Skill("hot-cache-protocol")`. Prune old artifacts: `bash $CLAUDE_PLUGIN_ROOT/scripts/prune-lint-reports.sh` (keeps 3 most recent).

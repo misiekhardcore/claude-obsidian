@@ -15,4 +15,4 @@ General coding, build, or test work in the current repo. Do not read the vault f
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).

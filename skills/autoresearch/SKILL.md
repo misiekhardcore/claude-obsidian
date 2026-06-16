@@ -10,11 +10,11 @@ Run iterative web searches on a topic, synthesize findings, and file everything 
 
 ## Before Starting
 
-Read `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` for research objectives, confidence scoring rules, loop constraints, and domain-specific preferences.
+Read `Skill("research-program")` for research objectives, confidence scoring rules, loop constraints, and domain-specific preferences.
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Agent dispatch overview
 
@@ -113,7 +113,7 @@ See `references/page-schemas.md` for full synthesis and trail templates. Key rul
    - Trail: [[Trail: Topic (YYYY-MM-DD)]]
    - Key finding: [one sentence]
    ```
-3. Update `wiki/hot.md` with the research summary. For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+3. Update `wiki/hot.md` with the research summary. For the full hot-cache protocol (when to read, when to update, sub-agent discipline), see `Skill("hot-cache-protocol")`.
 
 ## Report to User
 
@@ -132,4 +132,4 @@ Open questions filed: N
 
 ## Constraints
 
-Follow limits in `${CLAUDE_PLUGIN_ROOT}/_shared/research-program.md` (max rounds, max pages, confidence scoring, source preference). Respect constraints over completeness; note gaps in Open Questions section.
+Follow limits in `Skill("research-program")` (max rounds, max pages, confidence scoring, source preference). Respect constraints over completeness; note gaps in Open Questions section.

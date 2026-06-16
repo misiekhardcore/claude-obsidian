@@ -9,7 +9,7 @@ Visual layer of the wiki. Add images, text cards, PDFs, wiki pages to infinite v
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md). `Write` here is permitted only for the bypass paths (`*.canvas`, `_attachments/**`); all other vault writes must use the `obsidian` CLI via Bash (hook-enforced).
+[Instructions on how to interact with the vault](Skill("vault-ops")). `Write` here is permitted only for the bypass paths (`*.canvas`, `_attachments/**`); all other vault writes must use the `obsidian` CLI via Bash (hook-enforced).
 
 ## Operations
 
