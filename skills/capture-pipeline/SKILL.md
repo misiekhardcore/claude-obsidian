@@ -1,3 +1,8 @@
+---
+name: capture-pipeline
+description: Capture pipeline contract — vault path resolution, frontmatter schema, slug rules, MATCH/NEW heuristic, attachment handling, index patching.
+user-invocable: false
+---
 # Capture Pipeline
 
 Stable contract for capture surfaces: `/note`, `/daily`, `/braindump`. Section headings are **stable anchors** — do not reorder.
@@ -100,7 +105,7 @@ Append to existing file with `---` separator. If new content broadens scope, rew
 
 ## 5. Attachment handling
 
-See `_shared/image-capture.md` for validation, vision-LLM, move mechanics, embed syntax, and error handling.
+See `Skill("image-capture")` for validation, vision-LLM, move mechanics, embed syntax, and error handling.
 
 ## 6. Index patching (notes/index.md)
 

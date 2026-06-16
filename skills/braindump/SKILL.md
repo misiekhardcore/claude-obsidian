@@ -6,24 +6,24 @@ allowed-tools: Agent Bash Read
 ---
 # braindump
 
-Split long-form text into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`. All vault writes flow through the CAPTURE pipeline (`_shared/capture-pipeline.md`). The `Read` tool is used only for non-vault input file ingestion.
+Split long-form text into atomic thoughts. Chunks land in `notes/` for later triage via `/note process`. All vault writes flow through the CAPTURE pipeline (`Skill("capture-pipeline")`). The `Read` tool is used only for non-vault input file ingestion.
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Image routing
 
-If any image paths are present: read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md` before parsing.
+If any image paths are present: invoke `Skill("image-capture")` before parsing.
 
 ## Vault path & input parsing
 
-Vault path: See [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort if unconfigured: `No vault configured — run /wiki init first.`
+Vault path: See `Skill("capture-pipeline")` §1. Abort if unconfigured: `No vault configured — run /wiki init first.`
 
 Input: space-separated text snippets and/or file paths.
 - Empty → abort: `/braindump requires text or a file path.`
 - Paths: absolute (starts `/`) or vault-relative. Dirs excluded. Unsupported types → abort.
-- Image paths in args → read `_shared/image-capture.md` first.
+- Image paths in args → invoke `Skill("image-capture")` first.
 - Unresolvable args treated as inline text (no error).
 
 ## Split — atomic-thought rubric
@@ -51,9 +51,9 @@ Order matters for numbered lists, narratives, build-on-each-other arguments. Ind
 For each chunk in order, re-enumerate `<vault_root>/notes/*.md` fresh (so chunk K can MATCH-append
 to a note written by chunk K-1). Then:
 
-1. MATCH/NEW per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template) — skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
-2. MATCH or NEW path per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template); slug via [§3](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven).
-3. Index patch per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
+1. MATCH/NEW per `Skill("capture-pipeline")` §4 — skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
+2. MATCH or NEW path per `Skill("capture-pipeline")` §4; slug via `Skill("capture-pipeline")` §3.
+3. Index patch per `Skill("capture-pipeline")` §6.
 4. Record filename + success/failure. On error: append to failure list, continue — never abort the loop.
 
 ### Agent fan-out (parallel)
@@ -80,7 +80,7 @@ Wait for all agents to complete. Collect their `Filed:` / `Appended:` / `Error:`
 ```
 Agents do not patch the index; the orchestrator owns that write.
 
-`source_project` = `basename(cwd)`. Frontmatter: note shape from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily), no braindump provenance.
+`source_project` = `basename(cwd)`. Frontmatter: note shape from `Skill("capture-pipeline")` §2, no braindump provenance.
 
 ## Confirmation output
 

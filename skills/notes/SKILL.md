@@ -10,11 +10,11 @@ Capture raw thoughts verbatim in `notes/` without interrupting work. Triage late
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Vault path
 
-See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Always write to `<vault_root>/notes/` regardless of CWD. If no vault is configured, abort with `No vault configured — run /wiki init first.`
+See `Skill("capture-pipeline")` §1 for vault path resolution. Always write to `<vault_root>/notes/` regardless of CWD. If no vault is configured, abort with `No vault configured — run /wiki init first.`
 
 ## Operations
 
@@ -34,7 +34,7 @@ Steps:
 
 1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, capture everything after the trigger phrase as a single raw argument string. Scan it non-destructively for image-path tokens (any token that resolves to a path or carries a supported image extension) and URL tokens. Treat all remaining non-path, non-URL tokens as a single verbatim text segment — joined in their original order with single spaces. Preserve the relative order of text, paths, and URLs as they appeared in the input.
 
-2. **Image routing.** If any image paths are present → read `${CLAUDE_PLUGIN_ROOT}/_shared/image-capture.md`. Follow that file for the full image-input path; skip steps 3–4 below.
+2. **Image routing.** If any image paths are present → invoke `Skill("image-capture")`. Follow that skill for the full image-input path; skip steps 3–4 below.
 
 3. **URL detection (text-only, no images).** If the argument is a single URL:
    - Prompt exactly once: `Detected URL: <url>. Ingest via /ingest? [y/n]`
@@ -44,13 +44,13 @@ Steps:
 
 4. **Extract text for MATCH/NEW.** Everything after the trigger phrase, verbatim — no rewriting, no summarising.
 
-5. **Resolve** `<vault_root>` per [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`. If `<vault_root>/notes/` does not exist, create the directory and initialise `notes/index.md` from `_seed/notes/index.md`.
+5. **Resolve** `<vault_root>` per `Skill("capture-pipeline")` §1. Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`. If `<vault_root>/notes/` does not exist, create the directory and initialise `notes/index.md` from `_seed/notes/index.md`.
 
-6. **Enumerate** existing notes and decide MATCH or NEW per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template). Skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
+6. **Enumerate** existing notes and decide MATCH or NEW per `Skill("capture-pipeline")` §4. Skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
 
-7. **MATCH or NEW path** per [§4](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#4-matchnew-heuristic-incl-prompt-template). Slug via [§3](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#3-slug-rule-title-driven). Frontmatter from [§2](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily); body is verbatim text.
+7. **MATCH or NEW path** per `Skill("capture-pipeline")` §4. Slug via `Skill("capture-pipeline")` §3. Frontmatter from `Skill("capture-pipeline")` §2; body is verbatim text.
 
-8. **Update `notes/index.md`** per [§6](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd).
+8. **Update `notes/index.md`** per `Skill("capture-pipeline")` §6.
 
 9. **Confirm** with one terse line:
    - NEW: `Captured to notes/YYYY-MM-DD-<slug>.md`
@@ -109,13 +109,13 @@ Walk pending notes one-at-a-time. Route to `/save`, defer, or delete.
 
 ## Frontmatter schema
 
-See [§2 Frontmatter schema — note shape](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#2-frontmatter-schema-note--daily).
+See `Skill("capture-pipeline")` §2 for the note frontmatter schema.
 
 The body is the user's verbatim text. No headings, no metadata in the body. On MATCH-append, the separator is a blank line + `---` + blank line, then the new verbatim chunk.
 
 ## `notes/index.md`
 
-See [§6 Index patching](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#6-index-patching-notesindexmd). Canonical template lives at `_seed/notes/index.md` (copied during `/wiki init`).
+See `Skill("capture-pipeline")` §6 for index patching. Canonical template lives at `_seed/notes/index.md` (copied during `/wiki init`).
 
 ## Examples
 

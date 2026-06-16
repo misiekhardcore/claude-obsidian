@@ -1,3 +1,8 @@
+---
+name: hot-cache-protocol
+description: Hot cache protocol — when to read/update wiki/hot.md, auto-read gating, format, parallel worker discipline.
+user-invocable: false
+---
 # Hot Cache Protocol
 
 `wiki/hot.md` is a ~500-word recency cache for session context restoration.

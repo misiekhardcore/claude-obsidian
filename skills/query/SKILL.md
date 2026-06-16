@@ -10,7 +10,7 @@ Wiki has synthesis work done. Read strategically, answer precisely, file answers
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Query Modes
 
@@ -105,7 +105,7 @@ Read the minimum needed:
 
 If hot.md has the answer, respond without reading further.
 
-For the full hot-cache protocol (when it is written, what it contains, and sub-agent rules), see `${CLAUDE_PLUGIN_ROOT}/_shared/hot-cache-protocol.md`.
+For the full hot-cache protocol (when it is written, what it contains, and sub-agent rules), see `Skill("hot-cache-protocol")`.
 
 ## Index Format Reference
 

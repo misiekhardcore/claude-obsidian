@@ -9,11 +9,11 @@ Synthesize `daily/YYYY-MM-DD.md` into prose summary with optional follow-ups. Re
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 ## Vault path
 
-See [§1 Vault path resolution](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). If no vault is configured, abort with:
+See `Skill("capture-pipeline")` §1 for vault path resolution. If no vault is configured, abort with:
 
 ```text
 No vault configured — run /wiki init first.
@@ -21,7 +21,7 @@ No vault configured — run /wiki init first.
 
 ## Pipeline
 
-1. **Resolve vault** [§1](${CLAUDE_PLUGIN_ROOT}/_shared/capture-pipeline.md#1-vault-path-resolution). Abort if unconfigured.
+1. **Resolve vault** per `Skill("capture-pipeline")` §1. Abort if unconfigured.
 2. **Parse date** (no arg = today, validate `YYYY-MM-DD`, reject future dates).
 3. **Read daily file** `obsidian read path=daily/YYYY-MM-DD.md`. Abort if missing (no auto-create).
 4. **Scan for content**: count `## Captures` bullets. If zero, list pending notes via `obsidian files dir=notes format=json`; list wiki page candidates via `obsidian files dir=wiki format=json` (returns `{"path": "..."}` only — no frontmatter), then per candidate run `obsidian properties path=<file>` and keep only those whose `created:` or `updated:` value matches the date. Abort if nothing remains.

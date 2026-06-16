@@ -1,3 +1,8 @@
+---
+name: research-program
+description: Research program specification — search objectives, confidence scoring, constraints, style, source trust.
+user-invocable: false
+---
 # Research Program Specification
 
 Standard configuration for the `autoresearch` loop. Read before every run.

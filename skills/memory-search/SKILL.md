@@ -11,7 +11,7 @@ Quick vault lookups using obsidian CLI. For full synthesis with filing-back, use
 
 ## Vault I/O
 
-[Instructions on how to interact with the vault](${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md).
+[Instructions on how to interact with the vault](Skill("vault-ops")).
 
 All vault reads use `scripts/obsidian-cli.sh` — never grep, never direct file tools.
 
@@ -52,5 +52,5 @@ All vault reads use `scripts/obsidian-cli.sh` — never grep, never direct file 
 
 ## Reference
 
-- `${CLAUDE_PLUGIN_ROOT}/_shared/vault-ops.md` — vault I/O protocol
+- `Skill("vault-ops")` — vault I/O protocol
 - `scripts/obsidian-cli.sh` — CLI wrapper for all vault reads

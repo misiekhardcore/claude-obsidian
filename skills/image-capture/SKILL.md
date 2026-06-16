@@ -1,3 +1,8 @@
+---
+name: image-capture
+description: Image capture mechanics — validation, attachment directory, vision-LLM, move/naming, embed syntax, frontmatter field.
+user-invocable: false
+---
 # Image Capture — Common Mechanics
 
 Common contract for all capture skills accepting images.
@@ -20,7 +25,7 @@ Abort on any error. No vision-LLM call, no file move occurs in either error case
 
 ## Attachment directory
 
-1. Resolve `<vault_root>` per capture-pipeline.md §1
+1. Resolve `<vault_root>` per `Skill("capture-pipeline")` §1
 2. Ensure `<vault_root>/_attachments/` exists; create silently if absent
 
 For `/braindump`: create once before CAPTURE loop, not per chunk.
@@ -60,7 +65,7 @@ attachments: ["filename1.png", "filename2.png"]
 ## MATCH path with images
 
 1. Reuse initial vision description (no re-invoke)
-2. Append after `---` separator per capture-pipeline.md §4 MATCH
+2. Append after `---` separator per `Skill("capture-pipeline")` §4 MATCH
 3. Move to `_attachments/` with existing slug + collision indices
 4. Extend existing `attachments:` list
 5. Keep `title:` unless new content broadens scope (if so, rewrite to union; slug unchanged)
