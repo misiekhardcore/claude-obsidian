@@ -2,25 +2,48 @@
 
 All operations report position and zone.
 
-### `add image [path|url]`
-- URL → `curl -sL` to `_attachments/images/canvas/[filename]`
-- Local path → `cp` to `_attachments/images/canvas/`
-- Vault-relative → use as-is
-- Detect aspect ratio via PIL or `identify`
+## Text Node
 
-### `add text [content]`
-- Width 300, height 120, color 4
-- Content is raw text
+```json
+{
+  "id": "text-[timestamp]",
+  "type": "text",
+  "text": "[content]",
+  "x": [auto], "y": [auto],
+  "width": 300, "height": 120,
+  "color": "4"
+}
+```
 
-### `add pdf [path]`
-- Copy to `_attachments/pdfs/canvas/` if outside vault
-- Fixed size 400×520
+## File Node (wiki page)
 
-### `add note [page]`
-- Search `wiki/` for case-insensitive partial match
-- File node 300×100, no color
+```json
+{
+  "id": "note-[timestamp]",
+  "type": "file",
+  "file": "wiki/concepts/example.md",
+  "x": [auto], "y": [auto],
+  "width": 300, "height": 100
+}
+```
 
-### `zone [name] [color]`
-- Group node at max_y + 60 (or 280 if empty)
-- Width 1000, height 400
-- Colors: `"1"`=red, `"2"`=orange, `"3"`=yellow, `"4"`=green, `"5"`=cyan, `"6"`=purple
+## Group/Zone Node
+
+```json
+{
+  "id": "zone-[slug]",
+  "type": "group",
+  "label": "[name]",
+  "x": -400,
+  "y": [max_y],
+  "width": 1000,
+  "height": 400,
+  "color": "[color or '3']"
+}
+```
+
+Colors: `"1"`=red, `"2"`=orange, `"3"`=yellow, `"4"`=green, `"5"`=cyan, `"6"`=purple.
+
+## Image/PDF Nodes
+
+Follow the same JSON pattern as text nodes. Images: width/height per aspect ratio (see `_shared/canvas-spec.md`). PDFs: fixed 400×520.
