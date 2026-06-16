@@ -65,6 +65,6 @@ After research is complete, create these pages:
 
 ## Page Schemas
 
-See `references/page-schemas.md` for full synthesis and trail templates. Key rules:
+See `${CLAUDE_PLUGIN_ROOT}/_shared/autoresearch-page-schemas.md` for full synthesis and trail templates. Key rules:
 - **Synthesis pages**: one `type: synthesis`, `related:` lists all created pages, sections include Overview, Key Findings, Entities, Concepts, Contradictions, Open Questions, Sources.
 - **Trail pages**: one `type: trail`, `status: mature`, `confidence: EXTRACTED`, body is **exactly one** ordered list with one wikilink + annotation per item (no URLs, no extra wikilinks in annotations).

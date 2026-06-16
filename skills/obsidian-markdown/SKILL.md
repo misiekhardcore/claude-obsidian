@@ -6,7 +6,7 @@ allowed-tools: Read
 ---
 # obsidian-markdown
 
-Reference for Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, math. Check `references/syntax-tables.md` for full syntax tables.
+Reference for Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, math. Check `${CLAUDE_PLUGIN_ROOT}/_shared/obsidian-markdown-syntax-tables.md` for full syntax tables.
 
 ## Quick Reference
 

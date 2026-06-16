@@ -14,8 +14,8 @@ Health check for wiki orphans, dead links, frontmatter gaps. Ask before auto-fix
 - Output: Report at `wiki/meta/lint-report-YYYY-MM-DD.md`.
 
 ## Process
-1. **Scan**: `cd "${VAULT_ROOT}" && pwd && bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"` → produces `wiki/meta/lint-data-YYYY-MM-DD.json`. Scope per `references/scan-scope.md`.
-2. **Audit**: Dispatch `agents/lint.md` with `vault_path=$VAULT_ROOT` and `scope="full"`. Agent runs 16 checks (#1–#2, #6–#16) per `references/checks.md` and drafts report.
+1. **Scan**: `cd "${VAULT_ROOT}" && pwd && bash "${CLAUDE_PLUGIN_ROOT}/scripts/lint-scan.sh"` → produces `wiki/meta/lint-data-YYYY-MM-DD.json`. Scope per `${CLAUDE_PLUGIN_ROOT}/_shared/lint-scan-scope.md`.
+2. **Audit**: Dispatch `agents/lint.md` with `vault_path=$VAULT_ROOT` and `scope="full"`. Agent runs 16 checks (#1–#2, #6–#16) per `${CLAUDE_PLUGIN_ROOT}/_shared/lint-checks.md` and drafts report.
 3. **Review**: Present report (summary + per-section findings) to user. Ask "Auto-fix or review each?" before applying changes.
 4. **Rotate**: `bash $CLAUDE_PLUGIN_ROOT/scripts/prune-lint-reports.sh` to keep 3 most recent.
 5. **Maintain**: If auto-fixes modified pages, update `wiki/hot.md` per `_shared/hot-cache-protocol.md`.
@@ -23,4 +23,4 @@ Health check for wiki orphans, dead links, frontmatter gaps. Ask before auto-fix
 ## Rules
 - Show report before any auto-fix. Safe to auto: checks #1, #2, #6, #9, #10. Review first: deletions, contradictions, merges. Never auto-fix trail integrity (#16).
 - If auto-fixes modified pages, update hot.md.
-- See `references/checks.md` for per-check detail + auto-fix policy, `references/scan-scope.md` for scanned/excluded folders, `references/conventions.md` for style rules.
+- See `${CLAUDE_PLUGIN_ROOT}/_shared/lint-checks.md` for per-check detail + auto-fix policy, `${CLAUDE_PLUGIN_ROOT}/_shared/lint-scan-scope.md` for scanned/excluded folders, `${CLAUDE_PLUGIN_ROOT}/_shared/lint-conventions.md` for style rules.
