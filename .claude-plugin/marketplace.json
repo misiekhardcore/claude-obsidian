@@ -5,14 +5,14 @@
     "email": "misiekhardcore@gmail.com"
   },
   "metadata": {
-    "description": "agents-memo: Personal knowledge vault with LLM-assisted ingestion, research, and retrieval by Michał Konopski",
+    "description": "agents-memo: Personal knowledge memory with LLM-assisted ingestion, research, and retrieval by Michał Konopski",
     "version": "2.0.0"
   },
   "plugins": [
     {
   "name": "agents-memo",
       "source": "./",
-      "description": "Personal knowledge vault. Sets up a persistent, compounding wiki vault with LLM-assisted ingestion, research, and retrieval.",
+      "description": "Personal knowledge memory. Sets up a persistent, compounding wiki memory with LLM-assisted ingestion, research, and retrieval.",
       "version": "2.0.0",
       "author": {
         "name": "Michał Konopski",

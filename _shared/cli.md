@@ -26,7 +26,7 @@ See `${CLAUDE_PLUGIN_ROOT}/_shared/cli-reference.md` for full exit-code table an
 
 ## 3. Verb reference
 
-The upstream CLI always exits 0; the wrapper normalizes exit codes per §2. Verbs marked with  are **wrapper-only** (synthesized by `scripts/obsidian-cli.sh`).
+The upstream CLI always exits 0; the wrapper normalizes exit codes per §2.
 
 ### 3.1 Verb table (grouped by category)
 
