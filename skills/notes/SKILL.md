@@ -1,203 +1,27 @@
 ---
 name: notes
 description: Capture quick inbox notes without breaking flow. Verbatim, auto-match, per-project filtering, list/triage.
-when_to_use: Use for quick verbatim capture (`/note <text>`), listing pending inbox notes (`/note list`), or triaging the inbox (`/note process`).
+when_to_use: "/note <text>" for quick capture, "/note list" to view inbox, "/note process" to triage.
+model: sonnet
+effort: medium
+user-invocable: true
+argument-hint: "[text | list | process]"
 allowed-tools: Bash Read
 ---
-# notes
+Capture raw thoughts verbatim in `notes/` without interrupting work. Wiki is polished; notes/ is inbox.
 
-Capture raw thoughts verbatim in `notes/` without interrupting work. Triage later. Wiki is polished; notes/ is inbox. `/save` files synthesis; `/note` files raw thoughts.
+## I/O
+- Input: `/note <text>`, `/note list`, `/note process` commands.
+- Output: Capture → `<vault>/notes/<slug>.md`. List → rendered bullets. Process → triaged notes.
 
-## Vault I/O
+## Process
+1. **CAPTURE**: Extract text → enumerate existing notes → MATCH/NEW per `_shared/capture-pipeline.md` §4 → write with frontmatter per §2 → patch index per §6. See `references/capture.md`.
+2. **LIST**: Read frontmatter from all `notes/*.md` via `obsidian properties`. Render pending/deferred bullets reverse-chronologically. Support `--project=<name>` filter. See `references/list.md`.
+3. **PROCESS**: Walk pending notes oldest-first. Per note: [s]ave (invoke save skill, delete), [d]efer (patch status to deferred), [x]delete, [q]uit. Summary on exit. See `references/process.md`.
 
-[Instructions on how to interact with the vault](Skill("vault-ops")).
-
-## Vault path
-
-See `Skill("capture-pipeline")` §1 for vault path resolution. Always write to `<vault_root>/notes/` regardless of CWD. If no vault is configured, abort with `No vault configured — run /wiki init first.`
-
-## Operations
-
-|User says|Operation|Handled by|
-|-|-|-|
-|`/note <text>`, `/dump <text>`, "note this …", "remember this for later", "add to inbox …", "todo: …"|CAPTURE|this skill|
-|`/note list`, "show my inbox", "what's in notes"|LIST|this skill|
-|`/note process`, "process my notes", "triage the inbox"|PROCESS|this skill|
-
-Capture, list, and process do not prompt for tags, types, or confirmations beyond the per-note action prompt in PROCESS.
-
-## CAPTURE Operation
-
-Goal: persist the user's verbatim text with minimal metadata. No conversation context, no auto-tagging, no questions.
-
-Steps:
-
-1. **Extract arguments** from the user's message. For `/note <args>` and `/dump <args>`, capture everything after the trigger phrase as a single raw argument string. Scan it non-destructively for image-path tokens (any token that resolves to a path or carries a supported image extension) and URL tokens. Treat all remaining non-path, non-URL tokens as a single verbatim text segment — joined in their original order with single spaces. Preserve the relative order of text, paths, and URLs as they appeared in the input.
-
-2. **Image routing.** If any image paths are present → invoke `Skill("image-capture")`. Follow that skill for the full image-input path; skip steps 3–4 below.
-
-3. **URL detection (text-only, no images).** If the argument is a single URL:
-   - Prompt exactly once: `Detected URL: <url>. Ingest via /ingest? [y/n]`
-   - Read one response only. Treat case-insensitive `y` or `yes` as consent. Treat any other response (including `n`, `no`, empty input, or arbitrary text) as "no". Do not re-prompt.
-   - If consent → invoke `/ingest`. On success: `Ingested via /ingest: <wiki-page>`. Exit.
-   - Otherwise → proceed, treating the URL as verbatim text.
-
-4. **Extract text for MATCH/NEW.** Everything after the trigger phrase, verbatim — no rewriting, no summarising.
-
-5. **Resolve** `<vault_root>` per `Skill("capture-pipeline")` §1. Compute today's date as `YYYY-MM-DD`. Compute `source_project = basename(cwd)`. If `<vault_root>/notes/` does not exist, create the directory and initialise `notes/index.md` from `_seed/notes/index.md`.
-
-6. **Enumerate** existing notes and decide MATCH or NEW per `Skill("capture-pipeline")` §4. Skip `notes/index.md` and `status: deferred`; cap at 20 most recent.
-
-7. **MATCH or NEW path** per `Skill("capture-pipeline")` §4. Slug via `Skill("capture-pipeline")` §3. Frontmatter from `Skill("capture-pipeline")` §2; body is verbatim text.
-
-8. **Update `notes/index.md`** per `Skill("capture-pipeline")` §6.
-
-9. **Confirm** with one terse line:
-   - NEW: `Captured to notes/YYYY-MM-DD-<slug>.md`
-   - MATCH: `Appended to notes/YYYY-MM-DD-<slug>.md`
-
-Do **not** print the diff, the match reasoning, or attachment details.
-
-## LIST Operation
-
-1. Read frontmatter from all `notes/*.md` (skip index). Call `obsidian properties path=notes/<filename>`. Sort by `updated` descending.
-2. Render reverse-chronological bullets:
-
-   ```text
-   Pending notes (N):
-
-   - [ ] YYYY-MM-DD [source_project] title
-   - [ ] YYYY-MM-DD [source_project] title
-
-   Deferred (M):
-
-   - [~] YYYY-MM-DD [source_project] title
-   ```
-
-   Glyphs: `[ ]` pending, `[~]` deferred. Always include both sections; show `(none)` under a section that's empty.
-
-4. **Filter `--project=<basename>`** — when present, only show notes whose `source_project` matches. Honour the same flag in natural-language form (`"show my inbox for claude-obsidian"`).
-
-`/note list` includes pending + deferred. `/note process` iterates pending only by default; pass `--include-deferred` to walk both.
-
-## PROCESS Operation
-
-Walk pending notes one-at-a-time. Route to `/save`, defer, or delete.
-
-1. Enumerate pending notes (skip `status: deferred` unless `--include-deferred`). Sort by `updated` ascending — oldest first. If there are no notes to process, print `Inbox is empty.` and exit.
-2. For each note, read full frontmatter + body and display:
-
-   ```text
-   [N/total] YYYY-MM-DD [source_project]
-   title: <title>
-   body:
-   > <verbatim body, indented as a blockquote>
-
-   Action? [s]ave / [d]efer / [x]delete / [q]uit
-   ```
-
-3. Wait for single-letter action. Loop on invalid input.
-4. **`s` (save)** — invoke `save` skill via Skill tool with note body, frontmatter, explicit name so name-prompt is pre-satisfied. On success:
-   - Delete `<vault_root>/notes/<filename>`.
-   - Remove the corresponding row from `notes/index.md`. On `/save` failure, leave the note untouched and surface the error.
-5. **`d` (defer)** — patch the note's frontmatter: `status: deferred`, bump `updated:` to today. Move the row in `notes/index.md` from `## Pending` to `## Deferred`.
-6. **`x` (delete)** — delete the file unconditionally. Remove the corresponding row from `notes/index.md`.
-7. **`q` (quit)** — exit. Remaining notes stay pending.
-8. Print one-line summary: `Processed N notes: X saved, Y deferred, Z deleted.`
-
-/save is primary off-ramp. Defer for future-actionable notes. Delete for noise.
-
-## Frontmatter schema
-
-See `Skill("capture-pipeline")` §2 for the note frontmatter schema.
-
-The body is the user's verbatim text. No headings, no metadata in the body. On MATCH-append, the separator is a blank line + `---` + blank line, then the new verbatim chunk.
-
-## `notes/index.md`
-
-See `Skill("capture-pipeline")` §6 for index patching. Canonical template lives at `_seed/notes/index.md` (copied during `/wiki init`).
-
-## Examples
-
-**Capture (NEW):**
-
-```text
-user> /note inbox count missing from /wiki status
-assistant> Captured to notes/2026-04-25-inbox-count-missing-from-wiki-status.md
-```
-
-**Capture (NEW, filler stripped from title):**
-
-```text
-user> /note we need to check why claude-workflow is not using 'wt' for worktrees but the git cli directly
-# title summarised to "claude-workflow uses git CLI instead of wt for worktrees"
-# slug exceeds 40 chars; truncated at last `-` before char 40
-assistant> Captured to notes/2026-04-26-claude-workflow-uses-git-cli-instead.md
-```
-
-**Capture (MATCH-append, scope unchanged):**
-
-```text
-user> note this: still seeing the same flaky behaviour on macOS
-assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
-```
-
-**Capture (MATCH-append with title rewrite):**
-
-```text
-user> /dump same issue now reproduces on Linux too
-# existing note title was "flaky macOS runner"; new content broadens scope
-assistant> Appended to notes/2026-04-22-flaky-macos-runner.md
-# title rewritten to "flaky CI runner (macOS + Linux)", filename unchanged
-```
-
-**List, filtered:**
-
-```text
-user> /note list --project=claude-obsidian
-assistant>
-Pending notes (2):
-
-- [ ] 2026-04-25 [claude-obsidian] /note process should reuse confidence threshold
-- [ ] 2026-04-24 [claude-obsidian] inbox count missing from /wiki status
-
-Deferred (1):
-
-- [~] 2026-04-12 [claude-obsidian] consider auto-tagging from CWD remote name
-```
-
-**Process:**
-
-```text
-user> /note process
-assistant>
-[1/3] 2026-04-25 [claude-obsidian]
-title: /note process should reuse confidence threshold from save
-body:
-> /note process should reuse confidence threshold from save
-
-Action? [s]ave / [d]efer / [x]delete / [q]uit
-user> s
-# /save invoked, wiki page created, note removed from notes/
-assistant> Saved as [[Confidence threshold reuse]] in wiki/concepts/. Note deleted.
-```
-
-**URL redirect (yes):**
-
-```text
-user> /note https://example.com/article
-assistant> Detected URL: https://example.com/article. Ingest via /ingest? [y/n]
-user> y
-# /ingest invoked, wiki page created, URL processed
-assistant> Ingested via /ingest: [[Article Title]]
-```
-
-**URL redirect (no):**
-
-```text
-user> /note https://example.com/article
-assistant> Detected URL: https://example.com/article. Ingest via /ingest? [y/n]
-user> n
-# standard CAPTURE proceeds, URL captured as text
-assistant> Captured to notes/2026-04-27-example-article-url.md
-```
+## Rules
+- Body is user's verbatim text. No headings, no metadata in body.
+- On MATCH-append, separator is blank line + `---` + blank line.
+- No tags/types/confirmations beyond the PROCESS action prompt.
+- Single URL in capture → offer `/ingest` redirect.
+- See `references/examples.md` for end-to-end examples of all subcommands.
